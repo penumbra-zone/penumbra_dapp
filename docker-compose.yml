@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  penumbra_dapp_frontend:
+    image: penumbra_dapp:latest    
+    ports:
+      - 9012:9012
+    volumes:
+      - ./:/penumbra_dapp_frontend
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    restart: always
