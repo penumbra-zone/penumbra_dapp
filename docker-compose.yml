@@ -8,6 +8,4 @@ services:
       - 9012:9012
     volumes:
       - ./:/penumbra_frontend
-    env_file:
-      - .env
     restart: always
