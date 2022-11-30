@@ -5,6 +5,7 @@ import { Tabs } from './components/Tab';
 import { Descriptions } from './Descriptions';
 import img from './assets/img/logo.png';
 import { Status } from './Status';
+import { Notes } from './Notes';
 
 declare global {
   interface Window {
@@ -68,6 +69,77 @@ function App() {
                   />
                 ) : (
                   <Status />
+                )
+              }
+            />
+          </div>
+          <div className="p-[12px] border-[1px] border-solid border-dark_grey rounded-[15px] mt-[10px]">
+            <Tabs
+              tabs={['Description', 'Request']}
+              children={(type: string) =>
+                type === 'Description' ? (
+                  <Descriptions
+                    desc="Queries for notes that have been accepted by the core.chain.v1alpha1."
+                    type="Notes"
+                    requestFields={[
+                      {
+                        type: 'penumbra.core.crypto.v1alpha1.AccountID account_id = 1;',
+                        desc: '// Identifies the FVK for the notes to query.',
+                      },
+                      {
+                        type: 'bool include_spent = 2;',
+                        desc: '// If set, return spent notes as well as unspent notes.',
+                      },
+                      {
+                        type: 'penumbra.core.crypto.v1alpha1.AssetId asset_id = 3;',
+                        desc: '// If set, only return notes with the specified asset id.',
+                      },
+                      {
+                        type: 'penumbra.core.crypto.v1alpha1.AddressIndex address_index = 4;',
+                        desc: '// If set, only return notes with the specified address incore.dex.v1alpha1.',
+                      },
+                      {
+                        type: 'uint64 amount_to_spend = 5;',
+                        desc: '// If set, stop returning notes once the total exceeds this amount. gnored if `asset_id` is unset or if `include_spent` is set.',
+                      },
+                    ]}
+                    responseFields={[
+                      {
+                        type: '	penumbra.core.crypto.v1alpha1.NoteCommitment note_commitment = 1;',
+                        desc: '// The note commitment, identifying the note.',
+                      },
+                      {
+                        type: 'penumbra.core.crypto.v1alpha1.Note note = 2;',
+                        desc: '// The note plaintext itself.',
+                      },
+                      {
+                        type: 'penumbra.core.crypto.v1alpha1.AddressIndex address_index = 3;',
+                        desc: "// A precomputed decryption of the note's address incore.dex.v1alpha1.",
+                      },
+                      {
+                        type: 'penumbra.core.crypto.v1alpha1.Nullifier nullifier = 4;',
+                        desc: "// The note's nullifier.",
+                      },
+                      {
+                        type: 'uint64 height_created = 5;',
+                        desc: '// The height at which the note was created.',
+                      },
+                      {
+                        type: 'optional uint64 height_spent = 6;',
+                        desc: '// Records whether the note was spent (and if so, at what height).',
+                      },
+                      {
+                        type: 'uint64 position = 7;',
+                        desc: '// The note position.',
+                      },
+                      {
+                        type: 'penumbra.core.chain.v1alpha1.NoteSource source = 8;',
+                        desc: '// The source of the note (a tx hash or otherwise)',
+                      },
+                    ]}
+                  />
+                ) : (
+                  <Notes />
                 )
               }
             />

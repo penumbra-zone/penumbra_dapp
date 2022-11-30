@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 
 export const Notes = () => {
-  const [res, setRes] = useState([]);
+  const [res, setRes] = useState('');
 
   const getData = async () => {
     const data = await window.penumbra.getNotes();
 
-    setRes(data);
+    setRes(JSON.stringify(data));
   };
 
   useEffect(() => {
@@ -16,9 +16,8 @@ export const Notes = () => {
     };
   }, []);
   return (
-    <div>
-      <p>Notes</p>
-      <p>{JSON.stringify(res)}</p>
+    <div className="w-[100%] flex flex-col bg-brown rounded-[15px] px-[24px] py-[12px] text_body break-words">
+      {res}
     </div>
   );
 };
