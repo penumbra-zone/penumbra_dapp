@@ -6,6 +6,9 @@ import { Descriptions } from './Descriptions';
 import img from './assets/img/logo.png';
 import { Status } from './Status';
 import { Notes } from './Notes';
+import { TransactionHashes } from './TransactionHashes';
+import { Transactions } from './Transactions';
+import { TransactionByHash } from './TransactionByHash';
 
 declare global {
   interface Window {
@@ -194,6 +197,115 @@ function App() {
                   />
                 ) : (
                   <ChainParameters />
+                )
+              }
+            />
+          </div>
+          <div className="p-[12px] border-[1px] border-solid border-dark_grey rounded-[15px] mt-[10px]">
+            <Tabs
+              tabs={['Description', 'Request']}
+              children={(type: string) =>
+                type === 'Description' ? (
+                  <Descriptions
+                    desc="Query for the transaction hashes in the given range of blocks."
+                    type="TransactionHashes"
+                    requestFields={[
+                      {
+                        type: 'optional uint64 start_height = 1;',
+                        desc: '// If present, return only transactions after this height.',
+                      },
+                      {
+                        type: 'optional uint64 end_height = 2;',
+                        desc: '// If present, return only transactions before this height.',
+                      },
+                    ]}
+                    responseFields={[
+                      {
+                        type: 'uint64 block_height = 1;',
+                        desc: '',
+                      },
+                      {
+                        type: 'bytes tx_hash = 2;',
+                        desc: '',
+                      },
+                    ]}
+                  />
+                ) : (
+                  <TransactionHashes />
+                )
+              }
+            />
+          </div>
+          <div className="p-[12px] border-[1px] border-solid border-dark_grey rounded-[15px] mt-[10px]">
+            <Tabs
+              tabs={['Description', 'Request']}
+              children={(type: string) =>
+                type === 'Description' ? (
+                  <Descriptions
+                    desc="Query for the full transactions in the given range of blocks."
+                    type="Transactions"
+                    requestFields={[
+                      {
+                        type: 'optional uint64 start_height = 1;',
+                        desc: '// If present, return only transactions after this height.',
+                      },
+                      {
+                        type: 'optional uint64 end_height = 2;',
+                        desc: '// If present, return only transactions before this height.',
+                      },
+                    ]}
+                    responseFields={[
+                      {
+                        type: 'uint64 block_height = 1;',
+                        desc: '',
+                      },
+                      {
+                        type: 'bytes tx_hash = 2;',
+                        desc: '',
+                      },
+                      {
+                        type: 'penumbra.core.transaction.v1alpha1.Transaction tx = 3;',
+                        desc: '',
+                      },
+                    ]}
+                  />
+                ) : (
+                  <Transactions />
+                )
+              }
+            />
+          </div>
+          <div className="p-[12px] border-[1px] border-solid border-dark_grey rounded-[15px] mt-[10px]">
+            <Tabs
+              tabs={['Description', 'Request']}
+              children={(type: string) =>
+                type === 'Description' ? (
+                  <Descriptions
+                    desc="Query for a given transaction hash."
+                    type="TransactionByHash"
+                    requestFields={[
+                      {
+                        type: 'bytes tx_hash = 1;',
+                        desc: '// The transaction hash to query for.',
+                      },
+                    ]}
+                    responseFields={[
+                      {
+                        type: 'TransactionBody body = 1;',
+                        desc: '',
+                      },
+                      {
+                        type: 'bytes binding_sig = 2;',
+                        desc: '// The binding signature is stored separately from the transaction body that it signs.',
+                      },
+                      {
+                        type: 'penumbra.core.crypto.v1alpha1.MerkleRoot anchor = 3;',
+                        desc: '// The root of some previous state of the note commitment tree, used as an anchor for all ZK state transition proofs.',
+                      },
+                    ]}
+                  />
+                ) : (
+                  <TransactionByHash />
                 )
               }
             />
