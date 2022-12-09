@@ -11,12 +11,6 @@ import { Transactions } from './Transactions';
 import { TransactionByHash } from './TransactionByHash';
 import { NoteByCommitment } from './NoteByCommitment';
 
-declare global {
-  interface Window {
-    penumbra: any;
-  }
-}
-
 function App() {
   const [isPenumbra, setIsPenumbra] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);

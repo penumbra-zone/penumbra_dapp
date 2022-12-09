@@ -15,6 +15,9 @@ export const NoteByCommitment = () => {
       firstNote.note_commitment
     );
 
+    console.log(data);
+    
+
     setRes(JSON.stringify(data));
   };
 

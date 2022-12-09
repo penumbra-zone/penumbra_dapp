@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export const ChainParameters = () => {
-  const [res, setRes] = useState([]);
+  const [res, setRes] = useState('');
 
   const getData = async () => {
     const data = await window.penumbra.getChainParameters();

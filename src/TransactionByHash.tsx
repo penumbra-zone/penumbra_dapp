@@ -12,7 +12,6 @@ export const TransactionByHash = () => {
     }
 
     const data = await window.penumbra.getTransactionByHash(firstTx.tx_hash);
-   
 
     setRes(JSON.stringify(data));
   };
