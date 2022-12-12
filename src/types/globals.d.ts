@@ -4,9 +4,28 @@ declare global {
   }
 }
 
-declare namespace Penumbra {
+export declare namespace Penumbra {
   type TPenumbraApi = {
+    /**
+     * If a website is trusted, Penumbra public data are returned.
+     */
     publicState(): Promise<IPublicStateResponse>;
+    /**
+     * On initialize window.penumbra has no api methods.
+     * You can use penumbra.initialPromise for waiting end initializing api
+     */
+    initialPromise: Promise<any>;
+
+    /**
+     * Allows subscribing to Waves Keeper events.
+     * If a website is not trusted, events won't show.
+     * @param event
+     * Supports events:
+     * update – subscribe to updates of the state
+     * @param cb
+     */
+    on(event: 'update', cb: (state: IPublicStateResponse) => any): object;
+
     getAssets(): Promise<TAsset[]>;
     getChainParameters(): Promise<string>;
     getNotes(): Promise<TNote[]>;
