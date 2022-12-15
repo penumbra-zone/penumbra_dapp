@@ -4,6 +4,7 @@ import { ChainParameters } from './ChainParameters';
 import { Tabs } from './components/Tab';
 import { Descriptions } from './Descriptions';
 import img from './assets/img/logo.png';
+import img2 from './assets/img/test_2.gif';
 import { Status } from './Status';
 import { Notes } from './Notes';
 import { TransactionHashes } from './TransactionHashes';
@@ -16,6 +17,7 @@ import {
 } from './utils/ProviderPenumbra';
 import { Button } from './components/Tab/Button';
 import { UserData } from './Signer/types';
+import { FmdParameters } from './FmdParameters';
 
 export const getShortKey = (text: string) => {
   if (!text) return '';
@@ -41,6 +43,13 @@ function App() {
     const data = await penumbra.login();
     setUserData(data);
   };
+  // var personJSON = { name: 'sarah' }; // JSON
+  // var personBuffer = new Uint8Array(Bson.serialize(personJSON).buffer); // Uint8Array
+  // var personArray = Array.from(personBuffer); // Simple array
+  // var infoJSON = { count: 1, person: personArray }; // Inserting array into JSON
+  // var personUint8Array = Uint8Array.from(infoJSON.person); // Converting array back to Uint8Array
+  // console.log('deserializedObj:');
+  // console.log(Bson.deserialize(Buffer.from(personBuffer)));
 
   return (
     <div className="flex item-center justify-center mx-[104px]">
@@ -292,6 +301,33 @@ function App() {
                   children={(type: string) =>
                     type === 'Description' ? (
                       <Descriptions
+                        desc="Query for the current chain parameters."
+                        type="FMDParameters"
+                        requestFields={[
+                          {
+                            type: '',
+                            desc: '//  This message has no fields.',
+                          },
+                        ]}
+                        responseFields={[
+                          {
+                            type: 'penumbra.core.chain.v1alpha1.FmdParameters parameters = 1',
+                            desc: '',
+                          },
+                        ]}
+                      />
+                    ) : (
+                      <FmdParameters />
+                    )
+                  }
+                />
+              </div>
+              <div className="p-[12px] border-[1px] border-solid border-dark_grey rounded-[15px] mt-[10px]">
+                <Tabs
+                  tabs={['Description', 'Request']}
+                  children={(type: string) =>
+                    type === 'Description' ? (
+                      <Descriptions
                         desc="Query for the transaction hashes in the given range of blocks."
                         type="TransactionHashes"
                         requestFields={[
@@ -397,7 +433,9 @@ function App() {
               </div>
             </>
           ) : (
-            <p className="h1 mt-[300px] text-center">Connect to Penumbra if you want to have access to request</p>
+            <p className="h1 mt-[300px] text-center">
+              Connect to Penumbra if you want to have access to request
+            </p>
           )}
         </div>
       )}

@@ -1,12 +1,15 @@
+import { NotesResponse } from '@buf/bufbuild_es_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
 import { useEffect, useState } from 'react';
 
 export const Notes = () => {
   const [res, setRes] = useState('');
 
   const getData = async () => {
-    const data = await window.penumbra.getNotes();
+    const data: NotesResponse[] = await window.penumbra.getNotes();
+    console.log(data.map(i => i.noteRecord?.noteCommitment?.inner.length));
+    
 
-    setRes(JSON.stringify(data));
+    // setRes(JSON.stringify(data));
   };
 
   useEffect(() => {

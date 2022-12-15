@@ -6,17 +6,18 @@ export const NoteByCommitment = () => {
   const getData = async () => {
     const notes = await window.penumbra.getNotes();
 
-    const firstNote = notes[0];
+    console.log(notes);
+
+    const firstNote: any = notes[0];
     if (!firstNote) {
       return setRes('[]');
     }
 
-    const data = await window.penumbra.getNoteByCommitment(
-      firstNote.note_commitment
-    );
+    console.log({ noteCommitment: firstNote.noteRecord.noteCommitment });
 
-    console.log(data);
-    
+    const data = await window.penumbra.getNoteByCommitment({
+      noteCommitment: firstNote.noteRecord.noteCommitment,
+    } as any);
 
     setRes(JSON.stringify(data));
   };

@@ -1,3 +1,9 @@
+import {
+  NoteByCommitmentRequest,
+  NoteByCommitmentResponse,
+  NotesRequest,
+  NotesResponse,
+} from '@buf/bufbuild_es_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
 declare global {
   interface Window {
     penumbra: Penumbra.TPenumbraApi;
@@ -28,7 +34,7 @@ export declare namespace Penumbra {
 
     getAssets(): Promise<TAsset[]>;
     getChainParameters(): Promise<string>;
-    getNotes(): Promise<TNote[]>;
+    getNotes(request?: NotesRequest): Promise<NotesResponse[]>;
     getStatus(): Promise<TStatus>;
     getTransactionHashes(
       start_height?: number,
@@ -39,7 +45,10 @@ export declare namespace Penumbra {
       start_height?: number,
       end_height?: number
     ): Promise<TTransaction[]>;
-    getNoteByCommitment(note_commitment): Promise<TNote>;
+    getNoteByCommitment(
+      request: NoteByCommitmentRequest
+    ): Promise<NoteByCommitmentResponse>;
+    getFmdParameters: any;
   };
 
   interface IPublicStateResponse {

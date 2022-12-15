@@ -5,7 +5,8 @@ export const ChainParameters = () => {
 
   const getData = async () => {
     const data = await window.penumbra.getChainParameters();
-    setRes(data);
+
+    setRes(JSON.stringify(data));
   };
 
   useEffect(() => {
