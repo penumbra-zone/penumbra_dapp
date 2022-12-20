@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
+import { ProviderPenumbra } from './utils/ProviderPenumbra';
 
 export const FmdParameters = () => {
   const [res, setRes] = useState('');
 
   const getData = async () => {
-    const data = await window.penumbra.getFmdParameters();
+    const penumbra = new ProviderPenumbra();
+
+    const data = await penumbra.getFmdParameters();
 
     setRes(JSON.stringify(data));
   };

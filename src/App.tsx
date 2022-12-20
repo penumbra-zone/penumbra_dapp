@@ -4,7 +4,6 @@ import { ChainParameters } from './ChainParameters';
 import { Tabs } from './components/Tab';
 import { Descriptions } from './Descriptions';
 import img from './assets/img/logo.png';
-import img2 from './assets/img/test_2.gif';
 import { Status } from './Status';
 import { Notes } from './Notes';
 import { TransactionHashes } from './TransactionHashes';
@@ -41,15 +40,9 @@ function App() {
 
   const handleConnect = async () => {
     const data = await penumbra.login();
+
     setUserData(data);
   };
-  // var personJSON = { name: 'sarah' }; // JSON
-  // var personBuffer = new Uint8Array(Bson.serialize(personJSON).buffer); // Uint8Array
-  // var personArray = Array.from(personBuffer); // Simple array
-  // var infoJSON = { count: 1, person: personArray }; // Inserting array into JSON
-  // var personUint8Array = Uint8Array.from(infoJSON.person); // Converting array back to Uint8Array
-  // console.log('deserializedObj:');
-  // console.log(Bson.deserialize(Buffer.from(personBuffer)));
 
   return (
     <div className="flex item-center justify-center mx-[104px]">

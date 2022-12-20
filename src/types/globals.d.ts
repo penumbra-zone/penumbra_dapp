@@ -3,19 +3,32 @@ import {
   NoteByCommitmentResponse,
   NotesRequest,
   NotesResponse,
+  TransactionHashesRequest,
+  TransactionHashesResponse,
+  ChainParametersRequest,
+  ChainParametersResponse,
+  StatusRequest,
+  StatusResponse,
+  TransactionByHashRequest,
+  TransactionByHashResponse,
+  TransactionsRequest,
+  TransactionsResponse,
+  FMDParametersRequest,
+  AssetsRequest,
+  AssetsResponse,
 } from '@buf/bufbuild_es_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
 declare global {
   interface Window {
-    penumbra: Penumbra.TPenumbraApi;
+    penumbra: Penumbra.PenumbraApi;
   }
 }
 
 export declare namespace Penumbra {
-  type TPenumbraApi = {
+  type PenumbraApi = {
     /**
      * If a website is trusted, Penumbra public data are returned.
      */
-    publicState(): Promise<IPublicStateResponse>;
+    publicState(): Promise<any>;
     /**
      * On initialize window.penumbra has no api methods.
      * You can use penumbra.initialPromise for waiting end initializing api
@@ -30,102 +43,40 @@ export declare namespace Penumbra {
      * update – subscribe to updates of the state
      * @param cb
      */
-    on(event: 'update', cb: (state: IPublicStateResponse) => any): object;
+    on(event: 'update', cb: (state: PublicStateResponse) => any): object;
 
-    getAssets(): Promise<TAsset[]>;
-    getChainParameters(): Promise<string>;
-    getNotes(request?: NotesRequest): Promise<NotesResponse[]>;
-    getStatus(): Promise<TStatus>;
+    getAssets(request?: AssetsRequest): Promise<object[]>;
+    getChainParameters(request?: ChainParametersRequest): Promise<object>;
+    getNotes(request?: NotesRequest): Promise<object[]>;
+    getNoteByCommitment(
+      request: object
+    ): Promise<object>;
+
+    getStatus(request?: StatusRequest): Promise<StatusResponse>;
     getTransactionHashes(
-      start_height?: number,
-      end_height?: number
-    ): Promise<TTransactionHashe[]>;
-    getTransactionByHash(tx_hash: string): Promise<TTransactionByHash>;
+      request?: TransactionHashesRequest
+    ): Promise<TransactionHashesResponse[]>;
+    getTransactionByHash(
+      request: TransactionByHashRequest
+    ): Promise<TransactionByHashResponse>;
     getTransactions(
-      start_height?: number,
-      end_height?: number
-    ): Promise<TTransaction[]>;
+      request?: TransactionsRequest
+    ): Promise<TransactionsResponse[]>;
     getNoteByCommitment(
       request: NoteByCommitmentRequest
     ): Promise<NoteByCommitmentResponse>;
-    getFmdParameters: any;
+    getFmdParameters(request?: FMDParametersRequest): Promise<object>;
   };
 
-  interface IPublicStateResponse {
+  interface PublicStateResponse {
     initialized: boolean;
     locked: boolean;
-    account: TPublicStateAccount | null;
+    account: PublicStateAccount | null;
   }
 
-  type TAsset = {
-    denom: string;
-    id: string;
-  };
-
-  type TPublicStateAccount = {
+  type PublicStateAccount = {
     name: string;
     addressByIndex: string;
-  };
-
-  type TNote = {
-    address_index: number;
-    height_created: number;
-    note_commitment: string;
-    source: string;
-    //TODO add position and height_spent
-    height_spent: any;
-    position: any;
-    note: {
-      address: string;
-      note_blinding: string;
-      value: {
-        asset_id: string;
-        amount: {
-          hi: number;
-          lo: number;
-        };
-      };
-    };
-    nullifier: string[];
-  };
-
-  type TStatus = {
-    sync_height: number;
-    catching_up: boolean;
-    last_block: number;
-  };
-
-  type TTransactionHashe = {
-    block_height: number;
-    tx_hash: string;
-  };
-
-  type TTransactionByHash = {
-    anchor: string;
-    binding_sig: string;
-    body: TTransactionBody;
-  };
-
-  type TTransactionBody = {
-    //TODO add action
-    action: any[];
-    expiry_height: number;
-    chain_id: string;
-    fee: {
-      asset_id: string | null;
-      amount: {
-        hi: number;
-        lo: number;
-      };
-    };
-    fmd_clues: string[];
-    encrypted_memo: string[];
-  };
-
-  type TTransaction = {
-    block_height: number;
-    tx_hash: string;
-    tx: TTransactionByHash;
   };
 }
 

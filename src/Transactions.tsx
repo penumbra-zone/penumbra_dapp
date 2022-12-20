@@ -6,13 +6,8 @@ export const Transactions = () => {
   const getData = async () => {
     const data = await window.penumbra.getTransactions();
 
-    console.log(data);
-    
-
     setRes(JSON.stringify(data));
   };
-
-  
 
   useEffect(() => {
     getData();

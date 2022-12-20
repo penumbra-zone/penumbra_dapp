@@ -1,10 +1,29 @@
-import { AuthEvents, Handler, Provider, UserData } from '../Signer/types';
+import { AuthEvents, Handler, Provider } from '../Signer/types';
 import { Penumbra } from '../types/globals';
 import { EventEmitter } from 'typed-ts-events';
+import create from 'parse-json-bignumber';
+import {
+  AssetsRequest,
+  AssetsResponse,
+  ChainParametersRequest,
+  ChainParametersResponse,
+  FMDParametersRequest,
+  FMDParametersResponse,
+  NoteByCommitmentRequest,
+  NoteByCommitmentResponse,
+  NotesRequest,
+  NotesResponse,
+} from '@buf/bufbuild_es_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
+
+const { parse } = create();
+
+export function signerTxFactory(signed: string): any {
+  return parse(signed);
+}
 
 export class ProviderPenumbra implements Provider {
-  public user: UserData | null = null;
-  protected _apiPromise: Promise<Penumbra.TPenumbraApi>;
+  public user: any | null = null;
+  protected _apiPromise: Promise<Penumbra.PenumbraApi>;
   protected _connectPromise: Promise<void>; // used in _ensureApi
   private _connectResolve!: () => void; // initialized in Promise constructor
 
@@ -54,7 +73,7 @@ export class ProviderPenumbra implements Provider {
     return this;
   }
 
-  public login(): Promise<UserData> {
+  public login(): Promise<any> {
     return this._apiPromise
       .then((api) => api.publicState())
       .then((state) => {
@@ -63,6 +82,7 @@ export class ProviderPenumbra implements Provider {
         this.user = {
           name: state.account?.name!,
           addressByIndex: state.account?.addressByIndex!,
+          ...state,
         };
         this._emitter.trigger('login', this.user);
         return this.user;
@@ -73,6 +93,69 @@ export class ProviderPenumbra implements Provider {
     this.user = null;
     this._emitter.trigger('logout', void 0);
     return Promise.resolve();
+  }
+
+  public getAssets(request?: AssetsRequest) {
+    return this._apiPromise
+      .then((api) => api.getAssets())
+      .then((data) => {
+        const res = data.map((i) => {
+          return new AssetsResponse().fromBinary(
+            new Uint8Array(Object.values(i))
+          );
+        });
+        return res;
+      });
+  }
+
+  public getChainParameters(request?: ChainParametersRequest) {
+    return this._apiPromise
+      .then((api) => api.getChainParameters())
+      .then((data) => {
+        const res = new ChainParametersResponse().fromBinary(
+          new Uint8Array(Object.values(data))
+        );
+        return res;
+      });
+  }
+
+  public getFmdParameters(request?: FMDParametersRequest) {
+    return this._apiPromise
+      .then((api) => api.getFmdParameters())
+      .then((data) => {
+        const res = new FMDParametersResponse().fromBinary(
+          new Uint8Array(Object.values(data))
+        );
+
+        return res;
+      });
+  }
+
+  public getNotes(request?: NotesRequest) {
+    return this._apiPromise
+      .then((api) => api.getNotes())
+      .then((data) => {
+        const res = data.map((i) => {
+          return new NotesResponse().fromBinary(
+            new Uint8Array(Object.values(i))
+          );
+        });
+        return res;
+      });
+  }
+
+  public getNoteByCommitment(request: object) {
+    return this._apiPromise
+      .then((api) =>
+        api.getNoteByCommitment(new NoteByCommitmentRequest(request).toBinary())
+      )
+      .then((data) => {
+        const res = new NoteByCommitmentResponse().fromBinary(
+          new Uint8Array(Object.values(data))
+        );
+
+        return res;
+      });
   }
 }
 

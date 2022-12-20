@@ -7768,6 +7768,11 @@
     "just-diff" "^5.0.1"
     "just-diff-apply" "^5.2.0"
 
+"parse-json-bignumber@^1.0.0":
+  "integrity" "sha512-iUBAXzuCH4NQG5hTe/6nCCe1+u4HBF2yCrrbtOjUAk1qaEVaEOFaR/TXoZuG1FhNWmIIDOrw03V9PQ+/TBpIYA=="
+  "resolved" "https://registry.npmjs.org/parse-json-bignumber/-/parse-json-bignumber-1.0.0.tgz"
+  "version" "1.0.0"
+
 "parse-json@^5.0.0", "parse-json@^5.2.0":
   "integrity" "sha512-ayCKvm/phCGxOkYRSCM82iDwct8/EonSEgCSxWxD7ve6jHggsFl4fZVQBPRNgQoKiuV/odhFrGzQXZwbifC8Rg=="
   "resolved" "https://registry.npmjs.org/parse-json/-/parse-json-5.2.0.tgz"
