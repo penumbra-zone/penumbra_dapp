@@ -1,20 +1,22 @@
-import { TransactionByHashRequest } from '@buf/bufbuild_es_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
 import { useEffect, useState } from 'react';
+import { ProviderPenumbra } from './utils/ProviderPenumbra';
 
 export const TransactionByHash = () => {
   const [res, setRes] = useState<string>('');
 
   const getData = async () => {
-    const txs = await window.penumbra.getTransactions();
+    const penumbra = new ProviderPenumbra();
+
+    const txs = await penumbra.getTransactions();
 
     const firstTx = txs[0];
     if (!firstTx) {
-      return setRes('[]');
+      return;
     }
 
-    const data = await window.penumbra.getTransactionByHash({
+    const data = await penumbra.getTransactionByHash({
       txHash: firstTx.txHash,
-    } as TransactionByHashRequest);
+    });
 
     setRes(JSON.stringify(data));
   };

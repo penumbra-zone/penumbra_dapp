@@ -48,23 +48,11 @@ export declare namespace Penumbra {
     getAssets(request?: AssetsRequest): Promise<object[]>;
     getChainParameters(request?: ChainParametersRequest): Promise<object>;
     getNotes(request?: NotesRequest): Promise<object[]>;
-    getNoteByCommitment(
-      request: object
-    ): Promise<object>;
-
-    getStatus(request?: StatusRequest): Promise<StatusResponse>;
-    getTransactionHashes(
-      request?: TransactionHashesRequest
-    ): Promise<TransactionHashesResponse[]>;
-    getTransactionByHash(
-      request: TransactionByHashRequest
-    ): Promise<TransactionByHashResponse>;
-    getTransactions(
-      request?: TransactionsRequest
-    ): Promise<TransactionsResponse[]>;
-    getNoteByCommitment(
-      request: NoteByCommitmentRequest
-    ): Promise<NoteByCommitmentResponse>;
+    getNoteByCommitment(request: object): Promise<object>;
+    getStatus(request?: StatusRequest): Promise<object>;
+    getTransactionHashes(request?: object): Promise<object[]>;
+    getTransactionByHash(request: object): Promise<object>;
+    getTransactions(request?: object): Promise<object[]>;
     getFmdParameters(request?: FMDParametersRequest): Promise<object>;
   };
 

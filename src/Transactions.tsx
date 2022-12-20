@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
+import { ProviderPenumbra } from './utils/ProviderPenumbra';
 
 export const Transactions = () => {
   const [res, setRes] = useState<string>('');
 
   const getData = async () => {
-    const data = await window.penumbra.getTransactions();
+    const penumbra = new ProviderPenumbra();
+
+    const data = await penumbra.getTransactions();
 
     setRes(JSON.stringify(data));
   };

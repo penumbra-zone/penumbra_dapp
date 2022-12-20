@@ -4,14 +4,16 @@ type TabsProps = {
   tabs: string[];
   children: any;
   className?: string;
+  initial?: string;
 };
 
 export const Tabs: React.FC<TabsProps> = ({
   tabs,
   children,
   className = 'bg-[#000000]',
+  initial,
 }) => {
-  const [activeTab, setActivetab] = useState<string>(tabs[0]);
+  const [activeTab, setActivetab] = useState<string>(initial || tabs[0]);
 
   const handleChangeTab = (tab: string) => () => setActivetab(tab);
 
