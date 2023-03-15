@@ -1,22 +1,13 @@
 import { useEffect, useState } from 'react';
-import { ProviderPenumbra } from './utils/ProviderPenumbra';
+import { ProviderPenumbra } from '../../utils/ProviderPenumbra';
 
-export const TransactionByHash = () => {
+export const TransactionHashes = () => {
   const [res, setRes] = useState<string>('');
 
   const getData = async () => {
     const penumbra = new ProviderPenumbra();
 
-    const txs = await penumbra.getTransactions();
-
-    const firstTx = txs[0];
-    if (!firstTx) {
-      return;
-    }
-
-    const data = await penumbra.getTransactionByHash({
-      txHash: firstTx.txHash,
-    });
+    const data = await penumbra.getTransactionHashes();
 
     setRes(JSON.stringify(data));
   };

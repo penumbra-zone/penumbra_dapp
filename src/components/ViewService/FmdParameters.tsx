@@ -6,7 +6,6 @@ export const FmdParameters = () => {
 
 	const getData = async () => {
 		const data = await window.penumbra.getFmdParameters()
-		console.log({ data })
 
 		setRes(data)
 	}

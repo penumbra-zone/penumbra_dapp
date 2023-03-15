@@ -1,31 +1,46 @@
 import { useEffect, useState } from 'react'
-import { Assets } from './Assets'
-import { ChainParameters } from './ChainParameters'
+import { Assets } from './components/ViewService/Assets'
+import { ChainParameters } from './components/ViewService/ChainParameters'
 import { Tabs } from './components/Tab'
-import { Descriptions } from './Descriptions'
+import { Descriptions } from './components/Descriptions'
 import img from './assets/img/logo.png'
-import { Status } from './Status'
-import { Notes } from './Notes'
-import { TransactionHashes } from './TransactionHashes'
-import { Transactions } from './Transactions'
-import { TransactionByHash } from './TransactionByHash'
-import { NoteByCommitment } from './NoteByCommitment'
+import { Status } from './components/ViewService/Status'
+import { Notes } from './components/ViewService/Notes'
+import { TransactionHashes } from './components/ViewService/TransactionHashes'
+import { Transactions } from './components/ViewService/Transactions'
+import { TransactionByHash } from './components/ViewService/TransactionByHash'
+import { NoteByCommitment } from './components/ViewService/NoteByCommitment'
 import { isPenumbraInstalled, ProviderPenumbra } from './utils/ProviderPenumbra'
 import { Button } from './components/Tab/Button'
 import { UserData } from './Signer/types'
-import { FmdParameters } from './FmdParameters'
-import { StatusStream } from './StatusStream'
-import { BalanceByAddressResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { FmdParameters } from './components/ViewService/FmdParameters'
+import { StatusStream } from './components/ViewService/StatusStream'
+import {
+	BalanceByAddressResponse,
+	NotesResponse,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+
+import * as wasm from 'penumbra-web-assembly'
 
 export const getShortKey = (text: string) => {
 	if (!text) return ''
 	return text.slice(0, 10) + '..' + text.slice(-9)
 }
 
+const uint8ToBase64 = (arr: Uint8Array): string =>
+	btoa(
+		Array(arr.length)
+			.fill('')
+			.map((_, i) => String.fromCharCode(arr[i]))
+			.join('')
+	)
 function App() {
 	const [isPenumbra, setIsPenumbra] = useState<boolean>(false)
-	const [userData, setUserData] = useState<null | UserData>(null)
+	const [userData, setUserData] = useState<null | (UserData & { fvk: string })>(
+		null
+	)
 	const [balance, setBalance] = useState<BalanceByAddressResponse[]>([])
+	const [notes, setNotes] = useState<NotesResponse[]>([])
 
 	const penumbra = new ProviderPenumbra()
 
@@ -65,9 +80,63 @@ function App() {
 			console.log({ status })
 		})
 		window.penumbra.on('notes', note => {
+			setNotes(state => [...state, note])
 			console.log({ note })
 		})
+		window.penumbra.on('state', state => {
+			setUserData(state.account)
+		})
 	}, [isPenumbra])
+
+	const getTransactionPlan = async (
+		destAddress = 'penumbrav2t1fk9vamrkyskeysrlggyj2444axrdtck90cvysqg5ksmrh8r228mspwfflrw35unrhsncvwxr68f52gagrwfwp4gg9u0wmzarw8crxzyh5zhru048q8q4uemsl74c8vpasacufd',
+		amount = 1,
+		assetId = 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA='
+	) => {
+		const fvk = userData!.fvk
+		if (!fvk) return
+		console.log({ fvk })
+		console.log({ notes })
+		const filteredNotes = notes.filter(
+			note =>
+				!note.noteRecord?.heightSpent &&
+				uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) === assetId
+		)
+		console.log({ filteredNotes })
+		if (!filteredNotes.length) console.error('No notes found to spend')
+
+		const fmdParameters = (await window.penumbra.getFmdParameters()).parameters
+		console.log({ fmdParameters })
+		if (!fmdParameters) console.error('No found FmdParameters')
+
+		const chainParameters = (await window.penumbra.getChainParameters())
+			.parameters
+		console.log({ chainParameters })
+		if (!chainParameters) console.error('No found chain parameters')
+
+		const viewServiceData = {
+			notes,
+			chain_parameters: chainParameters,
+			fmd_parameters: fmdParameters,
+		}
+		console.log({ viewServiceData })
+
+		const valueJs = {
+			amount: {
+				lo: amount * 1000000,
+				hi: '0n',
+			},
+			assetId,
+		}
+
+		const transactionPlan = wasm.send_plan(
+			fvk,
+			valueJs,
+			destAddress,
+			viewServiceData
+		)
+		console.log({transactionPlan});
+	}
 
 	return (
 		<div className='flex item-center justify-center mx-[104px]'>
@@ -93,6 +162,12 @@ function App() {
 										</div>
 									)
 								})}
+								<Button
+									mode='gradient'
+									title='Send tx'
+									className='w-[200px]'
+									onClick={getTransactionPlan}
+								/>
 							</div>
 						) : (
 							<Button
