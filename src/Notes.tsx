@@ -1,26 +1,18 @@
-import { useEffect, useState } from 'react';
-import { ProviderPenumbra } from './utils/ProviderPenumbra';
+import { NotesResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { useEffect, useState } from 'react'
 
 export const Notes = () => {
-  const [res, setRes] = useState('');
+	const [res, setRes] = useState<NotesResponse[]>([])
 
-  const getData = async () => {
-    const penumbra = new ProviderPenumbra();
-
-    const data = await penumbra.getNotes();
-
-    setRes(JSON.stringify(data));
-  };
-
-  useEffect(() => {
-    const interval = setTimeout(getData, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-  return (
-    <div className="w-[100%] flex flex-col bg-brown rounded-[15px] px-[24px] py-[12px] text_body break-words">
-      {res}
-    </div>
-  );
-};
+	useEffect(() => {
+		window.penumbra.on('notes', note => {
+			setRes(state => [...state, note])
+		})
+	}, [])
+  
+	return (
+		<div className='w-[100%] flex flex-col bg-brown rounded-[15px] px-[24px] py-[12px] text_body break-words'>
+			{JSON.stringify(res)}
+		</div>
+	)
+}

@@ -1,24 +1,18 @@
-import { useEffect, useState } from 'react';
-import { ProviderPenumbra } from './utils/ProviderPenumbra';
+import { AssetsResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { useEffect, useState } from 'react'
 
 export const Assets = () => {
-  const [res, setRes] = useState<string>('');
+	const [res, setRes] = useState<AssetsResponse[]>([])
 
-  const getData = async () => {
-    const penumbra = new ProviderPenumbra();
+	useEffect(() => {
+		window.penumbra.on('assets', asset => {
+			setRes(state => [...state, asset])
+		})
+	}, [])
 
-    const data = await penumbra.getAssets();
-
-    setRes(JSON.stringify(data));
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
-
-  return (
-    <div className="w-[100%] flex flex-col bg-brown rounded-[15px] px-[24px] py-[12px] text_body break-words">
-      {res}
-    </div>
-  );
-};
+	return (
+		<div className='w-[100%] flex flex-col bg-brown rounded-[15px] px-[24px] py-[12px] text_body break-words'>
+			{JSON.stringify(res)}
+		</div>
+	)
+}

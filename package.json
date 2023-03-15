@@ -3,7 +3,8 @@
   "version": "0.1.2",
   "private": true,
   "dependencies": {
-    "@buf/bufbuild_es_penumbra-zone_penumbra": "^1.7.31",
+    "@buf/penumbra-zone_penumbra.bufbuild_connect-web": "^0.8.3-20230313084402-d1a191fb79c6.1",
+    "@buf/penumbra-zone_penumbra.bufbuild_es": "^1.1.0-20230313084402-d1a191fb79c6.1",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
@@ -11,7 +12,6 @@
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "i": "^0.3.7",
     "npm": "^9.2.0",
     "parse-json-bignumber": "^1.0.0",
     "react": "^18.2.0",
@@ -46,6 +46,7 @@
     ]
   },
   "devDependencies": {
+    "@types/events": "^3.0.0",
     "tailwindcss": "^3.2.4"
   }
 }

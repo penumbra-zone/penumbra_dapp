@@ -30,4 +30,5 @@ export type Handler<T> = (data: T) => any;
 export type AuthEvents = {
   login: Readonly<UserData>;
   logout: void;
+  update: any
 };
