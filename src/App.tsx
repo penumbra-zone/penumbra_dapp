@@ -21,6 +21,7 @@ import {
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 import * as wasm from 'penumbra-web-assembly'
+import React from 'react'
 
 export const getShortKey = (text: string) => {
 	if (!text) return ''
@@ -34,12 +35,13 @@ const uint8ToBase64 = (arr: Uint8Array): string =>
 			.map((_, i) => String.fromCharCode(arr[i]))
 			.join('')
 	)
+
 function App() {
 	const [isPenumbra, setIsPenumbra] = useState<boolean>(false)
 	const [userData, setUserData] = useState<null | (UserData & { fvk: string })>(
 		null
 	)
-	const [balance, setBalance] = useState<BalanceByAddressResponse[]>([])
+	const [balance, setBalance] = useState<BalanceByAddressResponse>()
 	const [notes, setNotes] = useState<NotesResponse[]>([])
 
 	const penumbra = new ProviderPenumbra()
@@ -56,86 +58,72 @@ function App() {
 	const handleConnect = async () => {
 		const data = await penumbra.login()
 
-		setUserData(data)
+		setUserData(data.account)
 	}
 
 	useEffect(() => {
 		if (!isPenumbra) return
 
 		window.penumbra.on('balance', balance => {
-			setBalance(state => [...state, balance])
+			setBalance(balance)
 		})
 	}, [isPenumbra])
 
 	useEffect(() => {
 		if (!isPenumbra) return
-
-		window.penumbra.on('balance', balance => {
-			console.log({ balance })
-		})
-		window.penumbra.on('assets', asset => {
-			console.log({ asset })
-		})
-		window.penumbra.on('status', status => {
-			console.log({ status })
-		})
 		window.penumbra.on('notes', note => {
 			setNotes(state => [...state, note])
-			console.log({ note })
-		})
-		window.penumbra.on('state', state => {
-			setUserData(state.account)
 		})
 	}, [isPenumbra])
+	const destAddress =
+		'penumbrav2t1fk9vamrkyskeysrlggyj2444axrdtck90cvysqg5ksmrh8r228mspwfflrw35unrhsncvwxr68f52gagrwfwp4gg9u0wmzarw8crxzyh5zhru048q8q4uemsl74c8vpasacufd'
+	const amount = 1
+	const assetId = 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA='
 
-	const getTransactionPlan = async (
-		destAddress = 'penumbrav2t1fk9vamrkyskeysrlggyj2444axrdtck90cvysqg5ksmrh8r228mspwfflrw35unrhsncvwxr68f52gagrwfwp4gg9u0wmzarw8crxzyh5zhru048q8q4uemsl74c8vpasacufd',
-		amount = 1,
-		assetId = 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA='
-	) => {
+	const getTransactionPlan = async () => {
 		const fvk = userData!.fvk
+
 		if (!fvk) return
-		console.log({ fvk })
-		console.log({ notes })
-		const filteredNotes = notes.filter(
-			note =>
-				!note.noteRecord?.heightSpent &&
-				uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) === assetId
-		)
-		console.log({ filteredNotes })
+		const filteredNotes = notes
+			.filter(
+				note =>
+					!note.noteRecord?.heightSpent &&
+					uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
+						assetId
+			)
+			.map(i => i.noteRecord?.toJson())
 		if (!filteredNotes.length) console.error('No notes found to spend')
 
 		const fmdParameters = (await window.penumbra.getFmdParameters()).parameters
-		console.log({ fmdParameters })
+
 		if (!fmdParameters) console.error('No found FmdParameters')
 
 		const chainParameters = (await window.penumbra.getChainParameters())
 			.parameters
-		console.log({ chainParameters })
 		if (!chainParameters) console.error('No found chain parameters')
 
 		const viewServiceData = {
-			notes,
+			notes: filteredNotes,
 			chain_parameters: chainParameters,
 			fmd_parameters: fmdParameters,
 		}
-		console.log({ viewServiceData })
 
 		const valueJs = {
 			amount: {
 				lo: amount * 1000000,
-				hi: '0n',
+				hi: 0,
 			},
-			assetId,
+			assetId: { inner: assetId },
 		}
 
-		const transactionPlan = wasm.send_plan(
+		const transactionPlan = await wasm.send_plan(
 			fvk,
 			valueJs,
 			destAddress,
 			viewServiceData
 		)
-		console.log({transactionPlan});
+
+		await window.penumbra.signTransaction(transactionPlan)
 	}
 
 	return (
@@ -154,14 +142,11 @@ function App() {
 							<div>
 								<p className='h3'>{getShortKey(userData.addressByIndex)}</p>
 
-								{balance.map((i, index) => {
-									i.amount?.lo.toString()
-									return (
-										<div key={index}>
-											Balance - {Number(i.amount?.lo.toString()) / 10 ** 6}
-										</div>
-									)
-								})}
+								{balance && (
+									<div>
+										Balance - {Number(balance.amount?.lo.toString()) / 10 ** 6}
+									</div>
+								)}
 								<Button
 									mode='gradient'
 									title='Send tx'

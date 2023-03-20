@@ -51,6 +51,7 @@ export declare namespace Penumbra {
 			request?: FMDParametersRequest
 		): Promise<FMDParametersResponse>
 		getBalanceByAddress: (request?: { address: string }) => Promise<any>
+		signTransaction: (data: any) => Promise<void>
 	}
 
 	interface PublicStateResponse {

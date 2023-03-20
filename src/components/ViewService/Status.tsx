@@ -1,4 +1,5 @@
 import { StatusResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import React from 'react'
 import { useEffect, useState } from 'react'
 
 export const Status = () => {
