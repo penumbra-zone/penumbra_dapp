@@ -52,19 +52,19 @@ function App() {
 	}
 
 	useEffect(() => {
-		if (!isPenumbra) return
+		if (!isPenumbra || !userData) return
 
 		window.penumbra.on('balance', balance => {
 			setBalance(balance)
 		})
-	}, [isPenumbra])
+	}, [isPenumbra, userData])
 
 	useEffect(() => {
-		if (!isPenumbra) return
+		if (!isPenumbra || !userData) return
 		window.penumbra.on('notes', note => {
 			setNotes(state => [...state, note])
 		})
-	}, [isPenumbra])
+	}, [isPenumbra, userData])
 
 	return (
 		<div className='flex item-center justify-center mx-[104px]'>
