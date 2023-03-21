@@ -19,22 +19,12 @@ import {
 	BalanceByAddressResponse,
 	NotesResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-
-import * as wasm from 'penumbra-web-assembly'
-import React from 'react'
+import { SendTx } from './components/SendTx'
 
 export const getShortKey = (text: string) => {
 	if (!text) return ''
 	return text.slice(0, 10) + '..' + text.slice(-9)
 }
-
-const uint8ToBase64 = (arr: Uint8Array): string =>
-	btoa(
-		Array(arr.length)
-			.fill('')
-			.map((_, i) => String.fromCharCode(arr[i]))
-			.join('')
-	)
 
 function App() {
 	const [isPenumbra, setIsPenumbra] = useState<boolean>(false)
@@ -75,56 +65,6 @@ function App() {
 			setNotes(state => [...state, note])
 		})
 	}, [isPenumbra])
-	const destAddress =
-		'penumbrav2t1fk9vamrkyskeysrlggyj2444axrdtck90cvysqg5ksmrh8r228mspwfflrw35unrhsncvwxr68f52gagrwfwp4gg9u0wmzarw8crxzyh5zhru048q8q4uemsl74c8vpasacufd'
-	const amount = 1
-	const assetId = 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA='
-
-	const getTransactionPlan = async () => {
-		const fvk = userData!.fvk
-
-		if (!fvk) return
-		const filteredNotes = notes
-			.filter(
-				note =>
-					!note.noteRecord?.heightSpent &&
-					uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
-						assetId
-			)
-			.map(i => i.noteRecord?.toJson())
-		if (!filteredNotes.length) console.error('No notes found to spend')
-
-		const fmdParameters = (await window.penumbra.getFmdParameters()).parameters
-
-		if (!fmdParameters) console.error('No found FmdParameters')
-
-		const chainParameters = (await window.penumbra.getChainParameters())
-			.parameters
-		if (!chainParameters) console.error('No found chain parameters')
-
-		const viewServiceData = {
-			notes: filteredNotes,
-			chain_parameters: chainParameters,
-			fmd_parameters: fmdParameters,
-		}
-
-		const valueJs = {
-			amount: {
-				lo: amount * 1000000,
-				hi: 0,
-			},
-			assetId: { inner: assetId },
-		}
-
-		const transactionPlan = await wasm.send_plan(
-			fvk,
-			valueJs,
-			destAddress,
-			viewServiceData
-		)
-
-		await window.penumbra.signTransaction(transactionPlan)
-	}
 
 	return (
 		<div className='flex item-center justify-center mx-[104px]'>
@@ -147,12 +87,6 @@ function App() {
 										Balance - {Number(balance.amount?.lo.toString()) / 10 ** 6}
 									</div>
 								)}
-								<Button
-									mode='gradient'
-									title='Send tx'
-									className='w-[200px]'
-									onClick={getTransactionPlan}
-								/>
 							</div>
 						) : (
 							<Button
@@ -165,6 +99,9 @@ function App() {
 					</div>
 					{userData ? (
 						<>
+							<div className='p-[12px] border-[1px] border-solid border-dark_grey rounded-[15px] mt-[10px]'>
+								<SendTx userData={userData} notes={notes} />
+							</div>
 							<div className='p-[12px] border-[1px] border-solid border-dark_grey rounded-[15px] mt-[10px]'>
 								<Tabs
 									tabs={['Description', 'Request']}
