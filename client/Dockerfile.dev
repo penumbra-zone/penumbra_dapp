@@ -1,6 +1,7 @@
 FROM node:alpine
 WORKDIR /client
 COPY package.json .
+RUN npm config set @buf:registry https://buf.build/gen/npm/v1/
 RUN npm i
 COPY . .
 CMD ["npm", "start"]

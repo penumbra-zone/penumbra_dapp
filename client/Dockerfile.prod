@@ -1,7 +1,8 @@
 FROM node:alpine AS build
 WORKDIR /client
 COPY package.json .
-RUN npm i
+RUN npm config set @buf:registry https://buf.build/gen/npm/v1/
+RUN npm install
 COPY . .
 RUN npm run build
 

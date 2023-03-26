@@ -6,6 +6,6 @@ services:
       dockerfile: Dockerfile.prod
     container_name: client-prod-c
     ports:
-      - "8080:80"
+      - "9012:9012"
     environment:
       - NODE_ENV=production
