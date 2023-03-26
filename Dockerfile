@@ -5,6 +5,6 @@ RUN npm config set @buf:registry https://buf.build/gen/npm/v1/
 RUN npm install
 COPY . .
 RUN npm run build
-EXPOSE 9012
+EXPOSE 7073
 
 CMD [ "npm", "start" ]
