@@ -12,6 +12,7 @@ module.exports = merge(common, {
     compress: true,
     open: true,
     static: './build',
+    port: 9012,
   },
   stats: {
     errorDetails: true,
