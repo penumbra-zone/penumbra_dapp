@@ -15,7 +15,7 @@
 	},
 	"scripts": {
 		"build": "webpack --config webpack.production.js",
-		"start": "webpack-dev-server --progress --disableHostCheck --config webpack.development.js",
+		"start": "webpack-dev-server --progress --config webpack.development.js",
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage"

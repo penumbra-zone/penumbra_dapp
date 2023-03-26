@@ -11,7 +11,7 @@ module.exports = merge(common, {
     },
     compress: true,
     open: true,
-    // public: 'penumbradapp.zpoken.io', 
+    allowedHosts: ['penumbradapp.zpoken.io'],
     static: './build',
     port: 9012,
   },
