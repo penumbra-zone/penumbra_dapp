@@ -9,6 +9,6 @@ RUN npm install
 
 COPY . /usr/src/app
 RUN npm run build
-EXPOSE 7073
+EXPOSE 9012
 
 CMD [ "npm", "start" ]
