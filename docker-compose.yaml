@@ -1,5 +1,11 @@
 version: "3.0"
 services:
   client:
+    image: client-prod-i:latest
     build:
-      context: ./client
+      dockerfile: Dockerfile
+    container_name: client-prod-c
+    ports:
+      - "9012:9012"
+    environment:
+      - NODE_ENV=production
