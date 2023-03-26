@@ -1,17 +1,11 @@
 
 version: '3'
+
 services:
-  app:
-    container_name: penumbra
-    image: penumbra:latest  
-    build:
-      context: .
-      dockerfile: Dockerfile
+  penumbra_frontend:
+    image: penumbra:latest    
     ports:
-      - "9012:9012"
+      - 9012:9012
     volumes:
-      - ./.:/app
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
+      - ./:/penumbra_frontend
     restart: always

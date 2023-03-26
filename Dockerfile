@@ -1,4 +1,6 @@
-FROM node:alpine AS build
+FROM node:16
+
+ENV PORT 9012
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
