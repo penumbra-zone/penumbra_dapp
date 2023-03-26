@@ -11,6 +11,7 @@ module.exports = merge(common, {
     },
     compress: true,
     open: true,
+    disableHostCheck: true, 
     static: './build',
     port: 9012,
   },
