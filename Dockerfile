@@ -1,6 +1,4 @@
-FROM node:16
-
-RUN npm install webpack -g
+FROM node:alpine as build
 
 ENV PORT 9012
 
@@ -11,7 +9,7 @@ WORKDIR /usr/src/app
 # Installing dependencies
 COPY package.json /usr/src/app/
 COPY package-lock.json /usr/src/app/
-RUN npm install
+RUN npm i
 
 # Copying source files
 COPY . /usr/src/app
@@ -20,5 +18,8 @@ COPY . /usr/src/app
 RUN  npm run build
 EXPOSE 9012
 
-# Running the app
-CMD ["npm", "start"]
+FROM nginx
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
+
+# # Running the app
+# CMD ["npm", "start"]
