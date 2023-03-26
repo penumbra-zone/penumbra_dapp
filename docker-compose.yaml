@@ -10,7 +10,8 @@ services:
     ports:
       - "7073:7073"
     volumes:
-      - .:/app
+      - ./.:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
+    restart: always
