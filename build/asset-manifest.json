@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/static/css/main.0f50fd4e.css",
+    "main.js": "/static/js/main.2f68a1d6.js",
+    "static/media/Devanagari-Sangam-Regular.ttf": "/static/media/Devanagari-Sangam-Regular.1484500af26089879906.ttf",
+    "static/media/Faktum-Medium.ttf": "/static/media/Faktum-Medium.68d31800fa943e2419d4.ttf",
+    "static/media/Faktum-SemiBold.ttf": "/static/media/Faktum-SemiBold.5045d0080326b46fbc72.ttf",
+    "static/media/Faktum-Bold.ttf": "/static/media/Faktum-Bold.6fc68eb195dfd006c89d.ttf",
+    "static/media/logo.png": "/static/media/logo.78283f9c567360d1b3f5.png",
+    "index.html": "/index.html",
+    "main.0f50fd4e.css.map": "/static/css/main.0f50fd4e.css.map",
+    "main.2f68a1d6.js.map": "/static/js/main.2f68a1d6.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0f50fd4e.css",
+    "static/js/main.2f68a1d6.js"
+  ]
+}
