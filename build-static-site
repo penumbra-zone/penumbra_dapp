@@ -1,0 +1,14 @@
+#!/bin/bash
+# Script to build a static site for the Penumbra webapp,
+# designed for use with the Penumbra web extension. Requires docker.
+
+set -euo pipefail
+
+>&2 echo "Removing local docroot dir... "
+rm -rf docroot/
+docker build -t penumbra_dapp .
+cid=$(podman create penumbra_dapp)
+docker cp $cid:/usr/src/app/build docroot
+
+>&2 echo "Build complete! Website can be found in: docroot/"
+tree docroot
