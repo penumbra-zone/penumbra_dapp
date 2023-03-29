@@ -83,3 +83,11 @@ In Penumbra, using the penumbra.signTransaction method directly, sending a trans
 		
 		await window.penumbra.signTransaction(transactionPlan)
 	}
+
+# View Service
+
+### rpc Status
+
+Get current status of chain sync
+
+	window.penumbra.getStatus()
