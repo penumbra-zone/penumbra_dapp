@@ -91,3 +91,44 @@ In Penumbra, using the penumbra.signTransaction method directly, sending a trans
 Get current status of chain sync
 
 	window.penumbra.getStatus()
+
+### rpc StatusStream
+
+Stream sync status updates until the view service has caught up with the core.chain.v1alpha1.
+
+	window.penumbra.on('status', status => console.log(status))
+
+### rpc Notes
+
+Queries for notes that have been accepted by the core.chain.v1alpha1.
+
+	window.penumbra.on('notes', note => console.log(note))
+
+### rpc Assets
+
+Queries for assets.
+
+	window.penumbra.on('assets', asset => console.log(asset))
+
+### rpc ChainParameters
+
+Query for the current chain parameters.
+
+	window.penumbra.getChainParameters()
+
+### rpc FMDParameters
+
+Query for the current FMD parameters.
+
+	window.penumbra.getFmdParameters()
+
+### rpc BalanceByAddress
+
+Query for balance of a given address
+
+	window.penumbra.on('balance', balance => console.log(balance))
+
+
+
+
+
