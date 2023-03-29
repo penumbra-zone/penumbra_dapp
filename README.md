@@ -1,4 +1,18 @@
+#### Penumbra dApp is the canonical wallet functionality interface for penumbra network.
+
+# Get started
+To use the Penumbra dApp, you must install Penumbra wallet extension and import/create a new wallet
+
+Penumbra wallet extension is available for installation in the chrome store at [Link ](https://chrome.google.com/webstore/detail/penumbra-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe/related?hl=uk)
+
+Or you can build the Wallet Extension locally by following the [instructions](https://github.com/penumbra-zone/wallet)
+
 Link to Dapp - https://penumbradapp.zpoken.io
+
+### Local Launch Guide
+1. ```npm install```
+2. ```npm run start```
+
 
 # Basic Considerations
 
