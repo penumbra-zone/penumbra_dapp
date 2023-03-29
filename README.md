@@ -10,8 +10,9 @@ Or you can build the Wallet Extension locally by following the [instructions](ht
 Link to Dapp - https://penumbradapp.zpoken.io
 
 ### Local Launch Guide
-1. ```npm install```
-2. ```npm run start```
+> ```npm install```
+
+> ```npm run start```
 
 
 # Basic Considerations
@@ -141,6 +142,37 @@ Query for the current FMD parameters.
 Query for balance of a given address
 
 	window.penumbra.on('balance', balance => console.log(balance))
+
+# Penumbra web assembly ussage 
+### Creating TransactionPlan for send transaction
+``` 
+export function send_plan(full_viewing_key: string, valueJs: any, dest_address: string, view_service_data: any): TransactionPlan;
+```
+#### Example of use
+```
+const viewServiceData = {
+			notes: filteredNotes,
+			chain_parameters: chainParameters,
+			fmd_parameters: fmdParameters,
+		}
+
+		const valueJs = {
+			amount: {
+				lo: amount * 1000000,
+				hi: 0,
+			},
+			assetId: { inner: assetId },
+		}
+
+		const transactionPlan = await wasm.send_plan(
+			fvk,
+			valueJs,
+			reciever,
+			viewServiceData
+		)
+```
+
+
 
 
 
