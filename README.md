@@ -39,48 +39,46 @@ If you'd like to be notified when the user state changes, we have an event you c
 Transactions are a formal action on a blockchain. They are always initiated in Penumbra with a call to the signTransaction method. They can involve a simple sending of token. They are always initiated by a signature from an external account, or a simple key pair.
 
 In Penumbra, using the penumbra.signTransaction method directly, sending a transaction will involve composing an options object like this:
-			const sendTx = async () => {
+	const sendTx = async () => {
 
-			const fullViewingKey = userData.fvk  // fullViewingKey get`s from window.penumbra.publicState()
+		const fullViewingKey = userData.fvk  // fullViewingKey get`s from window.penumbra.publicState()
 
-			const filteredNotes = notes
-				.filter(
-					note =>
-						!note.noteRecord?.heightSpent &&
-						uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
-							assetId
-				)
-				.map(i => i.noteRecord?.toJson()) // notes get`s from penumbra.on('notes')
+		const filteredNotes = notes.filter(
+			note =>
+				!note.noteRecord?.heightSpent &&
+				uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
+				assetId
+		)
+		.map(i => i.noteRecord?.toJson()) // notes get`s from penumbra.on('notes')
 
-			if (!filteredNotes.length) console.error('No notes found to spend')
+		if (!filteredNotes.length) console.error('No notes found to spend')
 
-			const fmdParameters = (await window.penumbra.getFmdParameters()).parameters
+		const fmdParameters = (await window.penumbra.getFmdParameters()).parameters
+		if (!fmdParameters) console.error('No found FmdParameters')
 
-			if (!fmdParameters) console.error('No found FmdParameters')
+		const chainParameters = (await window.penumbra.getChainParameters()).parameters
+		if (!chainParameters) console.error('No found chain parameters')
 
-			const chainParameters = (await window.penumbra.getChainParameters()).parameters
-			if (!chainParameters) console.error('No found chain parameters')
-
-			const viewServiceData = {
-				notes: filteredNotes,
-				chain_parameters: chainParameters,
-				fmd_parameters: fmdParameters,
-			}
-
-			const valueJs = {
-				amount: {
-					lo: amount * 1000000,
-					hi: 0,
-				},
-				assetId: { inner: assetId },
-			}
-
-			const transactionPlan = await wasm.send_plan( // import wasm as "import * as wasm from 'penumbra-web-assembly'"
-				fvk,
-				valueJs,
-				reciever,
-				viewServiceData
-			)
-
-			await window.penumbra.signTransaction(transactionPlan)
+		const viewServiceData = {
+			notes: filteredNotes,
+			chain_parameters: chainParameters,
+			fmd_parameters: fmdParameters,
 		}
+
+		const valueJs = {
+			amount: {
+				lo: amount * 1000000,
+				hi: 0,
+			},
+			assetId: { inner: assetId },
+		}
+
+		const transactionPlan = await wasm.send_plan( // import wasm as "import * as wasm from 'penumbra-web-assembly'"
+			fvk,
+			valueJs,
+			reciever,
+			viewServiceData
+		)
+		
+		await window.penumbra.signTransaction(transactionPlan)
+	}
