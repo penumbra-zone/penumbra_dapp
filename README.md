@@ -39,6 +39,7 @@ If you'd like to be notified when the user state changes, we have an event you c
 Transactions are a formal action on a blockchain. They are always initiated in Penumbra with a call to the signTransaction method. They can involve a simple sending of token. They are always initiated by a signature from an external account, or a simple key pair.
 
 In Penumbra, using the penumbra.signTransaction method directly, sending a transaction will involve composing an options object like this:
+
 	const sendTx = async () => {
 
 		const fullViewingKey = userData.fvk  // fullViewingKey get`s from window.penumbra.publicState()
