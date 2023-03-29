@@ -46,10 +46,18 @@ function App() {
 	}, [])
 
 	const handleConnect = async () => {
-		const data = await penumbra.login()
-
-		setUserData(data.account)
+		const data = await window.penumbra.publicState()
+		const account = data.account
+		setUserData(account)
 	}
+
+	useEffect(() => {
+		if (!isPenumbra || !userData) return
+
+		window.penumbra.on('state', state => {
+			console.log(state)
+		})
+	}, [isPenumbra, userData])
 
 	useEffect(() => {
 		if (!isPenumbra || !userData) return
