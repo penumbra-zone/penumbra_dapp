@@ -18,7 +18,7 @@ export const Tabs: React.FC<TabsProps> = ({
   const handleChangeTab = (tab: string) => () => setActivetab(tab);
 
   return (
-    <div className="w-[100%] flex flex-col">
+    <div className="w-[100%] flex flex-col ">
       <div className="flex mb-[24px]">
         {tabs.map((i) => {
           return (

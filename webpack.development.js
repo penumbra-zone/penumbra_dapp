@@ -9,6 +9,7 @@ module.exports = merge(common, {
       logging: 'info',
       overlay: true,
     },
+    historyApiFallback: true,
     compress: true,
     open: true,
     allowedHosts: ['penumbradapp.zpoken.io'],
