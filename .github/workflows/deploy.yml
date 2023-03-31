@@ -1,28 +1,24 @@
 ---
+# Builds the static site via webpack in a container image,
+# then copies that directory to localhost and pushes to Firebase, at:
+# https://app.testnet.penumbra.zone
 name: Deploy static site
 on:
+  # Support ad-hoc runs via dispatch, so we can deploy from
+  # unmerged feature branches if necessary.
   workflow_dispatch:
   push:
     branches:
       - main
-  # on PRs while debugging
-  pull_request:
+  # Uncomment to run on PRs; useful while debugging.
+  # pull_request:
 jobs:
   build:
     name: Render and deploy protocol and API docs
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v2
-
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-
-      - name: Load Rust caching
-        uses: Swatinem/rust-cache@v1
 
       - name: Build static site
         run: ./build-static-site
