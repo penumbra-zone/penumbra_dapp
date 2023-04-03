@@ -1,21 +1,31 @@
-#### Penumbra dApp is the canonical wallet functionality interface for penumbra network.
+# Penumbra dApp
+Penumbra dApp is the canonical wallet functionality interface for the [Penumbra network](https://penumbra.zone).
 
-# Get started
-To use the Penumbra dApp, you must install Penumbra wallet extension and import/create a new wallet
+## Getting started
+To use the Penumbra dApp, you must first install the Penumbra wallet extension and import/create a new wallet.
+The Penumbra wallet extension is available for installation [in the Chrome store](https://chrome.google.com/webstore/detail/penumbra-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe/).
+You can also build the wallet extension locally by following the [build instructions](https://github.com/penumbra-zone/wallet).
 
-Penumbra wallet extension is available for installation in the chrome store at [Link ](https://chrome.google.com/webstore/detail/penumbra-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe/related?hl=uk)
+After you've installed the extension, navigate to the dApp: https://app.testnet.penumbra.zone
 
-Or you can build the Wallet Extension locally by following the [instructions](https://github.com/penumbra-zone/wallet)
+## Building the site locally
+You can start the site using `npm`:
+```
+npm install
+npm run start
+```
 
-Link to Dapp - https://penumbradapp.zpoken.io
+Or you can use docker:
 
-### Local Launch Guide
-> ```npm install```
+```
+docker build -t penumbra_dapp .
+docker run -p 9012:9012 -it penumbra_dapp
+```
 
-> ```npm run start```
+In either case, the site will be available at http://localhost:9012.
 
-
-# Basic Considerations
+## Developer documentation
+Below we document common uses for developers who want to use the code in their own projects.
 
 ### Web3 Browser Detection
 
@@ -41,7 +51,7 @@ We recommend that you provide a button to allow the user to connect Penumbra to 
 		const account = data.account
 	}
 
-# Accessing Accounts
+### Accessing Accounts
 
 If you'd like to be notified when the user state changes, we have an event you can subscribe to:
 
@@ -49,7 +59,7 @@ If you'd like to be notified when the user state changes, we have an event you c
 		console.log(state)
 	})
 
-# Sending Transactions
+### Sending Transactions
 
 Transactions are a formal action on a blockchain. They are always initiated in Penumbra with a call to the signTransaction method. They can involve a simple sending of token. They are always initiated by a signature from an external account, or a simple key pair.
 
@@ -95,57 +105,61 @@ In Penumbra, using the penumbra.signTransaction method directly, sending a trans
 			reciever,
 			viewServiceData
 		)
-		
+
 		await window.penumbra.signTransaction(transactionPlan)
 	}
 
-# View Service
+### View Service
 
-### rpc Status
+#### rpc Status
 
 Get current status of chain sync
 
 	window.penumbra.getStatus()
 
-### rpc StatusStream
+#### rpc StatusStream
 
 Stream sync status updates until the view service has caught up with the core.chain.v1alpha1.
 
 	window.penumbra.on('status', status => console.log(status))
 
-### rpc Notes
+#### rpc Notes
 
 Queries for notes that have been accepted by the core.chain.v1alpha1.
 
 	window.penumbra.on('notes', note => console.log(note))
 
-### rpc Assets
+#### rpc Assets
 
 Queries for assets.
 
 	window.penumbra.on('assets', asset => console.log(asset))
 
-### rpc ChainParameters
+#### rpc ChainParameters
 
 Query for the current chain parameters.
 
 	window.penumbra.getChainParameters()
 
-### rpc FMDParameters
+#### rpc FMDParameters
 
 Query for the current FMD parameters.
 
 	window.penumbra.getFmdParameters()
 
-### rpc BalanceByAddress
+#### rpc BalanceByAddress
 
 Query for balance of a given address
 
 	window.penumbra.on('balance', balance => console.log(balance))
 
-# Penumbra web assembly ussage 
-### Creating TransactionPlan for send transaction
-``` 
+### Penumbra web assembly usage
+
+WASM bindings can be generated following the procedure documented here:
+https://github.com/penumbra-zone/penumbra/tree/main/wasm
+
+#### Creating TransactionPlan for send transaction
+```
 export function send_plan(full_viewing_key: string, valueJs: any, dest_address: string, view_service_data: any): TransactionPlan;
 ```
 #### Example of use
@@ -171,10 +185,3 @@ const viewServiceData = {
 			viewServiceData
 		)
 ```
-
-
-
-
-
-
-
