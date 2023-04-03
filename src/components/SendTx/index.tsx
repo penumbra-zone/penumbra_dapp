@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { UserData } from '../../Signer/types'
 import { Input } from '../Input'
 import { Button } from '../Tab/Button'
-import * as wasm from 'penumbra-web-assembly'
+import * as wasm from 'penumbra-wasm'
 
 const uint8ToBase64 = (arr: Uint8Array): string =>
 	btoa(

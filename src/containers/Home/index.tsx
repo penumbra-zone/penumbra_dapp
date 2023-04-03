@@ -19,7 +19,7 @@ export const Home = () => {
 	return (
 		<>
 			{auth.user ? (
-				<div className='pt-[16px] flex flex-col items-center justify-center bg-brown rounded-[15px]'>
+				<div className='py-[16px] flex flex-col items-center justify-center bg-brown rounded-[15px]'>
 					<BalanceAction />
 					<Tabs
 						tabs={['Assets', 'Activity']}

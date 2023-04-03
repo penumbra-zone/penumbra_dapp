@@ -89,7 +89,7 @@ In Penumbra, using the penumbra.signTransaction method directly, sending a trans
 			assetId: { inner: assetId },
 		}
 
-		const transactionPlan = await wasm.send_plan( // import wasm as "import * as wasm from 'penumbra-web-assembly'"
+		const transactionPlan = await wasm.send_plan( // import wasm as "import * as wasm from 'penumbra-wasm'"
 			fvk,
 			valueJs,
 			reciever,

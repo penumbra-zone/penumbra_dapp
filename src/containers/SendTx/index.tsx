@@ -11,8 +11,8 @@ import {
 	AddressValidatorsType,
 	validateAddress,
 } from '../../utils/validate/validateAddress'
-import * as wasm from 'penumbra-web-assembly'
-import { NotesResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import * as wasm from 'penumbra-wasm'
+import { BalanceByAddressResponse, NotesResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 const uint8ToBase64 = (arr: Uint8Array): string =>
 	btoa(
@@ -25,12 +25,13 @@ const uint8ToBase64 = (arr: Uint8Array): string =>
 export const SendTx = () => {
 	let auth = useAuth()
 	const navigate = useNavigate()
-	const [reciever, setReciever] = useState<string>('')
+	const [reciever, setReciever] = useState<string>('penumbrav2t1fk9vamrkyskeysrlggyj2444axrdtck90cvysqg5ksmrh8r228mspwfflrw35unrhsncvwxr68f52gagrwfwp4gg9u0wmzarw8crxzyh5zhru048q8q4uemsl74c8vpasacufd')
 	const [amount, setAmount] = useState<string>('')
 	const [select, setSelect] = useState<string>('PNB')
 	const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
 		{} as AddressValidatorsType
 	)
+	const [balance, setBalance] = useState<BalanceByAddressResponse>()
 	const [notes, setNotes] = useState<NotesResponse[]>([])
 
 	useEffect(() => {
@@ -38,6 +39,11 @@ export const SendTx = () => {
 			setNotes(state => [...state, note])
 		})
 	}, [])
+
+	useEffect(() => {
+		if (!auth.user) return
+		window.penumbra.on('balance', balance => setBalance(balance))
+	}, [auth])
 
 	const options = [
 		{
@@ -48,7 +54,7 @@ export const SendTx = () => {
 					<div className='flex items-center'>
 						<p className='text_body text-light_grey'>Balance:</p>
 						<p className='text_numbers_s text-light_grey ml-[16px]'>
-							{Number(Number(0) / 10 ** 6).toLocaleString('en-US')} PNB
+							{Number(Number(balance?.amount?.lo || 0) / 10 ** 6).toLocaleString('en-US')} PNB
 						</p>
 					</div>
 				</div>
@@ -78,7 +84,7 @@ export const SendTx = () => {
 
 	const handleBack = () => navigate(routesPath.HOME)
 
-	const handleMax = () => setAmount(String(Number(0) / 10 ** 6))
+	const handleMax = () => setAmount(String(Number(balance?.amount?.lo || 0) / 10 ** 6))
 
 	const getTransactionPlan = async () => {
 		const fvk = auth.user!.fvk
@@ -168,7 +174,7 @@ export const SendTx = () => {
 									labelClassName='h3 text-light_grey mb-[16px]'
 									label='Total :'
 									value={amount}
-									isError={0 < Number(amount)}
+									isError={Number(balance?.amount?.lo) < Number(amount)}
 									onChange={handleChangeAmout}
 									className='mt-[24px]'
 									helperText={'You do not have enough token'}
@@ -194,7 +200,7 @@ export const SendTx = () => {
 									onClick={getTransactionPlan}
 									title='Send'
 									className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
-									disabled={!Number(amount) || 0 < Number(amount)}
+									disabled={!Number(amount) || Number(balance?.amount?.lo) < Number(amount)}
 								/>
 							</div>
 						</div>
