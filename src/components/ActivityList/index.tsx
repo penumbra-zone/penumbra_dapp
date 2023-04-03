@@ -63,7 +63,7 @@ export const ActivityList = () => {
 	return (
 		<div className='w-[100%] flex flex-col items-center'>
 			<div className='w-[100%] flex flex-col ext:mb-[32px] tablet:mb-[8px]'>
-				{activity.map((i, index) => {
+				{/* {[].map((i, index) => {
 					return (
 						<div
 							key={index}
@@ -98,7 +98,7 @@ export const ActivityList = () => {
 							</div>
 						</div>
 					)
-				})}
+				})} */}
 			</div>
 			{/* <Button
         mode="gradient"
