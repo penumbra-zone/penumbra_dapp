@@ -5,15 +5,25 @@ import { ActivityList } from '../../components/ActivityList'
 import { AssetsList } from '../../components/AssetsList'
 import { BalanceAction } from '../../components/BalanceAction'
 import { Tabs } from '../../components/Tab'
+import { uint8ToBase64 } from '../SendTx'
 
 export const Home = () => {
 	let auth = useAuth()
 
-	const [balance, setBalance] = useState<BalanceByAddressResponse>()
+	const [balance, setBalance] = useState<
+		Record<string, BalanceByAddressResponse>
+	>({})
 
 	useEffect(() => {
 		if (!auth.user) return
-		window.penumbra.on('balance', balance => setBalance(balance))
+		window.penumbra.on('balance', balance => {
+			const id = uint8ToBase64(balance.asset.inner)
+
+			setBalance(state => ({
+				...state,
+				[id]: balance,
+			}))
+		})
 	}, [auth])
 
 	return (
@@ -25,7 +35,11 @@ export const Home = () => {
 						tabs={['Assets', 'Activity']}
 						children={(type: string) =>
 							type === 'Assets' ? (
-								<AssetsList balance={balance} />
+								<AssetsList
+									assets={
+										balance
+									}
+								/>
 							) : (
 								<ActivityList />
 							)

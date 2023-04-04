@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../App'
 import { Input } from '../../components/Input'
@@ -12,9 +12,12 @@ import {
 	validateAddress,
 } from '../../utils/validate/validateAddress'
 import * as wasm from 'penumbra-wasm'
-import { BalanceByAddressResponse, NotesResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import {
+	BalanceByAddressResponse,
+	NotesResponse,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
-const uint8ToBase64 = (arr: Uint8Array): string =>
+export const uint8ToBase64 = (arr: Uint8Array): string =>
 	btoa(
 		Array(arr.length)
 			.fill('')
@@ -25,13 +28,17 @@ const uint8ToBase64 = (arr: Uint8Array): string =>
 export const SendTx = () => {
 	let auth = useAuth()
 	const navigate = useNavigate()
-	const [reciever, setReciever] = useState<string>('penumbrav2t1fk9vamrkyskeysrlggyj2444axrdtck90cvysqg5ksmrh8r228mspwfflrw35unrhsncvwxr68f52gagrwfwp4gg9u0wmzarw8crxzyh5zhru048q8q4uemsl74c8vpasacufd')
+	const [reciever, setReciever] = useState<string>(
+		'penumbrav2t1fk9vamrkyskeysrlggyj2444axrdtck90cvysqg5ksmrh8r228mspwfflrw35unrhsncvwxr68f52gagrwfwp4gg9u0wmzarw8crxzyh5zhru048q8q4uemsl74c8vpasacufd'
+	)
 	const [amount, setAmount] = useState<string>('')
-	const [select, setSelect] = useState<string>('PNB')
+	const [select, setSelect] = useState<string>('')
 	const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
 		{} as AddressValidatorsType
 	)
-	const [balance, setBalance] = useState<BalanceByAddressResponse>()
+	const [balance, setBalance] = useState<
+		Record<string, BalanceByAddressResponse>
+	>({})
 	const [notes, setNotes] = useState<NotesResponse[]>([])
 
 	useEffect(() => {
@@ -42,25 +49,38 @@ export const SendTx = () => {
 
 	useEffect(() => {
 		if (!auth.user) return
-		window.penumbra.on('balance', balance => setBalance(balance))
+		window.penumbra.on('balance', balance => {
+			const id = uint8ToBase64(balance.asset.inner)
+
+			setBalance(state => ({
+				...state,
+				[id]: balance,
+			}))
+		})
 	}, [auth])
 
-	const options = [
-		{
-			value: 'PNB',
-			label: (
-				<div className='flex flex-col'>
-					<p className='text_numbers'>PNB</p>
-					<div className='flex items-center'>
-						<p className='text_body text-light_grey'>Balance:</p>
-						<p className='text_numbers_s text-light_grey ml-[16px]'>
-							{Number(Number(balance?.amount?.lo || 0) / 10 ** 6).toLocaleString('en-US')} PNB
-						</p>
+	const options = useMemo(() => {
+		if (!Object.values(balance).length) return []
+		return Object.entries(balance).map(i => {
+			return {
+				value: i[0],
+				label: (
+					<div className='flex flex-col'>
+						<p className='text_numbers'>PNB</p>
+						<div className='flex items-center'>
+							<p className='text_body text-light_grey'>Balance:</p>
+							<p className='text_numbers_s text-light_grey ml-[16px]'>
+								{Number(Number(i[1].amount?.lo || 0) / 10 ** 6).toLocaleString(
+									'en-US'
+								)}{' '}
+								PNB
+							</p>
+						</div>
 					</div>
-				</div>
-			),
-		},
-	]
+				),
+			}
+		})
+	}, [balance])
 
 	const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setReciever(event.target.value)
@@ -84,7 +104,8 @@ export const SendTx = () => {
 
 	const handleBack = () => navigate(routesPath.HOME)
 
-	const handleMax = () => setAmount(String(Number(balance?.amount?.lo || 0) / 10 ** 6))
+	const handleMax = () =>
+		setAmount(String(Number(select ? balance[select].amount?.lo : 0) / 10 ** 6))
 
 	const getTransactionPlan = async () => {
 		const fvk = auth.user!.fvk
@@ -95,7 +116,7 @@ export const SendTx = () => {
 				note =>
 					!note.noteRecord?.heightSpent &&
 					uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
-						'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA='
+						select
 			)
 			.map(i => i.noteRecord?.toJson())
 		if (!filteredNotes.length) console.error('No notes found to spend')
@@ -119,7 +140,7 @@ export const SendTx = () => {
 				lo: Number(amount) * 1000000,
 				hi: 0,
 			},
-			assetId: { inner: 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA=' },
+			assetId: { inner: select },
 		}
 
 		const transactionPlan = await wasm.send_plan(
@@ -174,7 +195,12 @@ export const SendTx = () => {
 									labelClassName='h3 text-light_grey mb-[16px]'
 									label='Total :'
 									value={amount}
-									isError={Number(balance?.amount?.lo) < Number(amount)}
+									isError={
+										select
+											? Number(balance[select].amount?.lo) / 10 ** 6 <
+											  Number(amount)
+											: false
+									}
 									onChange={handleChangeAmout}
 									className='mt-[24px]'
 									helperText={'You do not have enough token'}
@@ -200,7 +226,12 @@ export const SendTx = () => {
 									onClick={getTransactionPlan}
 									title='Send'
 									className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
-									disabled={!Number(amount) || Number(balance?.amount?.lo) < Number(amount)}
+									disabled={
+										!Number(amount) ||
+										!select ||
+										Number(balance[select].amount?.lo) / 10 ** 6 <
+											Number(amount)
+									}
 								/>
 							</div>
 						</div>

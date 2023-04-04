@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ActivityList } from '../../components/ActivityList'
 import { BalanceAction } from '../../components/BalanceAction'
 import { ChevronLeftIcon } from '../../components/Svg'
@@ -7,6 +7,7 @@ import { routesPath } from '../../utils/constants'
 
 export const BalanceDetail = () => {
 	const navigate = useNavigate()
+	const { state } = useLocation()
 
 	const handleBack = () => navigate(routesPath.HOME)
 
@@ -21,7 +22,7 @@ export const BalanceDetail = () => {
 					className='self-start ext:mt-[20px] ext:ml-[8px] tablet:mt-[24px] tablet:ml-[16px]'
 				/>
 				<div className='w-[100%] ext:mt-[25px] tablet:mt-[27px] mb-[40px]'>
-					<BalanceAction />
+					<BalanceAction name={state} />
 				</div>
 				<ActivityList />
 			</div>
