@@ -1,4 +1,7 @@
-import { BalanceByAddressResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import {
+	AssetsResponse,
+	BalanceByAddressResponse,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../App'
@@ -15,20 +18,32 @@ export const BalanceAction: React.FC<IBalanceAction> = ({ name }) => {
 	const navigate = useNavigate()
 	let auth = useAuth()
 	const [balance, setBalance] = useState<
-		Record<string, BalanceByAddressResponse>
+		Record<string, BalanceByAddressResponse & { denom: { denom: string } }>
 	>({})
+	const [assets, setAssets] = useState<AssetsResponse[]>([])
 
 	useEffect(() => {
 		if (!auth.user) return
+		window.penumbra.on('assets', asset => {
+			setAssets(state => [...state, asset])
+		})
+	}, [auth])
+
+	useEffect(() => {
+		if (!assets.length) return
+
 		window.penumbra.on('balance', balance => {
 			const id = uint8ToBase64(balance.asset.inner)
+			const asset = assets.find(
+				i => uint8ToBase64(i.asset?.id?.inner as Uint8Array) === id
+			)?.asset
 
 			setBalance(state => ({
 				...state,
-				[id]: balance,
+				[id]: { ...balance, denom: asset?.denom },
 			}))
 		})
-	}, [auth])
+	}, [assets])
 
 	const handleNavigate = (url: string) => () => navigate(url)
 
@@ -45,7 +60,10 @@ export const BalanceAction: React.FC<IBalanceAction> = ({ name }) => {
 					) /
 					10 ** 6
 				).toLocaleString('en-US')}{' '}
-				PNB
+				{balance[name || 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA=']
+					? balance[name || 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA=']
+							.denom.denom
+					: ''}
 			</p>
 			<div className='flex ext:gap-x-[30px]  tablet:gap-x-[69px] ext:mb-[24px] tablet:mb-[40px]'>
 				<div className='flex flex-col items-center'>

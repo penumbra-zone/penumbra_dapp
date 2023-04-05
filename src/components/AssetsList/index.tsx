@@ -4,7 +4,10 @@ import { routesPath } from '../../utils/constants'
 import { ChevronLeftIcon } from '../Svg'
 
 interface IAssetList {
-	assets: Record<string, BalanceByAddressResponse>
+	assets: Record<
+		string,
+		BalanceByAddressResponse & { denom: { denom: string } }
+	>
 }
 
 export const AssetsList: React.FC<IAssetList> = ({ assets }) => {
@@ -26,7 +29,8 @@ export const AssetsList: React.FC<IAssetList> = ({ assets }) => {
 					<div className='flex items-center'>
 						<div className="relative w-[51px] h-[51px] bg-brown rounded-[50%] li_gradient text_body before:content-['PNB'] before:absolute before:top-[0.5px] before:left-[0.5px] before:w-[calc(100%-1px)] before:h-[calc(100%-1px)] before:bg-brown before:rounded-[50%] before:flex before:items-center before:justify-center"></div>
 						<p className='pl-[16px] text_numbers'>
-							{(Number(i[1].amount!.lo) / 10 ** 6).toLocaleString('en-US')} PNB
+							{(Number(i[1].amount!.lo) / 10 ** 6).toLocaleString('en-US')}{' '}
+							{i[1].denom.denom}
 						</p>
 					</div>
 					<div className='rotate-180'>

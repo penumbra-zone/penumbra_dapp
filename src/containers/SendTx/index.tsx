@@ -13,6 +13,7 @@ import {
 } from '../../utils/validate/validateAddress'
 import * as wasm from 'penumbra-wasm'
 import {
+	AssetsResponse,
 	BalanceByAddressResponse,
 	NotesResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
@@ -37,9 +38,10 @@ export const SendTx = () => {
 		{} as AddressValidatorsType
 	)
 	const [balance, setBalance] = useState<
-		Record<string, BalanceByAddressResponse>
+		Record<string, BalanceByAddressResponse & { denom: { denom: string } }>
 	>({})
 	const [notes, setNotes] = useState<NotesResponse[]>([])
+	const [assets, setAssets] = useState<AssetsResponse[]>([])
 
 	useEffect(() => {
 		window.penumbra.on('notes', note => {
@@ -49,15 +51,26 @@ export const SendTx = () => {
 
 	useEffect(() => {
 		if (!auth.user) return
+		window.penumbra.on('assets', asset => {
+			setAssets(state => [...state, asset])
+		})
+	}, [auth])
+
+	useEffect(() => {
+		if (!assets.length) return
+
 		window.penumbra.on('balance', balance => {
 			const id = uint8ToBase64(balance.asset.inner)
+			const asset = assets.find(
+				i => uint8ToBase64(i.asset?.id?.inner as Uint8Array) === id
+			)?.asset
 
 			setBalance(state => ({
 				...state,
-				[id]: balance,
+				[id]: { ...balance, denom: asset?.denom },
 			}))
 		})
-	}, [auth])
+	}, [assets])
 
 	const options = useMemo(() => {
 		if (!Object.values(balance).length) return []
@@ -73,7 +86,7 @@ export const SendTx = () => {
 								{Number(Number(i[1].amount?.lo || 0) / 10 ** 6).toLocaleString(
 									'en-US'
 								)}{' '}
-								PNB
+								{i[1].denom.denom}
 							</p>
 						</div>
 					</div>
