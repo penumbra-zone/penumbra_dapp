@@ -56,7 +56,19 @@ function Layout() {
 	return (
 		<div className='flex item-center justify-center mx-[104px]'>
 			{!isPenumbra ? (
-				<p className='h1 mt-[300px]'>Install Penumbra</p>
+			<Button
+					mode='gradient'
+					title={
+						<a
+							href='https://chrome.google.com/webstore/detail/penumbra-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe'
+							target='_blank'
+							rel='noreferrer'
+						>
+							Install Penumbra
+						</a>
+					}
+					className='w-[200px] ext:pt-[14px] tablet:pt-[14px]  ext:pb-[14px] tablet:pb-[14px] mt-[300px]'
+				/>
 			) : (
 				<>
 					<div className='w-[100%] flex flex-col'>
