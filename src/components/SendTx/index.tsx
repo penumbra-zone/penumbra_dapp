@@ -76,7 +76,7 @@ export const SendTx: React.FC<SendTxProps> = ({ userData, notes }) => {
 			values.reciever,
 			viewServiceData
 		)
-
+		
 		await window.penumbra.signTransaction(transactionPlan)
 	}
 	return (

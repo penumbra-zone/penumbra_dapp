@@ -1,110 +1,43 @@
-import moment from 'moment'
-import { useParams } from 'react-router-dom'
-import { getShortKey } from '../../App'
-import { ArrowUpRightSvg, DowmloadSvg } from '../Svg'
-
-const activity = [
-	{
-		type: 'receive',
-		date: new Date(),
-		value: 12,
-		address:
-			'penumbrav2t156t9s3s0786ghjnpk20jjaweqyeavfevpd7rkjycllu5qtevuuy69j948fy6gpgwptl2mgcgl0u5mw8glk38puggxx290cryz6pvxde3vgv4tuuey4rlrpf2smes5wt2m957r9',
-	},
-	{
-		type: 'send',
-		date: new Date(),
-		value: -1,
-		address:
-			'penumbrav2t156t9s3s0786ghjnpk20jjaweqyeavfevpd7rkjycllu5qtevuuy69j948fy6gpgwptl2mgcgl0u5mw8glk38puggxx290cryz6pvxde3vgv4tuuey4rlrpf2smes5wt2m957r9',
-	},
-	{
-		type: 'receive',
-		date: new Date(),
-		value: 121,
-		address:
-			'penumbrav2t156t9s3s0786ghjnpk20jjaweqyeavfevpd7rkjycllu5qtevuuy69j948fy6gpgwptl2mgcgl0u5mw8glk38puggxx290cryz6pvxde3vgv4tuuey4rlrpf2smes5wt2m957r9',
-	},
-	{
-		type: 'send',
-		date: new Date(),
-		value: -1223,
-		address:
-			'penumbrav2t156t9s3s0786ghjnpk20jjaweqyeavfevpd7rkjycllu5qtevuuy69j948fy6gpgwptl2mgcgl0u5mw8glk38puggxx290cryz6pvxde3vgv4tuuey4rlrpf2smes5wt2m957r9',
-	},
-	{
-		type: 'receive',
-		date: new Date(),
-		value: 1,
-		address:
-			'penumbrav2t156t9s3s0786ghjnpk20jjaweqyeavfevpd7rkjycllu5qtevuuy69j948fy6gpgwptl2mgcgl0u5mw8glk38puggxx290cryz6pvxde3vgv4tuuey4rlrpf2smes5wt2m957r9',
-	},
-	{
-		type: 'send',
-		date: new Date(),
-		value: -1123,
-		address:
-			'penumbrav2t156t9s3s0786ghjnpk20jjaweqyeavfevpd7rkjycllu5qtevuuy69j948fy6gpgwptl2mgcgl0u5mw8glk38puggxx290cryz6pvxde3vgv4tuuey4rlrpf2smes5wt2m957r9',
-	},
-]
-
-const icon: Record<string, JSX.Element> = {
-	receive: <DowmloadSvg />,
-	send: <ArrowUpRightSvg />,
-}
-
-const textAction: Record<string, string> = {
-	receive: 'From:',
-	send: 'Addressee:',
-}
+import { ArrowUpRightSvg, ChevronLeftIcon } from '../Svg'
+import { useEffect, useState } from 'react'
+import { TransactionsResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { uint8ToBase64 } from '../../containers'
 
 export const ActivityList = () => {
-	const { name } = useParams()
+	const [transactions, setTransactions] = useState<TransactionsResponse[]>([])
+	useEffect(() => {
+		window.penumbra.on('transactions', tx =>
+			setTransactions(state => [...state, tx])
+		)
+	}, [])
+
 	return (
 		<div className='w-[100%] flex flex-col items-center'>
 			<div className='w-[100%] flex flex-col ext:mb-[32px] tablet:mb-[8px]'>
-				{/* {[].map((i, index) => {
+				{transactions.map((i, index) => {
 					return (
 						<div
-							key={index}
-							className='px-[18px] py-[12px] border-y-[1px] border-solid border-dark_grey ext:mb-[8px] tablet:mb-[16px]'
+							key={Number(i.blockHeight)}
+							className='px-[18px] py-[12px] border-y-[1px] border-solid border-dark_grey ext:mb-[8px] tablet:mb-[16px flex justify-between items-center'
 						>
-							<div className='flex justify-between items-center'>
-								<div className='flex items-center'>
-									{icon[i.type as any]}
-									<div className='flex flex-col ml-[16px]'>
-										<p className='h3 mb-[6px]'>{i.type}</p>
-										<div className='flex text_ext'>
-											<p className='text-green'>
-												{moment(i.date).format('MMM D')}
-											</p>
-											<p className='text-light_grey ext:mx-[2px] tablet:mx-[6px]'>
-												{textAction[i.type]}
-											</p>
-											<p className='text-light_grey'>
-												{getShortKey(i.address)}
-											</p>
-										</div>
-									</div>
-								</div>
-								<div className='flex flex-col items-end'>
-									<p className='text_numbers'>
-										{i.value} {name ? name.toUpperCase() : 'PNB'}
-									</p>
-									<p className='text_ext text-light_grey'>
-										{i.value} {name ? name.toUpperCase() : 'PNB'}
+							<div className='flex items-center'>
+								<ArrowUpRightSvg />
+								<div className='flex flex-col ml-[16px]'>
+									<p className='h3 mb-[6px]'>Send</p>
+									<p className='text_body text-green'>
+										Block height : {String(i.blockHeight)}{' '}
 									</p>
 								</div>
+								<p className='text_body ml-[16px]'>Hash: </p>
+								<p className='text_body ml-[8px] break-words w-[300px]'>{uint8ToBase64(i.txHash)}</p>
+							</div>
+							<div className='rotate-180'>
+								<ChevronLeftIcon />
 							</div>
 						</div>
 					)
-				})} */}
+				})}
 			</div>
-			{/* <Button
-        mode="gradient"
-        title="More"
-        className="ext:w-[96px] tablet:w-[192px]"
-      /> */}
 		</div>
 	)
 }

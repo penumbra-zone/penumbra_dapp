@@ -1,5 +1,12 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { Routes, Route, useLocation, Navigate, Outlet } from 'react-router-dom'
+import {
+	Routes,
+	Route,
+	useLocation,
+	Navigate,
+	Outlet,
+	useNavigate,
+} from 'react-router-dom'
 import { Button } from './components/Tab/Button'
 import { UserData } from './Signer/types'
 import { isPenumbraInstalled } from './utils/ProviderPenumbra'
@@ -42,6 +49,7 @@ export default function App() {
 
 function Layout() {
 	let auth = useAuth()
+	const navigate = useNavigate()
 	const [isPenumbra, setIsPenumbra] = useState<boolean>(false)
 
 	const checkIsPenumbraInstalled = async () => {
@@ -52,6 +60,8 @@ function Layout() {
 	useEffect(() => {
 		checkIsPenumbraInstalled()
 	}, [])
+
+	const handleClick = () => navigate(routesPath.HOME)
 
 	return (
 		<div className='flex item-center justify-center mx-[104px]'>
@@ -75,8 +85,9 @@ function Layout() {
 						<div className='w-[100%] flex justify-between items-center'>
 							<img
 								src={img}
-								alt='penumbra log'
+								alt='penumbra logo'
 								className='w-[192px] object-cover cursor-pointer'
+								onClick={handleClick}
 							/>
 							{auth.user ? (
 								<div>

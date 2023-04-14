@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ActivityList } from '../../components/ActivityList'
 import { BalanceAction } from '../../components/BalanceAction'
 import { ChevronLeftIcon } from '../../components/Svg'
@@ -8,6 +8,7 @@ import { routesPath } from '../../utils/constants'
 export const BalanceDetail = () => {
 	const navigate = useNavigate()
 	const { state } = useLocation()
+	
 
 	const handleBack = () => navigate(routesPath.HOME)
 
