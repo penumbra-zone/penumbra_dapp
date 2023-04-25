@@ -11,23 +11,14 @@ import {
 	AddressValidatorsType,
 	validateAddress,
 } from '../../utils/validate/validateAddress'
+import { NotesResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { useBalance } from '../../context'
+import { uint8ToBase64 } from '../../utils/uint8ToBase64'
 import * as wasm from 'penumbra-wasm'
-import {
-	AssetsResponse,
-	BalanceByAddressResponse,
-	NotesResponse,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-
-export const uint8ToBase64 = (arr: Uint8Array): string =>
-	btoa(
-		Array(arr.length)
-			.fill('')
-			.map((_, i) => String.fromCharCode(arr[i]))
-			.join('')
-	)
 
 export const SendTx = () => {
-	let auth = useAuth()
+	const auth = useAuth()
+	const { balance } = useBalance()
 	const navigate = useNavigate()
 	const [reciever, setReciever] = useState<string>(
 		'penumbrav2t1fk9vamrkyskeysrlggyj2444axrdtck90cvysqg5ksmrh8r228mspwfflrw35unrhsncvwxr68f52gagrwfwp4gg9u0wmzarw8crxzyh5zhru048q8q4uemsl74c8vpasacufd'
@@ -37,40 +28,13 @@ export const SendTx = () => {
 	const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
 		{} as AddressValidatorsType
 	)
-	const [balance, setBalance] = useState<
-		Record<string, BalanceByAddressResponse & { denom: { denom: string } }>
-	>({})
 	const [notes, setNotes] = useState<NotesResponse[]>([])
-	const [assets, setAssets] = useState<AssetsResponse[]>([])
 
 	useEffect(() => {
 		window.penumbra.on('notes', note => {
 			setNotes(state => [...state, note])
 		})
 	}, [])
-
-	useEffect(() => {
-		if (!auth.user) return
-		window.penumbra.on('assets', asset => {
-			setAssets(state => [...state, asset])
-		})
-	}, [auth])
-
-	useEffect(() => {
-		if (!assets.length) return
-
-		window.penumbra.on('balance', balance => {
-			const id = uint8ToBase64(balance.asset.inner)
-			const asset = assets.find(
-				i => uint8ToBase64(i.asset?.id?.inner as Uint8Array) === id
-			)?.asset
-
-			setBalance(state => ({
-				...state,
-				[id]: { ...balance, denom: asset?.denom },
-			}))
-		})
-	}, [assets])
 
 	const options = useMemo(() => {
 		if (!Object.values(balance).length) return []

@@ -103,14 +103,11 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({
 	// 			'http://testnet.penumbra.zone:26657/validators'
 	// 		)
 
-	// 		console.log({ response })
-
 	// 		// const data = await response.json()
-	// 		// console.log({ data })
 
 	// 		// setTotalValidators(+data.result.total)
 	// 	} catch (error) {
-	// 		console.log('getValidatorsCount:', error)
+	// 		console.error('getValidatorsCount:', error)
 	// 	}
 	// }
 

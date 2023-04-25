@@ -1,7 +1,7 @@
 import { ArrowUpRightSvg, ChevronLeftIcon } from '../Svg'
 import { useEffect, useState } from 'react'
 import { TransactionsResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { uint8ToBase64 } from '../../containers'
+import { uint8ToBase64 } from '../../utils/uint8ToBase64'
 
 export const ActivityList = () => {
 	const [transactions, setTransactions] = useState<TransactionsResponse[]>([])

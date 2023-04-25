@@ -4,14 +4,7 @@ import { UserData } from '../../Signer/types'
 import { Input } from '../Input'
 import { Button } from '../Tab/Button'
 import * as wasm from 'penumbra-wasm'
-
-const uint8ToBase64 = (arr: Uint8Array): string =>
-	btoa(
-		Array(arr.length)
-			.fill('')
-			.map((_, i) => String.fromCharCode(arr[i]))
-			.join('')
-	)
+import { uint8ToBase64 } from '../../utils/uint8ToBase64'
 
 type SendTxProps = {
 	userData: UserData & { fvk: string }
