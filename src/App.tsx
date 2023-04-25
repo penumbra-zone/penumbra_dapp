@@ -11,7 +11,7 @@ import { Button } from './components/Tab/Button'
 import { UserData } from './Signer/types'
 import { isPenumbraInstalled } from './utils/ProviderPenumbra'
 import img from './assets/img/logo.png'
-import { BalanceDetail, Home, SendTx } from './containers'
+import { BalanceDetail, Home, SendTx, Validators } from './containers'
 import { routesPath } from './utils/constants'
 
 export const getShortKey = (text: string) => {
@@ -38,6 +38,14 @@ export default function App() {
 						element={
 							<RequireAuth>
 								<BalanceDetail />
+							</RequireAuth>
+						}
+					/>
+					<Route
+						path={routesPath.VALIDATORS}
+						element={
+							<RequireAuth>
+								<Validators />
 							</RequireAuth>
 						}
 					/>
