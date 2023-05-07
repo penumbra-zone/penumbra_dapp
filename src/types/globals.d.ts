@@ -44,8 +44,6 @@ export declare namespace Penumbra {
 		getNotes(request?: NotesRequest): Promise<object[]>
 		getNoteByCommitment(request: object): Promise<object>
 		getStatus(request?: StatusRequest): Promise<StatusResponse>
-		getTransactionHashes(request?: object): Promise<object[]>
-		getTransactionByHash(request: object): Promise<object>
 		getTransactions(request?: object): Promise<object[]>
 		getFmdParameters(
 			request?: FMDParametersRequest

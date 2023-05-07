@@ -2,7 +2,21 @@ import { AuthEvents, Handler, Provider } from '../Signer/types'
 import { Penumbra } from '../types/globals'
 import { EventEmitter } from 'typed-ts-events'
 import create from 'parse-json-bignumber'
-import { AssetsResponse, ChainParametersRequest, ChainParametersResponse, FMDParametersRequest, FMDParametersResponse, NoteByCommitmentRequest, NoteByCommitmentResponse, NotesRequest, NotesResponse, StatusRequest, StatusResponse, TransactionByHashRequest, TransactionByHashResponse, TransactionHashesRequest, TransactionHashesResponse, TransactionsRequest, TransactionsResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import {
+	AssetsResponse,
+	ChainParametersRequest,
+	ChainParametersResponse,
+	FMDParametersRequest,
+	FMDParametersResponse,
+	NoteByCommitmentRequest,
+	NoteByCommitmentResponse,
+	NotesRequest,
+	NotesResponse,
+	StatusRequest,
+	StatusResponse,
+	TransactionInfoRequest,
+	TransactionInfoResponse,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 const { parse } = create()
 
@@ -159,51 +173,17 @@ export class ProviderPenumbra implements Provider {
 			})
 	}
 
-	public getTransactionHashes(request?: object) {
-		return this._apiPromise
-			.then(api =>
-				api.getTransactionHashes(
-					new TransactionHashesRequest(request).toBinary()
-				)
-			)
-			.then(data => {
-				const res = data.map(i => {
-					return new TransactionHashesResponse().fromBinary(
-						new Uint8Array(Object.values(i))
-					)
-				})
-
-				return res
-			})
-	}
-
 	public getTransactions(request?: object) {
 		return this._apiPromise
 			.then(api =>
-				api.getTransactions(new TransactionsRequest(request).toBinary())
+				api.getTransactions(new TransactionInfoRequest(request).toBinary())
 			)
 			.then(data => {
 				const res = data.map(i => {
-					return new TransactionsResponse().fromBinary(
+					return new TransactionInfoResponse().fromBinary(
 						new Uint8Array(Object.values(i))
 					)
 				})
-
-				return res
-			})
-	}
-
-	public getTransactionByHash(request?: object) {
-		return this._apiPromise
-			.then(api => {
-				return api.getTransactionByHash(
-					new TransactionByHashRequest(request).toBinary()
-				)
-			})
-			.then(data => {
-				const res = new TransactionByHashResponse().fromBinary(
-					new Uint8Array(Object.values(data))
-				)
 
 				return res
 			})
