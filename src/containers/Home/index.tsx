@@ -23,7 +23,6 @@ export const Home = () => {
 					<div className='w-[100%] flex items-center justify-between ext:py-[15.5px] tablet:py-[13.5px] px-[18px] border-y-[1px] border-solid border-dark_grey'>
 						<div className='flex flex-col'>
 							<p className='text_button mb-[4px]'>Stake</p>
-							{/* <p className="text_body text-light_grey">Earn to 21% per year</p> */}
 						</div>
 						<Button
 							mode='transparent'
