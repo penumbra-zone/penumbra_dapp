@@ -14,7 +14,6 @@ import img from './assets/img/logo.png'
 import { BalanceDetail, Home, SendTx, Validators } from './containers'
 import { routesPath } from './utils/constants'
 import { BalanceContextProvider } from './context'
-import { base64_to_bech32 } from 'penumbra-wasm'
 
 export const getShortKey = (text: string) => {
 	if (!text) return ''
@@ -22,6 +21,9 @@ export const getShortKey = (text: string) => {
 }
 
 export default function App() {
+	useEffect(() => {
+		console.log('updated 10.05.23')
+	}, [])
 	return (
 		<AuthProvider>
 			<Routes>
