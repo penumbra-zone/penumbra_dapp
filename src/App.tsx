@@ -22,7 +22,7 @@ export const getShortKey = (text: string) => {
 
 export default function App() {
 	useEffect(() => {
-		console.log('updated 10.05.23')
+		console.log('updated 12.05.23')
 	}, [])
 	return (
 		<AuthProvider>
