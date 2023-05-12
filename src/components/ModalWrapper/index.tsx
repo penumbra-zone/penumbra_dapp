@@ -27,12 +27,12 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 
 	const modalContent = show ? (
 		<div
-			className='top-[0] w-[100%] h-[100vh] fixed bg-background-0.7 overflow-y-hidden z-150'
+			className='top-[0] w-[100%] h-[100vh] fixed bg-background-0.7 overflow-y-hidden z-150 flex items-center justify-center'
 			onClick={onClose}
 		>
-			<div className='flex items-center justify-center'>
+			{/* <div className='flex items-center justify-center'> */}
 				<div
-					className={`w-[100%] ext:h-[100vh] tablet:h-[100vh] flex ${
+					className={`w-[100%] ext:h-[100vh] tablet:h-[80vh] overflow-auto flex ${
 						position === 'center'
 							? 'items-center justify-center'
 							: 'items-start justify-end mt-[100px] ext:mx-[40px] laptop:mx-[312px]'
@@ -45,7 +45,7 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 						{children}
 					</div>
 				</div>
-			</div>
+			{/* </div> */}
 		</div>
 	) : null
 
