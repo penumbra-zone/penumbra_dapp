@@ -10,7 +10,7 @@
 		"axios": "^1.3.6",
 		"moment": "^2.29.4",
 		"parse-json-bignumber": "^1.0.0",
-		"penumbra-wasm": "^0.51.0",
+		"penumbra-wasm": "^0.52.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"react-router-dom": "^6.10.0",
