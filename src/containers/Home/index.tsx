@@ -18,9 +18,10 @@ export const Home = () => {
 	return (
 		<>
 			{auth.user ? (
-				<div className='py-[16px] flex flex-col items-center justify-center bg-brown rounded-[15px]'>
+				<div className='flex flex-col items-center justify-center '>
+				<div className='py-[16px] w-[800px] bg-brown rounded-[15px]'>
 					<BalanceAction />
-					<div className='w-[100%] flex items-center justify-between ext:py-[15.5px] tablet:py-[13.5px] px-[18px] border-y-[1px] border-solid border-dark_grey'>
+					<div className='w-[100%] flex items-center justify-between ext:py-[15.5px] tablet:py-[13.5px] border-y-[1px] border-solid border-dark_grey'>
 						<div className='flex flex-col'>
 							<p className='text_button mb-[4px]'>Stake</p>
 						</div>
@@ -42,6 +43,7 @@ export const Home = () => {
 						}
 						className='bg-brown'
 					/>
+				</div>
 				</div>
 			) : (
 				<p className='h1 mt-[300px] text-center'>

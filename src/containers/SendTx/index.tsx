@@ -15,6 +15,7 @@ import { NotesResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/
 import { useBalance } from '../../context'
 import { uint8ToBase64 } from '../../utils/uint8ToBase64'
 import * as wasm from 'penumbra-wasm'
+import { getShortName } from '../../utils/getShortValue'
 
 export const SendTx = () => {
 	const auth = useAuth()
@@ -43,14 +44,14 @@ export const SendTx = () => {
 				value: i[0],
 				label: (
 					<div className='flex flex-col'>
-						<p className='text_numbers'>PNB</p>
+						<p className='text_numbers'>{getShortName(i[1].denom.denom)}</p>
 						<div className='flex items-center'>
 							<p className='text_body text-light_grey'>Balance:</p>
 							<p className='text_numbers_s text-light_grey ml-[16px]'>
 								{Number(Number(i[1].amount?.lo || 0) / 10 ** 6).toLocaleString(
 									'en-US'
 								)}{' '}
-								{i[1].denom.denom}
+								{getShortName(i[1].denom.denom)}
 							</p>
 						</div>
 					</div>
@@ -132,7 +133,7 @@ export const SendTx = () => {
 
 	return (
 		<div className='w-[100%]  flex flex-col items-center justify-center ext:py-[40px] tablet:py-[0px] tablet:mb-[20px]'>
-			<div className='w-[400px]'>
+			<div className='w-[800px]'>
 				<div className='w-[100%]  flex flex-col items-center justify-center ext:py-[40px] tablet:py-[0px] tablet:mb-[20px]'>
 					<div className='w-[100%] flex justify-center items-center mb-[8px]'>
 						<p className='h1 ml-[auto]'>Send to address</p>

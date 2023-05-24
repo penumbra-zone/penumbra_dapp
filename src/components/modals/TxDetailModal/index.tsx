@@ -174,12 +174,8 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 	}, [transaction, assets, notes])
 
 	return (
-		<ModalWrapper
-			show={show}
-			onClose={onClose}
-			className='pt-[30px] pb-[52px] px-[24px] w-[500px]'
-		>
-			<div className='overflow-scroll'>
+		<ModalWrapper show={show} onClose={onClose}>
+			<div className='relative overflow-y-auto pt-[30px] pb-[52px] px-[24px]'>
 				<div className='w-[100%]'>
 					{actionText!.map((i, index) => {
 						return (

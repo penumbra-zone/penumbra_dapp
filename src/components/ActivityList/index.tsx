@@ -40,16 +40,17 @@ export const ActivityList = () => {
 								className='px-[18px] py-[12px] border-y-[1px] border-solid border-dark_grey ext:mb-[8px] tablet:mb-[16px flex justify-between items-center cursor-pointer'
 								onClick={handleSelect(i)}
 							>
-								<div className='flex items-center'>
+								<div className='flex items-center w-[100%]'>
 									<ArrowUpRightSvg />
-									<div className='flex flex-col ml-[16px]'>
+									<div className='flex flex-col ml-[14px]'>
 										<p className='h3 mb-[6px]'>Send</p>
+										<p className='text_body text-green'>Block height :</p>
 										<p className='text_body text-green'>
-											Block height : {String(i.txInfo?.height)}{' '}
+											{String(i.txInfo?.height)}
 										</p>
 									</div>
-									<p className='text_body ml-[16px]'>Hash: </p>
-									<p className='text_body ml-[8px] break-words w-[300px]'>
+									<p className='text_body ml-[14px]'>Hash: </p>
+									<p className='text_body ml-[14px] break-all'>
 										{uint8ToBase64(i.txInfo?.id?.hash!)}
 									</p>
 								</div>
