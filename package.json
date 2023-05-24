@@ -3,6 +3,7 @@
 	"version": "0.1.2",
 	"private": true,
 	"dependencies": {
+		"@buf/penumbra-zone_penumbra.bufbuild_connect-es": "^0.8.6-20230522154434-c2601a060351.1",
 		"@buf/penumbra-zone_penumbra.bufbuild_connect-web": "^0.8.6-20230522154434-c2601a060351.1",
 		"@buf/penumbra-zone_penumbra.bufbuild_es": "^1.2.0-20230522154434-c2601a060351.1",
 		"@bufbuild/connect": "^0.8.6",

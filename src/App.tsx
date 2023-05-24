@@ -14,6 +14,9 @@ import img from './assets/img/logo.png'
 import { BalanceDetail, Home, SendTx, Validators } from './containers'
 import { routesPath } from './utils/constants'
 import { BalanceContextProvider } from './context'
+import { createPromiseClient } from '@bufbuild/connect'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { createWebExtTransport } from './utils/webExtTransport'
 
 export const getShortKey = (text: string) => {
 	if (!text) return ''
@@ -24,6 +27,16 @@ export default function App() {
 	useEffect(() => {
 		console.log('updated 12.05.23')
 	}, [])
+
+	const getStatus = async () => {
+		const client = createPromiseClient(
+			ViewProtocolService,
+			createWebExtTransport(ViewProtocolService)
+		)
+		const status = await client.status({})
+		console.log(status)
+	}
+	getStatus()
 	return (
 		<AuthProvider>
 			<Routes>
