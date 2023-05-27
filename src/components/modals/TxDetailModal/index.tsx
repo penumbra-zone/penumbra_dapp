@@ -80,16 +80,24 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 
 					const amount =
 						//@ts-ignore
-						i.actionView.value.outputView.value.note.value.valueView.value
-							.amount.lo
+						assetId.includes('nft')
+							? Number(
+									//@ts-ignore
+									i.actionView.value.outputView.value.note.value.valueView.value
+										.amount.lo
+							  )
+							: Number(
+									//@ts-ignore
+									i.actionView.value.outputView.value.note.value.valueView.value
+										.amount.lo
+							  ) /
+							  10 ** 6
 
 					return {
 						text:
 							addresView.case === 'opaque'
-								? `${Number(amount) / 10 ** 6} ${assetId} to ${getShortKey(
-										address
-								  )}`
-								: `${Number(amount) / 10 ** 6} ${assetId}`,
+								? `${amount} ${assetId} to ${getShortKey(address)}`
+								: `${amount} ${assetId}`,
 						type: addresView.case === 'opaque' ? 'Send' : 'Receive',
 					}
 				} catch (error) {

@@ -24,11 +24,27 @@ export const AssetsList: React.FC<IAssetList> = ({ assets }) => {
 					// tabIndex={0}
 					className='flex items-center justify-between py-[20px] pl-[22px] pr-[30px] border-y-[1px] border-solid border-dark_grey'
 				>
-					<div className='flex items-center'>
-						{/* <div className="relative w-[51px] h-[51px] bg-brown rounded-[50%] li_gradient text_body before:content-['PNB'] before:absolute before:top-[0.5px] before:left-[0.5px] before:w-[calc(100%-1px)] before:h-[calc(100%-1px)] before:bg-brown before:rounded-[50%] before:flex before:items-center before:justify-center"></div> */}
+					{/* <div className='flex items-center'>
+			
 						<p className='pl-[16px] text_numbers'>
-							{(Number(i.amount!.lo) / 10 ** 6).toLocaleString('en-US')}{' '}
-							{i?.denom?.denom}
+							{i[1].denom.denom.includes("nft")?(Number(i[1].amount!.lo)).toLocaleString('en-US'):(Number(i[1].amount!.lo) / 10 ** 6).toLocaleString('en-US')}{' '}
+							{i[1].denom.denom}
+						</p>
+					</div> */}
+					<div className='flex items-center justify-between'>
+						<p className='pl-[16px] text_numbers'>
+							{i.denom?.denom.includes('nft')
+								? Number(i.amount!.lo).toLocaleString('en-US', {
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 20,
+								  })
+								: (Number(i.amount!.lo) / 10 ** 6).toLocaleString('en-US', {
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 20,
+								  })}
+						</p>
+						<p className='pl-[4px] pr-[16px] h4 break-all'>
+							{i.denom?.denom}
 						</p>
 					</div>
 					<div className='rotate-180'>
