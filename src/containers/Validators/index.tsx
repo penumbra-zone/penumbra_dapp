@@ -8,7 +8,7 @@ import { createPromiseClient } from '@bufbuild/connect'
 import { ValidatorInfoRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import { AllValidators } from '../../components/AllValidators'
 import { useBalance } from '../../context'
-import { getAssetDenom, getBalanceByDenom } from '../../utils/assets'
+import { getBalanceByDenom } from '../../utils/assets'
 
 export const Validators = () => {
 	const { balance } = useBalance()
@@ -42,11 +42,9 @@ export const Validators = () => {
 				<div className='w-[800px]'>
 					<div className='w-[100%] flex items-center justify-between rounded-[15px] bg-brown py-[24px] px-[20px] mb-[24px]'>
 						<div className='flex flex-col'>
-							<p className='h3 mb-[16px]'>
-								Total {getAssetDenom(balance)} amount
-							</p>
+							<p className='h3 mb-[16px]'>Total upenumbra amount</p>
 							<p className='text_numbers pb-[4px]'>
-								{`${getBalanceByDenom(balance)} ${getAssetDenom(balance)}`}
+								{`${getBalanceByDenom(balance, 'upenumbra')} upenumbra`}
 							</p>
 							<div className='flex text_numbers_s'>
 								<p>~ $ -</p>
@@ -70,15 +68,13 @@ export const Validators = () => {
 					<div className='w-[100%] flex items-center justify-between rounded-[15px] bg-brown py-[24px] px-[20px] mb-[40px]'>
 						<div className='flex flex-col'>
 							<p className='h3 mb-[8px]'>Staked Amount</p>
-							<p className='text_numbers mb-[4px]'>
-								0 {getAssetDenom(balance)}
-							</p>
+							<p className='text_numbers mb-[4px]'>0 upenumbra</p>
 							<p className='text_numbers_s'>~ $ -</p>
 						</div>
 						<div className='flex flex-col border-l-[1px] border-solid border-light_brown pl-[24px]'>
 							<p className='h3 mb-[8px]'>Available Balance</p>
 							<p className='text_numbers pb-[4px]'>
-								{`${getBalanceByDenom(balance)} ${getAssetDenom(balance)}`}
+								{`${getBalanceByDenom(balance, 'upenumbra')}       upenumbra`}
 							</p>
 							<p className='text_numbers_s'>~ $ -</p>
 						</div>
@@ -98,10 +94,7 @@ export const Validators = () => {
 					className='bg-[#000000]'
 					children={(type: string) =>
 						type === 'All Penumbra Validators' ? (
-							<AllValidators
-								validators={validators}
-								denom={getAssetDenom(balance)}
-							/>
+							<AllValidators validators={validators} denom='upenumbra' />
 						) : (
 							<div className=' flex items-center justify-center w-[100%] bg-brown rounded-[15px] h-[400px] text_body text-light_brown'>
 								There are not validators

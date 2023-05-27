@@ -1,14 +1,31 @@
 import React from 'react'
-import { AssetsResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import {
+	AssetsRequest,
+	AssetsResponse,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { useEffect, useState } from 'react'
+import { createPromiseClient } from '@bufbuild/connect'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { createWebExtTransport } from '../../utils/webExtTransport'
 
 export const Assets = () => {
 	const [res, setRes] = useState<AssetsResponse[]>([])
 
 	useEffect(() => {
-		window.penumbra.on('assets', asset => {
-			setRes(state => [...state, asset])
-		})
+		const getAssets = async () => {
+			const client = createPromiseClient(
+				ViewProtocolService,
+				createWebExtTransport(ViewProtocolService)
+			)
+
+			const assetsRequest = new AssetsRequest({})
+
+			for await (const asset of client.assets(assetsRequest)) {
+				setRes(state => [...state, asset])
+			}
+		}
+		getAssets()
+		
 	}, [])
 
 	return (

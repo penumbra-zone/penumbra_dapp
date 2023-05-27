@@ -3,7 +3,7 @@ import { routesPath } from '../../utils/constants'
 import { ArrowUpRightSvg, CachedSvg, DowmloadSvg } from '../Svg'
 import { Button } from '../Tab/Button'
 import { useBalance } from '../../context'
-import { getAssetDenom, getBalanceByDenom } from '../../utils/assets'
+import { getBalanceByDenom } from '../../utils/assets'
 
 interface IBalanceAction {
 	name?: string
@@ -19,7 +19,8 @@ export const BalanceAction: React.FC<IBalanceAction> = ({ name }) => {
 		<div className='w-[100%] flex flex-col items-center'>
 			<div className="relative ext:w-[40px] ext:h-[40px] tablet:w-[51px] tablet:h-[51px] bg-brown rounded-[50%] li_gradient text_body before:content-['PNB'] before:absolute before:top-[0.5px] before:left-[0.5px] before:w-[calc(100%-1px)] before:h-[calc(100%-1px)] before:bg-brown before:rounded-[50%] before:flex before:items-center before:justify-center"></div>
 			<p className='pt-[16px] pb-[24px] text_numbers'>
-				{getBalanceByDenom(balance, name)} {getAssetDenom(balance, name)}
+				{getBalanceByDenom(balance, 'upenumbra')}{' '}
+				upenumbra
 			</p>
 			<div className='flex ext:gap-x-[30px]  tablet:gap-x-[69px] ext:mb-[24px] tablet:mb-[40px]'>
 				<div className='flex flex-col items-center'>

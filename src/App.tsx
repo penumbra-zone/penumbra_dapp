@@ -17,6 +17,11 @@ import { BalanceContextProvider } from './context'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import { createWebExtTransport } from './utils/webExtTransport'
+import { AssetInfoRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
+import {
+	AssetsRequest,
+	StatusStreamRequest,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 export const getShortKey = (text: string) => {
 	if (!text) return ''
@@ -28,15 +33,19 @@ export default function App() {
 		console.log('updated 12.05.23')
 	}, [])
 
-	const getStatus = async () => {
-		const client = createPromiseClient(
-			ViewProtocolService,
-			createWebExtTransport(ViewProtocolService)
-		)
-		const status = await client.status({})
-		console.log(status)
-	}
-	getStatus()
+	// const getStatus = async () => {
+	// 	const client = createPromiseClient(
+	// 		ViewProtocolService,
+	// 		createWebExtTransport(ViewProtocolService)
+	// 	)
+
+	// 	const statusRequest = new StatusStreamRequest({})
+
+	// 	for await (const statusResponse of client.statusStream(statusRequest)) {
+	// 		console.log({ statusResponse })
+	// 	}
+	// }
+	// getStatus()
 	return (
 		<AuthProvider>
 			<Routes>

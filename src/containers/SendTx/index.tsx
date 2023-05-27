@@ -38,20 +38,20 @@ export const SendTx = () => {
 	}, [])
 
 	const options = useMemo(() => {
-		if (!Object.values(balance).length) return []
-		return Object.entries(balance).map(i => {
+		if (!balance.length) return []
+		return balance.map(i => {
 			return {
-				value: i[0],
+				value: String(i.denom?.denom),
 				label: (
 					<div className='flex flex-col'>
-						<p className='text_numbers'>{getShortName(i[1].denom.denom)}</p>
+						<p className='text_numbers'>{getShortName(i!.denom!.denom)}</p>
 						<div className='flex items-center'>
 							<p className='text_body text-light_grey'>Balance:</p>
 							<p className='text_numbers_s text-light_grey ml-[16px]'>
-								{Number(Number(i[1].amount?.lo || 0) / 10 ** 6).toLocaleString(
+								{Number(Number(i.amount?.lo || 0) / 10 ** 6).toLocaleString(
 									'en-US'
 								)}{' '}
-								{getShortName(i[1].denom.denom)}
+								{getShortName(i!.denom!.denom)}
 							</p>
 						</div>
 					</div>
@@ -83,7 +83,14 @@ export const SendTx = () => {
 	const handleBack = () => navigate(routesPath.HOME)
 
 	const handleMax = () =>
-		setAmount(String(Number(select ? balance[select].amount?.lo : 0) / 10 ** 6))
+		setAmount(
+			String(
+				Number(
+					select ? balance.find(i => i.denom?.denom === select)?.amount?.lo : 0
+				) /
+					10 ** 6
+			)
+		)
 
 	const getTransactionPlan = async () => {
 		const fvk = auth.user!.fvk
@@ -173,12 +180,12 @@ export const SendTx = () => {
 									labelClassName='h3 text-light_grey mb-[16px]'
 									label='Total :'
 									value={amount}
-									isError={
-										select
-											? Number(balance[select].amount?.lo) / 10 ** 6 <
-											  Number(amount)
-											: false
-									}
+									// isError={
+									// 	select
+									// 		? Number(balance[select].amount?.lo) / 10 ** 6 <
+									// 		  Number(amount)
+									// 		: false
+									// }
 									onChange={handleChangeAmout}
 									className='mt-[24px]'
 									helperText={'You do not have enough token'}
@@ -204,12 +211,12 @@ export const SendTx = () => {
 									onClick={getTransactionPlan}
 									title='Send'
 									className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
-									disabled={
-										!Number(amount) ||
-										!select ||
-										Number(balance[select].amount?.lo) / 10 ** 6 <
-											Number(amount)
-									}
+									// disabled={
+									// 	!Number(amount) ||
+									// 	!select ||
+									// 	Number(balance[select].amount?.lo) / 10 ** 6 <
+									// 		Number(amount)
+									// }
 								/>
 							</div>
 						</div>
