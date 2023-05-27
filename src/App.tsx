@@ -33,19 +33,6 @@ export default function App() {
 		console.log('updated 12.05.23')
 	}, [])
 
-	// const getStatus = async () => {
-	// 	const client = createPromiseClient(
-	// 		ViewProtocolService,
-	// 		createWebExtTransport(ViewProtocolService)
-	// 	)
-
-	// 	const statusRequest = new StatusStreamRequest({})
-
-	// 	for await (const statusResponse of client.statusStream(statusRequest)) {
-	// 		console.log({ statusResponse })
-	// 	}
-	// }
-	// getStatus()
 	return (
 		<AuthProvider>
 			<Routes>

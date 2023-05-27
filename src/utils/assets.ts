@@ -7,7 +7,7 @@ export const getBalanceByDenom = (
 	denom: string
 ): string => {
 	return (
-		Number(balance.find(i => i.denom?.denom === denom)?.amount?.lo) /
+		(Number(balance.find(i => i.denom?.denom === denom)?.amount?.lo) || 0) /
 		10 ** 6
 	).toLocaleString('en-US')
 	// (

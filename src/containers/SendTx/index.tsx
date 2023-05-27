@@ -44,14 +44,18 @@ export const SendTx = () => {
 				value: String(i.denom?.denom),
 				label: (
 					<div className='flex flex-col'>
-						<p className='text_numbers'>{getShortName(i!.denom!.denom)}</p>
+						<p className='text_numbers break-all'>{i!.denom!.denom}</p>
 						<div className='flex items-center'>
 							<p className='text_body text-light_grey'>Balance:</p>
 							<p className='text_numbers_s text-light_grey ml-[16px]'>
 								{Number(Number(i.amount?.lo || 0) / 10 ** 6).toLocaleString(
-									'en-US'
+									'en-US',
+									{
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 20,
+									}
 								)}{' '}
-								{getShortName(i!.denom!.denom)}
+								{/* {getShortName(i!.denom!.denom)} */}
 							</p>
 						</div>
 					</div>
@@ -140,7 +144,7 @@ export const SendTx = () => {
 
 	return (
 		<div className='w-[100%]  flex flex-col items-center justify-center ext:py-[40px] tablet:py-[0px] tablet:mb-[20px]'>
-			<div className='w-[800px]'>
+			<div className='w-[400px]'>
 				<div className='w-[100%]  flex flex-col items-center justify-center ext:py-[40px] tablet:py-[0px] tablet:mb-[20px]'>
 					<div className='w-[100%] flex justify-center items-center mb-[8px]'>
 						<p className='h1 ml-[auto]'>Send to address</p>
