@@ -52,8 +52,6 @@ export const SendTx = () => {
 		getNotes()
 	}, [])
 
-	// console.log({ notes })
-
 	const options = useMemo(() => {
 		if (!balance.length) return []
 		return balance.map(i => {
@@ -117,19 +115,18 @@ export const SendTx = () => {
 		const fvk = auth.user!.fvk
 
 		if (!fvk) return
-		const selectedAsset = uint8ToBase64(balance.find(i => i.denom?.denom === select)?.asset
-			?.inner!)
+		const selectedAsset = uint8ToBase64(
+			balance.find(i => i.denom?.denom === select)?.asset?.inner!
+		)
 
 		const filteredNotes = notes
 			.filter(
 				note =>
 					!note.noteRecord?.heightSpent &&
 					uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
-					selectedAsset
+						selectedAsset
 			)
 			.map(i => i.noteRecord?.toJson())
-
-		console.log({ filteredNotes })
 
 		if (!filteredNotes.length) console.error('No notes found to spend')
 

@@ -21,8 +21,6 @@ export const ActivityList = () => {
 		undefined | TransactionInfoResponse
 	>()
 
-	console.log({ transactions })
-
 	useEffect(() => {
 		const getNotes = async () => {
 			const client = createPromiseClient(
@@ -40,7 +38,6 @@ export const ActivityList = () => {
 	}, [])
 
 	useEffect(() => {
-		
 		const getTxs = async () => {
 			const client = createPromiseClient(
 				ViewProtocolService,

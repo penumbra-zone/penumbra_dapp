@@ -77,7 +77,9 @@ export const createWebExtTransport = (s: typeof ViewProtocolService) =>
 				}
 			},
 			async *transactionInfo(message: TransactionInfoRequest) {
-				window.penumbra.on('transactions', tx => receiveMessage(tx))
+				window.penumbra.on('transactions', tx => receiveMessage(tx), message.toJson())
+
+				
 
 				for await (const res of createMessageStream()) {
 					yield new TransactionInfoResponse(res as any)
