@@ -40,6 +40,8 @@ export const BalanceContextProvider = (props: Props) => {
 	// >({})
 	const [balances, setBalances] = useState<BalanceByAddressResponse[]>([])
 	const [assets, setAssets] = useState<AssetsResponse[]>([])
+	console.log({balances, assets});
+	
 
 	const assetBalance = useMemo(() => {
 		if (balances.length === assets.length) {

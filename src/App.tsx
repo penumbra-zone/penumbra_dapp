@@ -14,14 +14,6 @@ import img from './assets/img/logo.png'
 import { BalanceDetail, Home, SendTx, Validators } from './containers'
 import { routesPath } from './utils/constants'
 import { BalanceContextProvider } from './context'
-import { createPromiseClient } from '@bufbuild/connect'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
-import { createWebExtTransport } from './utils/webExtTransport'
-import { AssetInfoRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
-import {
-	AssetsRequest,
-	StatusStreamRequest,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 export const getShortKey = (text: string) => {
 	if (!text) return ''

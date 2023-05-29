@@ -1,11 +1,16 @@
 import { ArrowUpRightSvg, ChevronLeftIcon } from '../Svg'
 import { useEffect, useState } from 'react'
 import {
+	NotesRequest,
 	NotesResponse,
+	TransactionInfoRequest,
 	TransactionInfoResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { uint8ToBase64 } from '../../utils/uint8ToBase64'
 import { TxDetailModal } from '../modals/TxDetailModal'
+import { createPromiseClient } from '@bufbuild/connect'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { createWebExtTransport } from '../../utils/webExtTransport'
 
 export const ActivityList = () => {
 	const [transactions, setTransactions] = useState<TransactionInfoResponse[]>(
@@ -16,16 +21,39 @@ export const ActivityList = () => {
 		undefined | TransactionInfoResponse
 	>()
 
+	console.log({ transactions })
+
 	useEffect(() => {
-		window.penumbra.on('notes', note => {
-			setNotes(state => [...state, note])
-		})
+		const getNotes = async () => {
+			const client = createPromiseClient(
+				ViewProtocolService,
+				createWebExtTransport(ViewProtocolService)
+			)
+
+			const notesRequest = new NotesRequest({})
+
+			for await (const note of client.notes(notesRequest)) {
+				setNotes(state => [...state, note])
+			}
+		}
+		getNotes()
 	}, [])
 
 	useEffect(() => {
-		window.penumbra.on('transactions', tx => {
-			setTransactions(state => [...state, tx])
-		})
+		
+		const getTxs = async () => {
+			const client = createPromiseClient(
+				ViewProtocolService,
+				createWebExtTransport(ViewProtocolService)
+			)
+
+			const txsRequest = new TransactionInfoRequest({})
+
+			for await (const tx of client.transactionInfo(txsRequest)) {
+				setTransactions(state => [...state, tx])
+			}
+		}
+		getTxs()
 	}, [])
 
 	const handleSelect = (tx?: TransactionInfoResponse) => () => setSelectedTx(tx)

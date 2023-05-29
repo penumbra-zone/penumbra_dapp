@@ -11,11 +11,16 @@ import {
 	AddressValidatorsType,
 	validateAddress,
 } from '../../utils/validate/validateAddress'
-import { NotesResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import {
+	NotesRequest,
+	NotesResponse,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { useBalance } from '../../context'
 import { uint8ToBase64 } from '../../utils/uint8ToBase64'
 import * as wasm from 'penumbra-wasm'
-import { getShortName } from '../../utils/getShortValue'
+import { createPromiseClient } from '@bufbuild/connect'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { createWebExtTransport } from '../../utils/webExtTransport'
 
 export const SendTx = () => {
 	const auth = useAuth()
@@ -32,10 +37,22 @@ export const SendTx = () => {
 	const [notes, setNotes] = useState<NotesResponse[]>([])
 
 	useEffect(() => {
-		window.penumbra.on('notes', note => {
-			setNotes(state => [...state, note])
-		})
+		const getNotes = async () => {
+			const client = createPromiseClient(
+				ViewProtocolService,
+				createWebExtTransport(ViewProtocolService)
+			)
+
+			const notesRequest = new NotesRequest({})
+
+			for await (const note of client.notes(notesRequest)) {
+				setNotes(state => [...state, note])
+			}
+		}
+		getNotes()
 	}, [])
+
+	// console.log({ notes })
 
 	const options = useMemo(() => {
 		if (!balance.length) return []
@@ -100,22 +117,32 @@ export const SendTx = () => {
 		const fvk = auth.user!.fvk
 
 		if (!fvk) return
+		const selectedAsset = uint8ToBase64(balance.find(i => i.denom?.denom === select)?.asset
+			?.inner!)
+
 		const filteredNotes = notes
 			.filter(
 				note =>
 					!note.noteRecord?.heightSpent &&
 					uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
-						select
+					selectedAsset
 			)
 			.map(i => i.noteRecord?.toJson())
+
+		console.log({ filteredNotes })
+
 		if (!filteredNotes.length) console.error('No notes found to spend')
 
-		const fmdParameters = (await window.penumbra.getFmdParameters()).parameters
+		const client = createPromiseClient(
+			ViewProtocolService,
+			createWebExtTransport(ViewProtocolService)
+		)
+
+		const fmdParameters = (await client.fMDParameters({})).parameters
 
 		if (!fmdParameters) console.error('No found FmdParameters')
 
-		const chainParameters = (await window.penumbra.getChainParameters())
-			.parameters
+		const chainParameters = (await client.chainParameters({})).parameters
 		if (!chainParameters) console.error('No found chain parameters')
 
 		const viewServiceData = {
@@ -129,7 +156,7 @@ export const SendTx = () => {
 				lo: Number(amount) * 1000000,
 				hi: 0,
 			},
-			assetId: { inner: select },
+			assetId: { inner: selectedAsset },
 		}
 
 		const transactionPlan = await wasm.send_plan(

@@ -69,20 +69,32 @@ In Penumbra, using the penumbra.signTransaction method directly, sending a trans
 
 		const fullViewingKey = userData.fvk  // fullViewingKey get`s from window.penumbra.publicState()
 
-		const filteredNotes = notes.filter(
-			note =>
-				!note.noteRecord?.heightSpent &&
-				uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
-				assetId
-		)
-		.map(i => i.noteRecord?.toJson()) // notes get`s from penumbra.on('notes')
+		if (!fullViewingKey) return;
+
+		const selectedAsset = uint8ToBase64(balance.find(i => i.denom?.denom === select)?.asset
+			?.inner!)
+
+		const filteredNotes = notes
+			.filter(
+				note =>
+					!note.noteRecord?.heightSpent &&
+					uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
+					selectedAsset
+			)
+			.map(i => i.noteRecord?.toJson())
 
 		if (!filteredNotes.length) console.error('No notes found to spend')
 
-		const fmdParameters = (await window.penumbra.getFmdParameters()).parameters
+		const client = createPromiseClient(
+			ViewProtocolService,
+			createWebExtTransport(ViewProtocolService)
+		)
+
+		const fmdParameters = (await client.fMDParameters({})).parameters
+
 		if (!fmdParameters) console.error('No found FmdParameters')
 
-		const chainParameters = (await window.penumbra.getChainParameters()).parameters
+		const chainParameters = (await client.chainParameters({})).parameters
 		if (!chainParameters) console.error('No found chain parameters')
 
 		const viewServiceData = {
@@ -93,13 +105,13 @@ In Penumbra, using the penumbra.signTransaction method directly, sending a trans
 
 		const valueJs = {
 			amount: {
-				lo: amount * 1000000,
+				lo: Number(amount) * 1000000,
 				hi: 0,
 			},
-			assetId: { inner: assetId },
+			assetId: { inner: selectedAsset },
 		}
 
-		const transactionPlan = await wasm.send_plan( // import wasm as "import * as wasm from 'penumbra-wasm'"
+		const transactionPlan = await wasm.send_plan(
 			fvk,
 			valueJs,
 			reciever,
@@ -111,47 +123,68 @@ In Penumbra, using the penumbra.signTransaction method directly, sending a trans
 
 ### View Service
 
+### Create client 
+	const client = createPromiseClient(
+		ViewProtocolService,
+		createWebExtTransport(ViewProtocolService)
+	)
+
 #### rpc Status
 
 Get current status of chain sync
 
-	window.penumbra.getStatus()
+	await client.status({})
 
 #### rpc StatusStream
 
 Stream sync status updates until the view service has caught up with the core.chain.v1alpha1.
 
-	window.penumbra.on('status', status => console.log(status))
+	for await (const note of client.statusStream({})) {
+		console.log(note)
+	}
 
 #### rpc Notes
 
 Queries for notes that have been accepted by the core.chain.v1alpha1.
 
-	window.penumbra.on('notes', note => console.log(note))
-
+	for await (const note of client.notes({})) {
+		console.log(note)
+	}
 #### rpc Assets
 
 Queries for assets.
 
-	window.penumbra.on('assets', asset => console.log(asset))
+	for await (const note of client.assets({})) {
+		console.log(note)
+	}
 
 #### rpc ChainParameters
 
 Query for the current chain parameters.
 
-	window.penumbra.getChainParameters()
+	await client.chainParameters({})
 
 #### rpc FMDParameters
 
 Query for the current FMD parameters.
 
-	window.penumbra.getFmdParameters()
+	await client.fMDParameters({})
 
 #### rpc BalanceByAddress
 
 Query for balance of a given address
 
-	window.penumbra.on('balance', balance => console.log(balance))
+	for await (const note of client.balanceByAddress({})) {
+		console.log(note)
+	}
+
+#### rpc TransactionInfo
+
+Query for the full transactions in the given range of blocks.
+
+	for await (const note of client.transactionInfo({})) {
+		console.log(note)
+	}
 
 ### Penumbra web assembly usage
 
