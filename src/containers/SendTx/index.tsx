@@ -63,14 +63,15 @@ export const SendTx = () => {
 						<div className='flex items-center'>
 							<p className='text_body text-light_grey'>Balance:</p>
 							<p className='text_numbers_s text-light_grey ml-[16px]'>
-								{Number(Number(i.amount?.lo || 0) / 10 ** 6).toLocaleString(
-									'en-US',
-									{
-										minimumFractionDigits: 2,
-										maximumFractionDigits: 20,
-									}
-								)}{' '}
-								{/* {getShortName(i!.denom!.denom)} */}
+								{i.denom?.denom.includes('nft')
+									? Number(i.amount!.lo).toLocaleString('en-US', {
+											minimumFractionDigits: 2,
+											maximumFractionDigits: 20,
+									  })
+									: (Number(i.amount!.lo) / 10 ** 6).toLocaleString('en-US', {
+											minimumFractionDigits: 2,
+											maximumFractionDigits: 20,
+									  })}
 							</p>
 						</div>
 					</div>
@@ -118,6 +119,11 @@ export const SendTx = () => {
 		const selectedAsset = uint8ToBase64(
 			balance.find(i => i.denom?.denom === select)?.asset?.inner!
 		)
+		const denom = balance
+			.find(i => i.denom?.denom === select)
+			?.denom?.denom.includes('nft')
+			? 1
+			: 1000000
 
 		const filteredNotes = notes
 			.filter(
@@ -150,7 +156,7 @@ export const SendTx = () => {
 
 		const valueJs = {
 			amount: {
-				lo: Number(amount) * 1000000,
+				lo: Number(amount) * denom,
 				hi: 0,
 			},
 			assetId: { inner: selectedAsset },

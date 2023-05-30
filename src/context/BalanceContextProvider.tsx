@@ -42,22 +42,20 @@ export const BalanceContextProvider = (props: Props) => {
 	const [assets, setAssets] = useState<AssetsResponse[]>([])
 
 	const assetBalance = useMemo(() => {
-		if (balances.length === assets.length) {
-			return balances
-				.map(balance => {
-					const id = uint8ToBase64(balance!.asset!.inner)
+		return balances
+			.map(balance => {
+				const id = uint8ToBase64(balance!.asset!.inner)
 
-					const asset = assets.find(
-						i => uint8ToBase64(i.asset?.id?.inner as Uint8Array) === id
-					)?.asset
+				const asset = assets.find(
+					i => uint8ToBase64(i.asset?.id?.inner as Uint8Array) === id
+				)?.asset
 
-					return {
-						...balance,
-						denom: asset?.denom,
-					}
-				})
-				.filter(balance => balance.amount?.lo)
-		} else return []
+				return {
+					...balance,
+					denom: asset?.denom,
+				}
+			})
+			.filter(balance => balance.amount?.lo)
 	}, [balances, assets])
 
 	useEffect(() => {
