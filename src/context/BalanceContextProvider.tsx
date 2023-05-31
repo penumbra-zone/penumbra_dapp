@@ -35,28 +35,30 @@ type Props = {
 
 export const BalanceContextProvider = (props: Props) => {
 	const auth = useAuth()
-	// const [balance, setBalance] = useState<
-	// 	Record<string, BalanceByAddressResponse & { denom: { denom: string } }>
-	// >({})
-	const [balances, setBalances] = useState<BalanceByAddressResponse[]>([])
+	const [balance, setBalance] = useState<
+		Record<string, BalanceByAddressResponse>
+	>({})
+	// const [balances, setBalances] = useState<BalanceByAddressResponse[]>([])
 	const [assets, setAssets] = useState<AssetsResponse[]>([])
 
-	const assetBalance = useMemo(() => {
-		return balances
-			.map(balance => {
-				const id = uint8ToBase64(balance!.asset!.inner)
-
-				const asset = assets.find(
-					i => uint8ToBase64(i.asset?.id?.inner as Uint8Array) === id
-				)?.asset
-
-				return {
-					...balance,
-					denom: asset?.denom,
-				}
+	const assetBalance: AssetBalance[] = useMemo(() => {
+		const detailAssets = Object.entries(balance).map(i => {
+			const asset = assets.find(j => {
+				return uint8ToBase64(j.asset?.id?.inner!) === i[0]
 			})
-			.filter(balance => balance.amount?.lo)
-	}, [balances, assets])
+
+			return {
+				[i[0]]: {
+					...i[1],
+					...asset?.asset,
+				},
+			}
+		})
+
+		return detailAssets
+			.map(i => Object.values(i)[0])
+			.filter(i => Number(i.amount?.lo))
+	}, [balance, assets])
 
 	useEffect(() => {
 		if (!auth.user) return
@@ -86,11 +88,17 @@ export const BalanceContextProvider = (props: Props) => {
 			const request = new BalanceByAddressRequest({})
 
 			for await (const balance of client.balanceByAddress(request)) {
-				setBalances(balances => [...balances, balance])
+				const asset = uint8ToBase64(balance.asset?.inner!)
+
+				setBalance(state => ({
+					...state,
+					[asset]: balance,
+				}))
 			}
 		}
 		getBalances()
 	}, [auth])
+
 	return (
 		<BalanceContext.Provider value={{ balance: assetBalance, assets }}>
 			{props.children}

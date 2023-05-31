@@ -52,9 +52,18 @@ export const SendTx = () => {
 		getNotes()
 	}, [])
 
+	const decimals = useMemo(() => {
+		return balance
+			.find(i => i.denom?.denom === select)
+			?.denom?.denom.includes('nft')
+			? 1
+			: 1000000
+	}, [balance, select])
+
 	const options = useMemo(() => {
 		if (!balance.length) return []
 		return balance.map(i => {
+			if (!i.denom?.denom) return { value: '', label: '' }
 			return {
 				value: String(i.denom?.denom),
 				label: (
@@ -68,7 +77,7 @@ export const SendTx = () => {
 											minimumFractionDigits: 2,
 											maximumFractionDigits: 20,
 									  })
-									: (Number(i.amount!.lo) / 10 ** 6).toLocaleString('en-US', {
+									: (Number(i.amount!.lo) / decimals).toLocaleString('en-US', {
 											minimumFractionDigits: 2,
 											maximumFractionDigits: 20,
 									  })}
@@ -107,8 +116,7 @@ export const SendTx = () => {
 			String(
 				Number(
 					select ? balance.find(i => i.denom?.denom === select)?.amount?.lo : 0
-				) /
-					10 ** 6
+				) / decimals
 			)
 		)
 
@@ -119,11 +127,6 @@ export const SendTx = () => {
 		const selectedAsset = uint8ToBase64(
 			balance.find(i => i.denom?.denom === select)?.asset?.inner!
 		)
-		const denom = balance
-			.find(i => i.denom?.denom === select)
-			?.denom?.denom.includes('nft')
-			? 1
-			: 1000000
 
 		const filteredNotes = notes
 			.filter(
@@ -156,7 +159,7 @@ export const SendTx = () => {
 
 		const valueJs = {
 			amount: {
-				lo: Number(amount) * denom,
+				lo: Number(amount) * decimals,
 				hi: 0,
 			},
 			assetId: { inner: selectedAsset },
@@ -214,12 +217,16 @@ export const SendTx = () => {
 									labelClassName='h3 text-light_grey mb-[16px]'
 									label='Total :'
 									value={amount}
-									// isError={
-									// 	select
-									// 		? Number(balance[select].amount?.lo) / 10 ** 6 <
-									// 		  Number(amount)
-									// 		: false
-									// }
+									isError={
+										select
+											? Number(
+													balance.find(i => select === i.denom?.denom)!.amount
+														?.lo
+											  ) /
+													decimals <
+											  Number(amount)
+											: false
+									}
 									onChange={handleChangeAmout}
 									className='mt-[24px]'
 									helperText={'You do not have enough token'}
@@ -245,12 +252,15 @@ export const SendTx = () => {
 									onClick={getTransactionPlan}
 									title='Send'
 									className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
-									// disabled={
-									// 	!Number(amount) ||
-									// 	!select ||
-									// 	Number(balance[select].amount?.lo) / 10 ** 6 <
-									// 		Number(amount)
-									// }
+									disabled={
+										!Number(amount) ||
+										!select ||
+										Number(
+											balance.find(i => select === i.denom?.denom)!.amount?.lo
+										) /
+											decimals <
+											Number(amount)
+									}
 								/>
 							</div>
 						</div>

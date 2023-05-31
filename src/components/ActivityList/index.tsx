@@ -47,7 +47,7 @@ export const ActivityList = () => {
 			const txsRequest = new TransactionInfoRequest({})
 
 			for await (const tx of client.transactionInfo(txsRequest)) {
-				setTransactions(state => [...state, tx])
+				setTransactions(state => [tx, ...state])
 			}
 		}
 		getTxs()
