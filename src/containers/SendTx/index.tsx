@@ -27,7 +27,7 @@ export const SendTx = () => {
 	const { balance } = useBalance()
 	const navigate = useNavigate()
 	const [reciever, setReciever] = useState<string>(
-		'penumbrav2t1fk9vamrkyskeysrlggyj2444axrdtck90cvysqg5ksmrh8r228mspwfflrw35unrhsncvwxr68f52gagrwfwp4gg9u0wmzarw8crxzyh5zhru048q8q4uemsl74c8vpasacufd'
+		'penumbrav2t156t9s3s0786ghjnpk20jjaweqyeavfevpd7rkjycllu5qtevuuy69j948fy6gpgwptl2mgcgl0u5mw8glk38puggxx290cryz6pvxde3vgv4tuuey4rlrpf2smes5wt2m957r9'
 	)
 	const [amount, setAmount] = useState<string>('')
 	const [select, setSelect] = useState<string>('')
@@ -121,58 +121,60 @@ export const SendTx = () => {
 		)
 
 	const getTransactionPlan = async () => {
-		const fvk = auth.user!.fvk
+		try {
+			const fvk = auth.user!.fvk
 
-		if (!fvk) return
-		const selectedAsset = uint8ToBase64(
-			balance.find(i => i.denom?.denom === select)?.asset?.inner!
-		)
-
-		const filteredNotes = notes
-			.filter(
-				note =>
-					!note.noteRecord?.heightSpent &&
-					uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
-						selectedAsset
+			if (!fvk) return
+			const selectedAsset = uint8ToBase64(
+				balance.find(i => i.denom?.denom === select)?.asset?.inner!
 			)
-			.map(i => i.noteRecord?.toJson())
 
-		if (!filteredNotes.length) console.error('No notes found to spend')
+			const filteredNotes = notes
+				.filter(
+					note =>
+						!note.noteRecord?.heightSpent &&
+						uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
+							selectedAsset
+				)
+				.map(i => i.noteRecord?.toJson())
 
-		const client = createPromiseClient(
-			ViewProtocolService,
-			createWebExtTransport(ViewProtocolService)
-		)
+			if (!filteredNotes.length) console.error('No notes found to spend')
 
-		const fmdParameters = (await client.fMDParameters({})).parameters
+			const client = createPromiseClient(
+				ViewProtocolService,
+				createWebExtTransport(ViewProtocolService)
+			)
 
-		if (!fmdParameters) console.error('No found FmdParameters')
+			const fmdParameters = (await client.fMDParameters({})).parameters
 
-		const chainParameters = (await client.chainParameters({})).parameters
-		if (!chainParameters) console.error('No found chain parameters')
+			if (!fmdParameters) console.error('No found FmdParameters')
 
-		const viewServiceData = {
-			notes: filteredNotes,
-			chain_parameters: chainParameters,
-			fmd_parameters: fmdParameters,
-		}
+			const chainParameters = (await client.chainParameters({})).parameters
+			if (!chainParameters) console.error('No found chain parameters')
 
-		const valueJs = {
-			amount: {
-				lo: Number(amount) * decimals,
-				hi: 0,
-			},
-			assetId: { inner: selectedAsset },
-		}
+			const viewServiceData = {
+				notes: filteredNotes,
+				chain_parameters: chainParameters,
+				fmd_parameters: fmdParameters,
+			}
 
-		const transactionPlan = await wasm.send_plan(
-			fvk,
-			valueJs,
-			reciever,
-			viewServiceData
-		)
+			const valueJs = {
+				amount: {
+					lo: Number(amount) * decimals,
+					hi: 0,
+				},
+				assetId: { inner: selectedAsset },
+			}
 
-		await window.penumbra.signTransaction(transactionPlan)
+			const transactionPlan = await wasm.send_plan(
+				fvk,
+				valueJs,
+				reciever,
+				viewServiceData
+			)
+
+			await window.penumbra.signTransaction(transactionPlan)
+		} catch (error) {}
 	}
 
 	return (
