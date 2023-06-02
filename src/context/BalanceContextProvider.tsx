@@ -61,7 +61,7 @@ export const BalanceContextProvider = (props: Props) => {
 	}, [balance, assets])
 
 	useEffect(() => {
-		if (!auth.user) return
+		if (!auth.walletAddress) return
 		const getAssets = async () => {
 			const client = createPromiseClient(
 				ViewProtocolService,
@@ -75,10 +75,10 @@ export const BalanceContextProvider = (props: Props) => {
 			}
 		}
 		getAssets()
-	}, [auth])
+	}, [auth.walletAddress])
 
 	useEffect(() => {
-		if (!auth.user) return
+		if (!auth.walletAddress) return
 		const getBalances = async () => {
 			const client = createPromiseClient(
 				ViewProtocolService,
@@ -97,7 +97,7 @@ export const BalanceContextProvider = (props: Props) => {
 			}
 		}
 		getBalances()
-	}, [auth])
+	}, [auth.walletAddress])
 
 	return (
 		<BalanceContext.Provider value={{ balance: assetBalance, assets }}>

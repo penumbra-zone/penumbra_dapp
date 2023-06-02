@@ -17,7 +17,7 @@ export const Home = () => {
 
 	return (
 		<>
-			{auth.user ? (
+			{auth.walletAddress ? (
 				<div className='flex flex-col items-center justify-center '>
 				<div className='py-[16px] w-[800px] bg-brown rounded-[15px]'>
 					<BalanceAction />

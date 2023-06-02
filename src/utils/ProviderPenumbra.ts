@@ -77,19 +77,22 @@ export class ProviderPenumbra implements Provider {
 	}
 
 	public login(): Promise<any> {
-		return this._apiPromise
-			.then(api => api.publicState())
-			.then(state => {
-				// in this case we already have state.account,
-				// otherwise api.publicState will throw an error
-				this.user = {
-					name: state.account?.name!,
-					addressByIndex: state.account?.addressByIndex!,
-					...state,
-				}
-				this._emitter.trigger('login', this.user)
-				return this.user
-			})
+		return new Promise((res) => {
+			return res
+		})
+		// return this._apiPromise
+		// 	.then(api => api.publicState())
+		// 	.then(state => {
+		// 		// in this case we already have state.account,
+		// 		// otherwise api.publicState will throw an error
+		// 		this.user = {
+		// 			name: state.account?.name!,
+		// 			addressByIndex: state.account?.addressByIndex!,
+		// 			...state,
+		// 		}
+		// 		this._emitter.trigger('login', this.user)
+		// 		return this.user
+		// 	})
 	}
 
 	public logout(): Promise<void> {

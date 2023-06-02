@@ -103,11 +103,9 @@ function Layout() {
 									className='w-[192px] object-cover cursor-pointer'
 									onClick={handleClick}
 								/>
-								{auth.user ? (
+								{auth.walletAddress ? (
 									<div>
-										<p className='h3'>
-											{getShortKey(auth.user.addressByIndex)}
-										</p>
+										<p className='h3'>{getShortKey(auth.walletAddress)}</p>
 									</div>
 								) : (
 									<Button
@@ -129,6 +127,7 @@ function Layout() {
 
 interface AuthContextType {
 	user: (UserData & { fvk: string }) | null
+	walletAddress?: string
 	signin: () => Promise<void>
 }
 
@@ -136,14 +135,44 @@ let AuthContext = createContext<AuthContextType>(null!)
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
 	let [user, setUser] = useState<null | (UserData & { fvk: string })>(null)
+	const [walletAddress, setWalletAddress] = useState<string | undefined>()
 
-	let signin = async () => {
-		const data = await window.penumbra.publicState()
-		const account = data.account
-		setUser(account)
+	useEffect(() => {
+		addWalletListener()
+	}, [])
+
+	const addWalletListener = async () => {
+		if (typeof window != 'undefined' && typeof window.penumbra != 'undefined') {
+			window.penumbra.on('accountsChanged', accounts => {
+				setWalletAddress(accounts[0])
+			})
+		} else {
+			/* Penumbra is not installed */
+			setWalletAddress(undefined)
+			console.log('Please install Penumbra Wallet')
+		}
 	}
 
-	let value = { user, signin }
+	let signin = async () => {
+		// const data = await window.penumbra.requestAccounts()
+		// const account = data.account
+		// setUser(account)
+		if (typeof window != 'undefined' && typeof window.penumbra != 'undefined') {
+			try {
+				/* Penumbra is installed */
+				const accounts = await window.penumbra.requestAccounts()
+				// setWalletAddress(accounts[0])
+				console.log({ eth_requestAccounts: accounts })
+			} catch (err) {
+				console.error(err)
+			}
+		} else {
+			/* Penumbra is not installed */
+			console.log('Please install Penumbra Wallet')
+		}
+	}
+
+	let value = { user, signin, walletAddress }
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
@@ -156,7 +185,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 	let auth = useAuth()
 	let location = useLocation()
 
-	if (!auth.user) {
+	if (!auth.walletAddress) {
 		// Redirect them to the /login page, but save the current location they were
 		// trying to go to when they were redirected. This allows us to send them
 		// along to that page after they login, which is a nicer user experience

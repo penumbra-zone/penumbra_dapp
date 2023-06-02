@@ -20,7 +20,8 @@ export declare namespace Penumbra {
 		/**
 		 * If a website is trusted, Penumbra public data are returned.
 		 */
-		publicState(): Promise<any>
+		requestAccounts(): Promise<string[]>
+
 		/**
 		 * On initialize window.penumbra has no api methods.
 		 * You can use penumbra.initialPromise for waiting end initializing api
@@ -50,6 +51,7 @@ export declare namespace Penumbra {
 		): Promise<FMDParametersResponse>
 		getBalanceByAddress: (request?: { address: string }) => Promise<any>
 		signTransaction: (data: any) => Promise<void>
+		getFullViewingKey: () => Promise<string>
 	}
 
 	interface PublicStateResponse {

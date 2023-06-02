@@ -122,7 +122,7 @@ export const SendTx = () => {
 
 	const getTransactionPlan = async () => {
 		try {
-			const fvk = auth.user!.fvk
+			const fvk = await window.penumbra.getFullViewingKey()
 
 			if (!fvk) return
 			const selectedAsset = uint8ToBase64(
