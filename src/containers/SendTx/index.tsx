@@ -173,7 +173,13 @@ export const SendTx = () => {
 				viewServiceData
 			)
 
-			await window.penumbra.signTransaction(transactionPlan)
+			const tx = await window.penumbra.signTransaction(transactionPlan)
+
+			if (tx.result.code === 0) {
+				navigate(routesPath.HOME)
+			} else {
+				console.log(tx.result)
+			}
 		} catch (error) {}
 	}
 

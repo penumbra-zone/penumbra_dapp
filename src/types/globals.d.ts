@@ -50,7 +50,7 @@ export declare namespace Penumbra {
 			request?: FMDParametersRequest
 		): Promise<FMDParametersResponse>
 		getBalanceByAddress: (request?: { address: string }) => Promise<any>
-		signTransaction: (data: any) => Promise<void>
+		signTransaction: (data: any) => Promise<TransactionResponse>
 		getFullViewingKey: () => Promise<string>
 	}
 
@@ -63,6 +63,18 @@ export declare namespace Penumbra {
 	type PublicStateAccount = {
 		name: string
 		addressByIndex: string
+	}
+}
+
+export type TransactionResponse = {
+	id: number
+	jsonrpc: string
+	result: {
+		code: 1 | 0
+		codespace: string
+		data: string
+		hash: string
+		log: string
 	}
 }
 

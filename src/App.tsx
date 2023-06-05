@@ -22,7 +22,7 @@ export const getShortKey = (text: string) => {
 
 export default function App() {
 	useEffect(() => {
-		console.log('updated 12.05.23')
+		console.log('updated 05.06.23')
 	}, [])
 
 	return (
@@ -161,8 +161,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 			try {
 				/* Penumbra is installed */
 				const accounts = await window.penumbra.requestAccounts()
-				// setWalletAddress(accounts[0])
-				console.log({ eth_requestAccounts: accounts })
+				setWalletAddress(accounts[0])
 			} catch (err) {
 				console.error(err)
 			}
