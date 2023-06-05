@@ -2,13 +2,13 @@ import {
 	NotesResponse,
 	TransactionInfoResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { ModalWrapper } from '../../ModalWrapper'
-import { uint8ToBase64 } from '../../../utils/uint8ToBase64'
-import { useBalance } from '../../../context'
 import { base64_to_bech32 } from 'penumbra-wasm'
-import { getDenomByAssetId } from '../../../utils/assets'
 import { useMemo } from 'react'
+import { useBalance } from '../../../context'
+import { getAssetByAssetId } from '../../../utils/assets'
 import { getShortKey } from '../../../utils/getShortValue'
+import { uint8ToBase64 } from '../../../utils/uint8ToBase64'
+import { ModalWrapper } from '../../ModalWrapper'
 
 type TxDetailModalProps = {
 	show: boolean
@@ -25,6 +25,8 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 }) => {
 	const { assets } = useBalance()
 
+	console.log({ assets })
+
 	const actionText = useMemo(() => {
 		return transaction.txInfo?.view?.bodyView?.actionViews.map(i => {
 			const type = i.actionView.case
@@ -40,18 +42,23 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 							uint8ToBase64(i.noteRecord?.nullifier?.inner as Uint8Array) ===
 							nullifier
 					)
-					const assetId = getDenomByAssetId(
+					const asset = getAssetByAssetId(
 						assets,
 						uint8ToBase64(
 							note?.noteRecord?.note?.value?.assetId?.inner as Uint8Array
 						)
-					)
+					).denomMetadata!
+
+					const exponent = asset.denomUnits.find(
+						i => i.denom === asset.display
+					)?.exponent
 
 					return {
 						type,
 						text: `${
-							Number(note?.noteRecord?.note?.value?.amount?.lo) / 10 ** 6
-						} ${assetId}`,
+							Number(note?.noteRecord?.note?.value?.amount?.lo) /
+							(exponent ? 10 ** exponent : 1)
+						} ${asset.display}`,
 					}
 				} catch (error) {
 					return {
@@ -61,14 +68,22 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 				}
 			} else if (type === 'output') {
 				try {
-					const assetId = getDenomByAssetId(
+					// const assetId = getAssetByAssetId(
+					// 	assets,
+					// 	uint8ToBase64(
+					// 		//@ts-ignore
+					// 		i.actionView.value.outputView.value.note.value.valueView.value
+					// 			.assetId.inner as Uint8Array
+					// 	)
+					// )
+					const asset = getAssetByAssetId(
 						assets,
 						uint8ToBase64(
 							//@ts-ignore
 							i.actionView.value.outputView.value.note.value.valueView.value
 								.assetId.inner as Uint8Array
 						)
-					)
+					).denomMetadata!
 
 					const addresView =
 						//@ts-ignore
@@ -78,26 +93,22 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 						uint8ToBase64(addresView.value.address.inner)
 					)
 
+					const exponent = asset.denomUnits.find(
+						i => i.denom === asset.display
+					)?.exponent
+
 					const amount =
-						//@ts-ignore
-						assetId.includes('nft')
-							? Number(
-									//@ts-ignore
-									i.actionView.value.outputView.value.note.value.valueView.value
-										.amount.lo
-							  )
-							: Number(
-									//@ts-ignore
-									i.actionView.value.outputView.value.note.value.valueView.value
-										.amount.lo
-							  ) /
-							  10 ** 6
+						Number(
+							//@ts-ignore
+							i.actionView.value.outputView.value.note.value.valueView.value
+								.amount.lo
+						) / (exponent ? 10 ** exponent : 1)
 
 					return {
 						text:
 							addresView.case === 'opaque'
-								? `${amount} ${assetId} to ${getShortKey(address)}`
-								: `${amount} ${assetId}`,
+								? `${amount} ${asset.display} to ${getShortKey(address)}`
+								: `${amount} ${asset.display}`,
 						type: addresView.case === 'opaque' ? 'Send' : 'Receive',
 					}
 				} catch (error) {
@@ -108,22 +119,38 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 				}
 			} else if (type === 'positionOpen') {
 				try {
-					const asset1 = getDenomByAssetId(
+					// const asset1 = getAssetByAssetId(
+					// 	assets,
+					// 	uint8ToBase64(
+					// 		i.actionView.value.position?.phi?.pair?.asset1
+					// 			?.inner as Uint8Array
+					// 	)
+					// )
+					const asset1 = getAssetByAssetId(
 						assets,
 						uint8ToBase64(
 							i.actionView.value.position?.phi?.pair?.asset1
 								?.inner as Uint8Array
 						)
-					)
-					const asset2 = getDenomByAssetId(
+					).denomMetadata!
+
+					const asset2 = getAssetByAssetId(
 						assets,
 						uint8ToBase64(
 							i.actionView.value.position?.phi?.pair?.asset2
 								?.inner as Uint8Array
 						)
-					)
+					).denomMetadata!
+
+					// const asset2 = getAssetByAssetId(
+					// 	assets,
+					// 	uint8ToBase64(
+					// 		i.actionView.value.position?.phi?.pair?.asset2
+					// 			?.inner as Uint8Array
+					// 	)
+					// )
 					return {
-						text: `Trading Pair: (${asset1}, ${asset2})`,
+						text: `Trading Pair: (${asset1.display}, ${asset2.display})`,
 						type,
 					}
 				} catch (error) {
@@ -140,30 +167,57 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 					const delta2I =
 						i.actionView.value.swapView.value?.swap?.body?.delta2I?.lo
 
-					const asset1 = getDenomByAssetId(
+					// const asset1 = getAssetByAssetId(
+					// 	assets,
+					// 	uint8ToBase64(
+					// 		i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset1
+					// 			?.inner as Uint8Array
+					// 	)
+					// )
+					const asset1 = getAssetByAssetId(
 						assets,
 						uint8ToBase64(
 							i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset1
 								?.inner as Uint8Array
 						)
-					)
+					).denomMetadata!
 
-					const asset2 = getDenomByAssetId(
+					const exponent1 = asset1.denomUnits.find(
+						i => i.denom === asset1.display
+					)?.exponent
+
+					// const asset2 = getAssetByAssetId(
+					// 	assets,
+					// 	uint8ToBase64(
+					// 		i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset2
+					// 			?.inner as Uint8Array
+					// 	)
+					// )
+
+					const asset2 = getAssetByAssetId(
 						assets,
 						uint8ToBase64(
 							i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset2
 								?.inner as Uint8Array
 						)
-					)
+					).denomMetadata!
+
+					const exponent2 = asset2.denomUnits.find(
+						i => i.denom === asset2.display
+					)?.exponent
 
 					if (delta1I) {
 						return {
-							text: `${Number(delta1I) / 10 ** 6} ${asset1} for ${asset2}`,
+							text: `${
+								Number(delta1I) / (exponent1 ? 10 ** exponent1 : 1)
+							} ${asset1.display} for ${asset2.display}`,
 							type,
 						}
 					}
 					return {
-						text: `${Number(delta2I) / 10 ** 6} ${asset2} for ${asset1}`,
+						text: `${
+							Number(delta2I) / (exponent2 ? 10 ** exponent2 : 1)
+						} ${asset2.display} for ${asset1.display}`,
 						type,
 					}
 				} catch (error) {

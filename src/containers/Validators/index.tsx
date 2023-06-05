@@ -8,7 +8,6 @@ import { createPromiseClient } from '@bufbuild/connect'
 import { ValidatorInfoRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import { AllValidators } from '../../components/AllValidators'
 import { useBalance } from '../../context'
-import { getBalanceByDenom } from '../../utils/assets'
 
 export const Validators = () => {
 	const { balance } = useBalance()
@@ -44,7 +43,13 @@ export const Validators = () => {
 						<div className='flex flex-col'>
 							<p className='h3 mb-[16px]'>Total upenumbra amount</p>
 							<p className='text_numbers pb-[4px]'>
-								{`${getBalanceByDenom(balance, 'upenumbra')} upenumbra`}
+								{(
+									balance.find(i => i.display === 'penumbra')?.amount || 0
+								).toLocaleString('en-US', {
+									minimumFractionDigits: 2,
+									maximumFractionDigits: 20,
+								})}{' '}
+								penumbra
 							</p>
 							<div className='flex text_numbers_s'>
 								<p>~ $ -</p>
@@ -74,7 +79,13 @@ export const Validators = () => {
 						<div className='flex flex-col border-l-[1px] border-solid border-light_brown pl-[24px]'>
 							<p className='h3 mb-[8px]'>Available Balance</p>
 							<p className='text_numbers pb-[4px]'>
-								{`${getBalanceByDenom(balance, 'upenumbra')}       upenumbra`}
+								{(
+									balance.find(i => i.display === 'penumbra')?.amount || 0
+								).toLocaleString('en-US', {
+									minimumFractionDigits: 2,
+									maximumFractionDigits: 20,
+								})}{' '}
+								penumbra
 							</p>
 							<p className='text_numbers_s'>~ $ -</p>
 						</div>

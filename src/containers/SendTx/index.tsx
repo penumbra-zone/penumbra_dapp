@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../App'
 import { Input } from '../../components/Input'
 import { SelectInput } from '../../components/Select'
 import { CloseSvg, SearchSvg } from '../../components/Svg'
@@ -23,7 +22,6 @@ import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connec
 import { createWebExtTransport } from '../../utils/webExtTransport'
 
 export const SendTx = () => {
-	const auth = useAuth()
 	const { balance } = useBalance()
 	const navigate = useNavigate()
 	const [reciever, setReciever] = useState<string>(
@@ -52,35 +50,22 @@ export const SendTx = () => {
 		getNotes()
 	}, [])
 
-	const decimals = useMemo(() => {
-		return balance
-			.find(i => i.denom?.denom === select)
-			?.denom?.denom.includes('nft')
-			? 1
-			: 1000000
-	}, [balance, select])
-
 	const options = useMemo(() => {
 		if (!balance.length) return []
 		return balance.map(i => {
-			if (!i.denom?.denom) return { value: '', label: '' }
+			if (!i.display) return { value: '', label: '' }
 			return {
-				value: String(i.denom?.denom),
+				value: i.display,
 				label: (
 					<div className='flex flex-col'>
-						<p className='text_numbers break-all'>{i!.denom!.denom}</p>
+						<p className='text_numbers break-all'>{i.display}</p>
 						<div className='flex items-center'>
 							<p className='text_body text-light_grey'>Balance:</p>
 							<p className='text_numbers_s text-light_grey ml-[16px]'>
-								{i.denom?.denom.includes('nft')
-									? Number(i.amount!.lo).toLocaleString('en-US', {
-											minimumFractionDigits: 2,
-											maximumFractionDigits: 20,
-									  })
-									: (Number(i.amount!.lo) / decimals).toLocaleString('en-US', {
-											minimumFractionDigits: 2,
-											maximumFractionDigits: 20,
-									  })}
+								{i.amount.toLocaleString('en-US', {
+									minimumFractionDigits: 2,
+									maximumFractionDigits: 20,
+								})}
 							</p>
 						</div>
 					</div>
@@ -114,9 +99,7 @@ export const SendTx = () => {
 	const handleMax = () =>
 		setAmount(
 			String(
-				Number(
-					select ? balance.find(i => i.denom?.denom === select)?.amount?.lo : 0
-				) / decimals
+				Number(select ? balance.find(i => i.display === select)?.amount : 0)
 			)
 		)
 
@@ -126,7 +109,7 @@ export const SendTx = () => {
 
 			if (!fvk) return
 			const selectedAsset = uint8ToBase64(
-				balance.find(i => i.denom?.denom === select)?.asset?.inner!
+				balance.find(i => i.display === select)?.asset?.inner!
 			)
 
 			const filteredNotes = notes
@@ -160,7 +143,11 @@ export const SendTx = () => {
 
 			const valueJs = {
 				amount: {
-					lo: Number(amount) * decimals,
+					lo:
+						Number(amount) *
+						(balance.find(i => i.display === select)?.exponent!
+							? 10 ** balance.find(i => i.display === select)?.exponent!
+							: 1),
 					hi: 0,
 				},
 				assetId: { inner: selectedAsset },
@@ -227,11 +214,7 @@ export const SendTx = () => {
 									value={amount}
 									isError={
 										select
-											? Number(
-													balance.find(i => select === i.denom?.denom)!.amount
-														?.lo
-											  ) /
-													decimals <
+											? balance.find(i => select === i.display)!.amount <
 											  Number(amount)
 											: false
 									}
@@ -260,15 +243,12 @@ export const SendTx = () => {
 									onClick={getTransactionPlan}
 									title='Send'
 									className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
-									disabled={
-										!Number(amount) ||
-										!select ||
-										Number(
-											balance.find(i => select === i.denom?.denom)!.amount?.lo
-										) /
-											decimals <
-											Number(amount)
-									}
+									// disabled={
+									// 	!Number(amount) ||
+									// 	!select ||
+									// 	balance.find(i => select === i.display)!.amount <
+									// 		Number(amount)
+									// }
 								/>
 							</div>
 						</div>

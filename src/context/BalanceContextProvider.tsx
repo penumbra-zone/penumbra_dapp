@@ -10,13 +10,21 @@ import { uint8ToBase64 } from '../utils/uint8ToBase64'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import { createWebExtTransport } from '../utils/webExtTransport'
-import { Denom } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import {
+	Denom,
+	DenomMetadata,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { Amount } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 
-export type AssetBalance = { asset?: AssetId } & { amount?: Amount } & {
-	denom?: Denom
+export type AssetBalance = {
+	asset?: AssetId
+	display: string
+	base: string
+	exponent: number
+	amount: number
 }
+
 type StoreState = {
 	balance: AssetBalance[]
 	assets: AssetsResponse[]
@@ -44,20 +52,33 @@ export const BalanceContextProvider = (props: Props) => {
 	const assetBalance: AssetBalance[] = useMemo(() => {
 		const detailAssets = Object.entries(balance).map(i => {
 			const asset = assets.find(j => {
-				return uint8ToBase64(j.asset?.id?.inner!) === i[0]
+				return uint8ToBase64(j.denomMetadata?.penumbraAssetId?.inner!) === i[0]
 			})
+
+			const exponent = Number(
+				asset?.denomMetadata?.denomUnits.find(
+					i => i.denom === asset.denomMetadata?.display
+				)?.exponent
+			)
+
+			const amount =
+				(Number(i[1].amount?.lo) + 2 ** 64 * Number(i[1].amount?.hi)) /
+				(exponent ? 10 ** exponent : 1)
 
 			return {
 				[i[0]]: {
 					...i[1],
-					...asset?.asset,
+					display: asset?.denomMetadata?.display || '',
+					base: asset?.denomMetadata?.base || '',
+					exponent,
+					amount,
 				},
 			}
 		})
 
 		return detailAssets
 			.map(i => Object.values(i)[0])
-			.filter(i => Number(i.amount?.lo))
+			.filter(i => Number(i.amount))
 	}, [balance, assets])
 
 	useEffect(() => {
