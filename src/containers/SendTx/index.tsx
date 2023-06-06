@@ -243,12 +243,12 @@ export const SendTx = () => {
 									onClick={getTransactionPlan}
 									title='Send'
 									className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
-									// disabled={
-									// 	!Number(amount) ||
-									// 	!select ||
-									// 	balance.find(i => select === i.display)!.amount <
-									// 		Number(amount)
-									// }
+									disabled={
+										!Number(amount) ||
+										!select ||
+										balance.find(i => select === i.display)!.amount <
+											Number(amount)
+									}
 								/>
 							</div>
 						</div>

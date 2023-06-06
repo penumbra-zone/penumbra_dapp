@@ -25,8 +25,6 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 }) => {
 	const { assets } = useBalance()
 
-	console.log({ assets })
-
 	const actionText = useMemo(() => {
 		return transaction.txInfo?.view?.bodyView?.actionViews.map(i => {
 			const type = i.actionView.case
@@ -208,16 +206,16 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 
 					if (delta1I) {
 						return {
-							text: `${
-								Number(delta1I) / (exponent1 ? 10 ** exponent1 : 1)
-							} ${asset1.display} for ${asset2.display}`,
+							text: `${Number(delta1I) / (exponent1 ? 10 ** exponent1 : 1)} ${
+								asset1.display
+							} for ${asset2.display}`,
 							type,
 						}
 					}
 					return {
-						text: `${
-							Number(delta2I) / (exponent2 ? 10 ** exponent2 : 1)
-						} ${asset2.display} for ${asset1.display}`,
+						text: `${Number(delta2I) / (exponent2 ? 10 ** exponent2 : 1)} ${
+							asset2.display
+						} for ${asset1.display}`,
 						type,
 					}
 				} catch (error) {
