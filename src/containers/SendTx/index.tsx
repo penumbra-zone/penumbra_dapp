@@ -25,7 +25,8 @@ export const SendTx = () => {
 	const { balance } = useBalance()
 	const navigate = useNavigate()
 	const [reciever, setReciever] = useState<string>(
-		'penumbrav2t156t9s3s0786ghjnpk20jjaweqyeavfevpd7rkjycllu5qtevuuy69j948fy6gpgwptl2mgcgl0u5mw8glk38puggxx290cryz6pvxde3vgv4tuuey4rlrpf2smes5wt2m957r9'
+		''
+		// 'penumbrav2t156t9s3s0786ghjnpk20jjaweqyeavfevpd7rkjycllu5qtevuuy69j948fy6gpgwptl2mgcgl0u5mw8glk38puggxx290cryz6pvxde3vgv4tuuey4rlrpf2smes5wt2m957r9'
 	)
 	const [amount, setAmount] = useState<string>('')
 	const [select, setSelect] = useState<string>('')
@@ -247,7 +248,9 @@ export const SendTx = () => {
 										!Number(amount) ||
 										!select ||
 										balance.find(i => select === i.display)!.amount <
-											Number(amount)
+											Number(amount) ||
+										!reciever ||
+										Object.values(isValidate).includes(false)
 									}
 								/>
 							</div>
