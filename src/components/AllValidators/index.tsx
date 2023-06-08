@@ -100,7 +100,7 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({
 	// const getValidatorsCount = async () => {
 	// 	try {
 	// 		const response = await axios.get(
-	// 			'http://testnet.penumbra.zone:26657/validators'
+	// 			'https://rpc.testnet.penumbra.zone/validators'
 	// 		)
 
 	// 		// const data = await response.json()

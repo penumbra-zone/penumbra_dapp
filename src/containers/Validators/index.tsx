@@ -16,7 +16,7 @@ export const Validators = () => {
 
 	const getValidators = async () => {
 		const transport = createGrpcWebTransport({
-			baseUrl: 'https://testnet1.penumbra.zone',
+			baseUrl: 'https://grpc.testnet.penumbra.zone',
 		})
 		const client = createPromiseClient(ObliviousQueryService, transport)
 
