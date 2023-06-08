@@ -13,7 +13,9 @@ enum TransactionType {
     OpenPosition = "Open Position",
     ClosePosition = "Close Position",
     WithdrawPosition = "Withdraw Position",
-    InternalSend = "Internal"
+    InternalSend = "Internal",
+
+    Swap = "Swap"
 
 }
 
@@ -53,7 +55,23 @@ export const getTransactionType = (txv: TransactionView | undefined) => {
     if (actions.find(e => e.actionView.case === "undelegate"))
         return TransactionType.Undelegate;
 
+    if (actions.find(e => e.actionView.case === "swap"))
+        return TransactionType.Swap;
+
     if (actions?.length === 2) {
+
+        if (actions.find(e => e.actionView.case === "output") &&
+            actions.find(e => e.actionView.case === "spend")) {
+            if (actions.find(e => e.actionView.case === "output"
+                && e.actionView.value.outputView.case === "visible"
+                && e.actionView.value.outputView.value.note?.address?.addressView.case === "visible")) {
+                return TransactionType.InternalSend;
+            } else  {
+                return TransactionType.Send;
+
+            }
+        }
+
 
     }
     if (actions?.length === 3) {
