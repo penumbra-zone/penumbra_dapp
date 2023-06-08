@@ -9,6 +9,7 @@ import { TxDetailModal } from '../modals/TxDetailModal'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import { createWebExtTransport } from '../../utils/webExtTransport'
+import {getTransactionType} from "../../utils/transactionType";
 
 export const ActivityList = () => {
 	const [transactions, setTransactions] = useState<TransactionInfoResponse[]>(
@@ -48,7 +49,9 @@ export const ActivityList = () => {
 								<div className='flex items-center w-[100%]'>
 									<ArrowUpRightSvg />
 									<div className='flex flex-col ml-[14px]'>
-										<p className='h3 mb-[6px]'>Send</p>
+										<p className='h3 mb-[6px]'>
+											{getTransactionType(i.txInfo?.view)}
+										</p>
 										<p className='text_body text-green'>Block height :</p>
 										<p className='text_body text-green'>
 											{String(i.txInfo?.height)}
