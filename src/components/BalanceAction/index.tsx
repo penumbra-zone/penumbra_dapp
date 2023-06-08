@@ -30,6 +30,7 @@ export const BalanceAction: React.FC<IBalanceAction> = ({ name }) => {
 				<div className='flex flex-col items-center'>
 					<Button
 						mode='gradient'
+						disabled
 						title={
 							<div className='flex items-center justify-center'>
 								<DowmloadSvg />
@@ -55,6 +56,7 @@ export const BalanceAction: React.FC<IBalanceAction> = ({ name }) => {
 				<div className='flex flex-col items-center'>
 					<Button
 						mode='gradient'
+						disabled
 						title={
 							<div className='flex items-center justify-center'>
 								<CachedSvg />

@@ -44,6 +44,17 @@ export const SelectInput: React.FC<SelectPropsType> = ({
 	const [isOpen, setOpen] = useState<boolean>(false)
 	const inputRef = useRef<null | Select>(null)
 	const [inputValue, setInputValue] = useState<string>('')
+	const [ignoreCase, setIgnoreCase] = useState(false)
+	const [ignoreAccents, setIgnoreAccents] = useState(false)
+	const [trim, setTrim] = useState(false)
+	const [matchFromStart, setMatchFromStart] = useState(false)
+
+	const filterConfig = {
+		ignoreCase,
+		ignoreAccents,
+		trim,
+		matchFrom: matchFromStart ? ('start' as const) : ('any' as const),
+	}
 
 	//add initailValue
 	useEffect(() => {
@@ -119,9 +130,7 @@ export const SelectInput: React.FC<SelectPropsType> = ({
 						isLoading={isLoading}
 						placeholder='  '
 						onBlur={inputBlurHandler}
-						filterOption={createFilter({
-							matchFrom: 'start',
-						})}
+						filterOption={createFilter(filterConfig)}
 						{...props}
 					/>
 				</div>

@@ -28,6 +28,7 @@ export const Home = () => {
 						<Button
 							mode='transparent'
 							onClick={handleStake}
+							disabled
 							title='Stake'
 							className='w-[119px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
 						/>

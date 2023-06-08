@@ -1,8 +1,6 @@
 import { ArrowUpRightSvg, ChevronLeftIcon } from '../Svg'
 import { useEffect, useState } from 'react'
 import {
-	NotesRequest,
-	NotesResponse,
 	TransactionInfoRequest,
 	TransactionInfoResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
@@ -16,26 +14,9 @@ export const ActivityList = () => {
 	const [transactions, setTransactions] = useState<TransactionInfoResponse[]>(
 		[]
 	)
-	const [notes, setNotes] = useState<NotesResponse[]>([])
 	const [selectedTx, setSelectedTx] = useState<
 		undefined | TransactionInfoResponse
 	>()
-
-	useEffect(() => {
-		const getNotes = async () => {
-			const client = createPromiseClient(
-				ViewProtocolService,
-				createWebExtTransport(ViewProtocolService)
-			)
-
-			const notesRequest = new NotesRequest({})
-
-			for await (const note of client.notes(notesRequest)) {
-				setNotes(state => [...state, note])
-			}
-		}
-		getNotes()
-	}, [])
 
 	useEffect(() => {
 		const getTxs = async () => {
@@ -62,8 +43,7 @@ export const ActivityList = () => {
 						return (
 							<div
 								key={Number(i.txInfo?.height)}
-								className='px-[18px] py-[12px] border-y-[1px] border-solid border-dark_grey ext:mb-[8px] tablet:mb-[16px flex justify-between items-center cursor-pointer'
-								onClick={handleSelect(i)}
+								className='px-[18px] py-[12px] border-y-[1px] border-solid border-dark_grey ext:mb-[8px] tablet:mb-[16px flex justify-between items-center'
 							>
 								<div className='flex items-center w-[100%]'>
 									<ArrowUpRightSvg />
@@ -79,7 +59,10 @@ export const ActivityList = () => {
 										{uint8ToBase64(i.txInfo?.id?.hash!)}
 									</p>
 								</div>
-								<div className='rotate-180'>
+								<div
+									className='rotate-180 cursor-pointer'
+									onClick={handleSelect(i)}
+								>
 									<ChevronLeftIcon />
 								</div>
 							</div>
@@ -87,12 +70,11 @@ export const ActivityList = () => {
 					})}
 				</div>
 			</div>
-			{selectedTx && notes.length && (
+			{selectedTx && (
 				<TxDetailModal
 					show={Boolean(selectedTx)}
 					onClose={handleSelect()}
 					transaction={selectedTx}
-					notes={notes}
 				/>
 			)}
 		</>
