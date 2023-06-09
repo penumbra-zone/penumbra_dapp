@@ -22,7 +22,7 @@ export const getShortKey = (text: string) => {
 
 export default function App() {
 	useEffect(() => {
-		console.log('updated 10.06.23')
+		console.log('updated 10.6.23')
 	}, [])
 
 	return (
