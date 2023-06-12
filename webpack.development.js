@@ -12,7 +12,6 @@ module.exports = merge(common, {
     historyApiFallback: true,
     compress: true,
     open: true,
-    allowedHosts: ['penumbradapp.zpoken.io'],
     static: './build',
     port: 9012,
   },
