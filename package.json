@@ -22,8 +22,10 @@
 		"web-vitals": "^2.1.0"
 	},
 	"scripts": {
-		"build": "webpack --config webpack.production.js",
+		"build": "webpack --config webpack.development.js",
+		"build:prod": "webpack --config webpack.production.js",
 		"start": "webpack-dev-server --progress --config webpack.development.js",
+		"start:prod": "webpack-dev-server --progress --config webpack.production.js",
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage"
