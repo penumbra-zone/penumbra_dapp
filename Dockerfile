@@ -11,6 +11,10 @@ RUN npm install
 
 COPY . /usr/src/app
 RUN npm run build
-EXPOSE 9012
 
-CMD [ "npm", "start" ]
+# Install a static webserver, to emulate Firebase static website hosting.
+RUN npm install http-server -g
+WORKDIR /usr/src/app/build
+EXPOSE 9012
+# CMD [ "npm", "start" ]
+CMD [ "http-server" ]
