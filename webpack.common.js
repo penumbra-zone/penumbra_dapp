@@ -18,6 +18,10 @@ module.exports = {
       overlay: false,
     },
     historyApiFallback: true,
+    allowedHosts: [
+      'penumbradapp.zpoken.io',
+      'app.testnet.penumbra.zone',
+    ],
     compress: true,
     static: './build',
     port: 9012,
