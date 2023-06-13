@@ -21,6 +21,9 @@ jobs:
   deploy:
     name: Deploy dapp website to cluster
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v3
