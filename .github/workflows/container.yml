@@ -1,13 +1,11 @@
 ---
 name: Build container image
 on:
+  # We don't run the container workflow build on pushes; see the deploy workflow,
+  # which calls the container workflow as a dependency.
   workflow_call:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    tags:
-      - '**'
+
 jobs:
   build-and-push-penumbra:
     runs-on: buildjet-16vcpu-ubuntu-2004

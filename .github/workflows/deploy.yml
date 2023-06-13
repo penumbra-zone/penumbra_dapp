@@ -10,16 +10,22 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '**'
   # Uncomment to run on PRs; useful while debugging.
   # pull_request:
 jobs:
-# TODO: build container via dispatch, and set dependency on build job.
-#  container:
-#    name: Build container for dapp
-#    uses: ./.github/workflows/container.yml
-#    secrets: inherit
+  container:
+    name: Build container for dapp
+    uses: ./.github/workflows/container.yml
+    secrets: inherit
   deploy:
     name: Deploy dapp website to cluster
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    needs:
+      - container
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the source code
