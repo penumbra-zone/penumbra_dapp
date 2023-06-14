@@ -31,7 +31,6 @@ export const BalanceAction: React.FC<IBalanceAction> = ({ name }) => {
 					<Button
 						disabled
 						mode='gradient'
-						disabled
 						title={
 							<div className='flex items-center justify-center'>
 								<DowmloadSvg />

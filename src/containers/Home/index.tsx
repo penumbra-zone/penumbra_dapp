@@ -19,33 +19,32 @@ export const Home = () => {
 		<>
 			{auth.walletAddress ? (
 				<div className='flex flex-col items-center justify-center '>
-				<div className='py-[16px] w-[800px] bg-brown rounded-[15px]'>
-					<BalanceAction />
-					<div className='w-[100%] flex items-center justify-between ext:py-[15.5px] tablet:py-[13.5px] px-[16px] border-y-[1px] border-solid border-dark_grey'>
-						<div className='flex flex-col'>
-							<p className='text_button mb-[4px]'>Stake</p>
+					<div className='py-[16px] w-[800px] bg-brown rounded-[15px]'>
+						<BalanceAction />
+						<div className='w-[100%] flex items-center justify-between ext:py-[15.5px] tablet:py-[13.5px] px-[16px] border-y-[1px] border-solid border-dark_grey'>
+							<div className='flex flex-col'>
+								<p className='text_button mb-[4px]'>Stake</p>
+							</div>
+							<Button
+								mode='transparent'
+								onClick={handleStake}
+								disabled
+								title='Stake'
+								className='w-[119px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
+							/>
 						</div>
-						<Button
-						disabled
-							mode='transparent'
-							onClick={handleStake}
-							disabled
-							title='Stake'
-							className='w-[119px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
+						<Tabs
+							tabs={['Assets', 'Activity']}
+							children={(type: string) =>
+								type === 'Assets' ? (
+									<AssetsList assets={balance} />
+								) : (
+									<ActivityList />
+								)
+							}
+							className='bg-brown'
 						/>
 					</div>
-					<Tabs
-						tabs={['Assets', 'Activity']}
-						children={(type: string) =>
-							type === 'Assets' ? (
-								<AssetsList assets={balance} />
-							) : (
-								<ActivityList />
-							)
-						}
-						className='bg-brown'
-					/>
-				</div>
 				</div>
 			) : (
 				<p className='h1 mt-[300px] text-center'>
