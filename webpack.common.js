@@ -12,6 +12,20 @@ module.exports = {
       patterns: [{ from: 'src/icons' }],
     }),
   ],
+  devServer: {
+    client: {
+      logging: 'info',
+      overlay: false,
+    },
+    historyApiFallback: true,
+    allowedHosts: [
+      'penumbradapp.zpoken.io',
+      'app.testnet.penumbra.zone',
+    ],
+    compress: true,
+    static: './build',
+    port: 9012,
+  },
   module: {
     rules: [
       {
