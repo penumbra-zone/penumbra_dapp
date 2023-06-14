@@ -57,7 +57,7 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 		onClick={onClose}>
 		<div
 			data-te-modal-dialog-ref
-			className="pointer-events-none relative flex items-center w-auto translate-y-[-50px]  transition-all duration-300 ease-in-out mx-auto mt-7 h-[calc(100%-3.5rem)] max-w-[500px]">
+			className="pointer-events-none relative flex items-center w-auto translate-y-[-50px]  transition-all duration-300 ease-in-out mx-auto mt-7 h-[calc(100%-3.5rem)] max-w-[500px]" onClick={stopPropagation}>
 			<div
 				className="pointer-events-auto relative flex max-h-[75vh] w-full flex-col overflow-hidden rounded-[15px] bg-brown outline-none">
 				{/* <div

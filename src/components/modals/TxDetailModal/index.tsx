@@ -1,25 +1,20 @@
-import {
-	NotesResponse,
-	TransactionInfoResponse,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { TransactionInfoResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { base64_to_bech32 } from 'penumbra-wasm'
 import { useMemo } from 'react'
 import { useBalance } from '../../../context'
 import { getAssetByAssetId } from '../../../utils/assets'
-import { getShortKey } from '../../../utils/getShortValue'
 import { uint8ToBase64 } from '../../../utils/uint8ToBase64'
 import { ModalWrapper } from '../../ModalWrapper'
 
 type TxDetailModalProps = {
 	show: boolean
 	transaction: TransactionInfoResponse
-	notes: NotesResponse[]
+
 	onClose: () => void
 }
 
 export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 	show,
-	notes,
 	transaction,
 	onClose,
 }) => {
@@ -31,32 +26,26 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 
 			if (type === 'spend') {
 				try {
-					const nullifier = uint8ToBase64(
-						i.actionView.value.spendView.value?.spend?.body
-							?.nullifier as Uint8Array
-					)
-					const note = notes.find(
-						i =>
-							uint8ToBase64(i.noteRecord?.nullifier?.inner as Uint8Array) ===
-							nullifier
-					)
+					const assetValue =
+						//@ts-ignore
+						i.actionView.value.spendView.value?.note.value.valueView.value
 					const asset = getAssetByAssetId(
 						assets,
-						uint8ToBase64(
-							note?.noteRecord?.note?.value?.assetId?.inner as Uint8Array
-						)
+						uint8ToBase64(assetValue.assetId.inner)
 					).denomMetadata!
 
 					const exponent = asset.denomUnits.find(
 						i => i.denom === asset.display
 					)?.exponent
 
+					const amount =
+						(Number(assetValue.amount?.lo) +
+							2 ** 64 * Number(assetValue.amount?.hi)) /
+						(exponent ? 10 ** exponent : 1)
+
 					return {
 						type,
-						text: `${
-							Number(note?.noteRecord?.note?.value?.amount?.lo) /
-							(exponent ? 10 ** exponent : 1)
-						} ${asset.display}`,
+						text: `${amount} ${asset.display}`,
 					}
 				} catch (error) {
 					return {
@@ -105,9 +94,9 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 					return {
 						text:
 							addresView.case === 'opaque'
-								? `${amount} ${asset.display} to ${getShortKey(address)}`
+								? `${amount} ${asset.display} to ${address}`
 								: `${amount} ${asset.display}`,
-						type: addresView.case === 'opaque' ? 'Send' : 'Receive',
+						type: addresView.case === 'opaque' ? 'Output' : 'Output',
 					}
 				} catch (error) {
 					return {
@@ -231,7 +220,7 @@ export const TxDetailModal: React.FC<TxDetailModalProps> = ({
 				}
 			}
 		})
-	}, [transaction, assets, notes])
+	}, [transaction, assets])
 
 	return (
 		<ModalWrapper show={show} onClose={onClose}>
