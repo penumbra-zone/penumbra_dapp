@@ -26,6 +26,7 @@ export const Home = () => {
 							<p className='text_button mb-[4px]'>Stake</p>
 						</div>
 						<Button
+						disabled
 							mode='transparent'
 							onClick={handleStake}
 							disabled

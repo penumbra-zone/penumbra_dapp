@@ -29,6 +29,7 @@ export const BalanceAction: React.FC<IBalanceAction> = ({ name }) => {
 			<div className='flex ext:gap-x-[30px]  tablet:gap-x-[69px] ext:mb-[24px] tablet:mb-[40px]'>
 				<div className='flex flex-col items-center'>
 					<Button
+						disabled
 						mode='gradient'
 						disabled
 						title={
