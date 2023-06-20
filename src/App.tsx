@@ -33,25 +33,25 @@ export default function App() {
 					<Route
 						path={routesPath.SEND}
 						element={
-							<RequireAuth>
+							// <RequireAuth>
 								<SendTx />
-							</RequireAuth>
+							// </RequireAuth>
 						}
 					/>
 					<Route
 						path={routesPath.BALANCE_DETAIL}
 						element={
-							<RequireAuth>
+							// <RequireAuth>
 								<BalanceDetail />
-							</RequireAuth>
+							// </RequireAuth>
 						}
 					/>
 					<Route
 						path={routesPath.VALIDATORS}
 						element={
-							<RequireAuth>
+							// <RequireAuth>
 								<Validators />
-							</RequireAuth>
+							// </RequireAuth>
 						}
 					/>
 				</Route>
