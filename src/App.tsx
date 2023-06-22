@@ -7,7 +7,6 @@ import {
 	Outlet,
 	useNavigate,
 } from 'react-router-dom'
-import * as wasm from 'penumbra-wasm'
 import { Button } from './components/Tab/Button'
 import { UserData } from './Signer/types'
 import { isPenumbraInstalled } from './utils/ProviderPenumbra'
@@ -21,6 +20,11 @@ import {
 } from './containers'
 import { routesPath } from './utils/constants'
 import { BalanceContextProvider, TransactionContextProvider } from './context'
+import { ProgressBar } from './components/ProgressBar'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { createWebExtTransport } from './utils/webExtTransport'
+import { StatusStreamRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { createPromiseClient } from '@bufbuild/connect'
 
 export const getShortKey = (text: string) => {
 	if (!text) return ''
@@ -71,10 +75,16 @@ export default function App() {
 	)
 }
 
+export function percentage(partialValue: number, totalValue: number) {
+	if (!totalValue) return 0
+	return Math.round((100 * partialValue) / totalValue)
+}
+
 function Layout() {
 	let auth = useAuth()
 	const navigate = useNavigate()
 	const [isPenumbra, setIsPenumbra] = useState<boolean>(false)
+	const [percent, setPercent] = useState<number>(0)
 
 	const checkIsPenumbraInstalled = async () => {
 		const isInstalled = await isPenumbraInstalled()
@@ -84,6 +94,28 @@ function Layout() {
 	useEffect(() => {
 		checkIsPenumbraInstalled()
 	}, [])
+
+	useEffect(() => {
+		if (!auth.walletAddress) return setPercent(0)
+		const getPercent = async () => {
+			const client = createPromiseClient(
+				ViewProtocolService,
+				createWebExtTransport(ViewProtocolService)
+			)
+
+			const statusRequest = new StatusStreamRequest({})
+
+			for await (const status of client.statusStream(statusRequest)) {
+				setPercent(
+					percentage(
+						Number(status.syncHeight),
+						Number(status.latestKnownBlockHeight)
+					)
+				)
+			}
+		}
+		getPercent()
+	}, [auth])
 
 	const handleClick = () => navigate(routesPath.HOME)
 
@@ -115,8 +147,16 @@ function Layout() {
 										className='w-[192px] object-cover cursor-pointer'
 										onClick={handleClick}
 									/>
+
 									{auth.walletAddress ? (
-										<div>
+										<div className='flex items-center justify-center h-[44px] py-[13px] px-[21px] gap-[8px] rounded-[10px] border-[1px] border-dark_grey bg-brown'>
+											{percent > 100 ? (
+												<></>
+											) : (
+												<div className='ext:w-[25px] ext:h-[25px] tablet:w-[35px] tablet:h-[35px] ext:mr-[6px] tablet:mr-[16px] flex items-center'>
+													<ProgressBar percent={percent} width='42px' />
+												</div>
+											)}
 											<p className='h3'>{getShortKey(auth.walletAddress)}</p>
 										</div>
 									) : (

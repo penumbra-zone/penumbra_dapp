@@ -29,7 +29,7 @@ export const TransactionContextProvider = (props: Props) => {
 	)
 
 	useEffect(() => {
-		if (!auth.walletAddress) return
+		if (!auth.walletAddress) return setTransactions([])
 		const getTxs = async () => {
 			const client = createPromiseClient(
 				ViewProtocolService,
