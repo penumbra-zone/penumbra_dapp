@@ -7,17 +7,24 @@ import {
 	Outlet,
 	useNavigate,
 } from 'react-router-dom'
+import * as wasm from 'penumbra-wasm'
 import { Button } from './components/Tab/Button'
 import { UserData } from './Signer/types'
 import { isPenumbraInstalled } from './utils/ProviderPenumbra'
 import img from './assets/img/logo.png'
-import { BalanceDetail, Home, SendTx, Validators } from './containers'
+import {
+	BalanceDetail,
+	Home,
+	SendTx,
+	TransactionDetail,
+	Validators,
+} from './containers'
 import { routesPath } from './utils/constants'
-import { BalanceContextProvider } from './context'
+import { BalanceContextProvider, TransactionContextProvider } from './context'
 
 export const getShortKey = (text: string) => {
 	if (!text) return ''
-	return text.slice(0, 10) + '..' + text.slice(-9)
+	return text.slice(0, 35) + '...'
 }
 
 export default function App() {
@@ -34,7 +41,7 @@ export default function App() {
 						path={routesPath.SEND}
 						element={
 							// <RequireAuth>
-								<SendTx />
+							<SendTx />
 							// </RequireAuth>
 						}
 					/>
@@ -42,7 +49,7 @@ export default function App() {
 						path={routesPath.BALANCE_DETAIL}
 						element={
 							// <RequireAuth>
-								<BalanceDetail />
+							<BalanceDetail />
 							// </RequireAuth>
 						}
 					/>
@@ -50,9 +57,13 @@ export default function App() {
 						path={routesPath.VALIDATORS}
 						element={
 							// <RequireAuth>
-								<Validators />
+							<Validators />
 							// </RequireAuth>
 						}
+					/>
+					<Route
+						path={routesPath.TRANSACTION}
+						element={<TransactionDetail />}
 					/>
 				</Route>
 			</Routes>
@@ -78,49 +89,51 @@ function Layout() {
 
 	return (
 		<BalanceContextProvider>
-			<div className='flex item-center justify-center mx-[104px]'>
-				{!isPenumbra ? (
-					<Button
-						mode='gradient'
-						title={
-							<a
-								href='https://chrome.google.com/webstore/detail/penumbra-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe'
-								target='_blank'
-								rel='noreferrer'
-							>
-								Install Penumbra
-							</a>
-						}
-						className='w-[200px] ext:pt-[14px] tablet:pt-[14px]  ext:pb-[14px] tablet:pb-[14px] mt-[300px]'
-					/>
-				) : (
-					<>
-						<div className='w-[100%] flex flex-col'>
-							<div className='w-[100%] flex justify-between items-center'>
-								<img
-									src={img}
-									alt='penumbra logo'
-									className='w-[192px] object-cover cursor-pointer'
-									onClick={handleClick}
-								/>
-								{auth.walletAddress ? (
-									<div>
-										<p className='h3'>{getShortKey(auth.walletAddress)}</p>
-									</div>
-								) : (
-									<Button
-										mode='gradient'
-										title='Connect'
-										className='w-[200px]'
-										onClick={auth.signin}
+			<TransactionContextProvider>
+				<div className='flex item-center justify-center mx-[104px]'>
+					{!isPenumbra ? (
+						<Button
+							mode='gradient'
+							title={
+								<a
+									href='https://chrome.google.com/webstore/detail/penumbra-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe'
+									target='_blank'
+									rel='noreferrer'
+								>
+									Install Penumbra
+								</a>
+							}
+							className='w-[200px] ext:pt-[14px] tablet:pt-[14px]  ext:pb-[14px] tablet:pb-[14px] mt-[300px]'
+						/>
+					) : (
+						<>
+							<div className='w-[100%] flex flex-col'>
+								<div className='w-[100%] flex justify-between items-center'>
+									<img
+										src={img}
+										alt='penumbra logo'
+										className='w-[192px] object-cover cursor-pointer'
+										onClick={handleClick}
 									/>
-								)}
+									{auth.walletAddress ? (
+										<div>
+											<p className='h3'>{getShortKey(auth.walletAddress)}</p>
+										</div>
+									) : (
+										<Button
+											mode='gradient'
+											title='Connect'
+											className='w-[200px]'
+											onClick={auth.signin}
+										/>
+									)}
+								</div>
+								<Outlet />
 							</div>
-							<Outlet />
-						</div>
-					</>
-				)}
-			</div>
+						</>
+					)}
+				</div>
+			</TransactionContextProvider>
 		</BalanceContextProvider>
 	)
 }

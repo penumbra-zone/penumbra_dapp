@@ -1,65 +1,63 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
 
 module.exports = {
-  entry: './src/index.tsx',
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: 'src/index.html',
-    }),
-    new CopyPlugin({
-      patterns: [{ from: 'src/icons' }],
-    }),
-  ],
-  devServer: {
-    client: {
-      logging: 'info',
-      overlay: false,
-    },
-    historyApiFallback: true,
-    allowedHosts: [
-      'penumbradapp.zpoken.io',
-      'app.testnet.penumbra.zone',
-    ],
-    compress: true,
-    static: './build',
-    port: 9012,
-  },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-      // {
-      //   test: /\.css$/i,
-      //   use: ['style-loader', 'css-loader'],
-      // },
-      {
-        test: /\.(png|svg|jpg|jpeg|gif|ico)$/i,
-        type: 'asset/resource',
-      },
-      {
-        test: /\.(woff|woff2|eot|ttf|otf)$/i,
-        type: 'asset/resource',
-      },
+	entry: './src/index.tsx',
+	plugins: [
+		new HtmlWebpackPlugin({
+			template: 'src/index.html',
+		}),
+		new CopyPlugin({
+			patterns: [{ from: 'src/icons' }],
+		}),
+	],
+	devServer: {
+		client: {
+			logging: 'info',
+			overlay: false,
+		},
+		historyApiFallback: true,
+		allowedHosts: ['penumbradapp.zpoken.io', 'app.testnet.penumbra.zone'],
+		compress: true,
+		static: './build',
+		port: 9012,
+	},
+	module: {
+		rules: [
+			{
+				test: /\.tsx?$/,
+				use: 'ts-loader',
+				exclude: /node_modules/,
+			},
+			// {
+			//   test: /\.css$/i,
+			//   use: ['style-loader', 'css-loader'],
+			// },
+			{
+				test: /\.(png|svg|jpg|jpeg|gif|ico)$/i,
+				type: 'asset/resource',
+			},
+			{
+				test: /\.(woff|woff2|eot|ttf|otf)$/i,
+				type: 'asset/resource',
+			},
 			{
 				test: /\.css$/i,
 				use: ['style-loader', 'css-loader', 'postcss-loader'],
 			},
-    ],
-  },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
-  output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'build'),
-    clean: true,
-  },
-  experiments: {
-    asyncWebAssembly: true,
-  },
-};
+		],
+	},
+	resolve: {
+		extensions: ['.tsx', '.ts', '.js'],
+	},
+	output: {
+		filename: 'bundle.js',
+		path: path.resolve(__dirname, 'build'),
+		clean: true,
+		publicPath: '/',
+	},
+	experiments: {
+		asyncWebAssembly: true,
+	},
+}

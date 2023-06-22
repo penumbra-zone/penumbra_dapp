@@ -1,0 +1,50 @@
+import React, { useEffect, useState } from 'react'
+import { ModalProps, ModalWrapper } from '../../ModalWrapper'
+import { CopySvg } from '../../Svg'
+import { createPromiseClient } from '@bufbuild/connect'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { createWebExtTransport } from '../../../utils/webExtTransport'
+import { AddressByIndexRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+
+export const ReceiveModal: React.FC<ModalProps> = ({ show, onClose }) => {
+	const [address, setAddress] = useState<string>('')
+
+	useEffect(() => {
+		const getAddressByIndex = async () => {
+			const client = createPromiseClient(
+				ViewProtocolService,
+				createWebExtTransport(ViewProtocolService)
+			)
+			const request = new AddressByIndexRequest({
+				addressIndex: {
+					account: 0,
+				},
+			})
+
+			const { address } = await client.addressByIndex(request)
+
+			const { altBech32m } = address?.toJson() as { altBech32m: string }
+
+			setAddress(altBech32m)
+		}
+		getAddressByIndex()
+	}, [])
+
+	const copyToClipboard = () => navigator.clipboard.writeText(address)
+
+	return (
+		<ModalWrapper show={show} onClose={onClose}>
+			<div className='relative overflow-y-auto pt-[30px] pb-[52px] px-[24px]'>
+				<p className='text_numbers_ext text-light_grey mb-[8px]'>Address 1</p>
+				<div className='flex p-[10px] justify-center items-center gap-[8px] rounded-[15px] border-[1px] border-light_brown bg-dark_grey'>
+					<p className='text_numbers_ext text-light_grey break-all'>
+						{address}
+					</p>
+					<p className='cursor-pointer' onClick={copyToClipboard}>
+						<CopySvg width='16' height='16' fill='#524B4B' />
+					</p>
+				</div>
+			</div>
+		</ModalWrapper>
+	)
+}

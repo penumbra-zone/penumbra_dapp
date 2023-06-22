@@ -1,41 +1,21 @@
 import { ArrowUpRightSvg, ChevronLeftIcon } from '../Svg'
-import { useEffect, useState } from 'react'
-import {
-	TransactionInfoRequest,
-	TransactionInfoResponse,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { TransactionInfoResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { uint8ToBase64 } from '../../utils/uint8ToBase64'
-import { TxDetailModal } from '../modals/TxDetailModal'
-import { createPromiseClient } from '@bufbuild/connect'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
-import { createWebExtTransport } from '../../utils/webExtTransport'
 import { getTransactionType } from '../../utils/transactionType'
+import { useNavigate } from 'react-router-dom'
+import { routesPath } from '../../utils/constants'
+import { useTransactions } from '../../context'
 
 export const ActivityList = () => {
-	const [transactions, setTransactions] = useState<TransactionInfoResponse[]>(
-		[]
-	)
-	const [selectedTx, setSelectedTx] = useState<
-		undefined | TransactionInfoResponse
-	>()
+	const navigate = useNavigate()
+	const { transactions } = useTransactions()
 
-	useEffect(() => {
-		const getTxs = async () => {
-			const client = createPromiseClient(
-				ViewProtocolService,
-				createWebExtTransport(ViewProtocolService)
-			)
+	const handleSelect = (tx: TransactionInfoResponse) => () => {
+		if (!tx) return
+		const hash = uint8ToBase64(tx.txInfo?.id?.hash!)
+		navigate(routesPath.TRANSACTION.replace(':slug', hash))
+	}
 
-			const txsRequest = new TransactionInfoRequest({})
-
-			for await (const tx of client.transactionInfo(txsRequest)) {
-				setTransactions(state => [tx, ...state])
-			}
-		}
-		getTxs()
-	}, [])
-
-	const handleSelect = (tx?: TransactionInfoResponse) => () => setSelectedTx(tx)
 	return (
 		<>
 			<div className='w-[100%] flex flex-col items-center'>
@@ -73,13 +53,6 @@ export const ActivityList = () => {
 					})}
 				</div>
 			</div>
-			{selectedTx && (
-				<TxDetailModal
-					show={Boolean(selectedTx)}
-					onClose={handleSelect()}
-					transaction={selectedTx}
-				/>
-			)}
 		</>
 	)
 }

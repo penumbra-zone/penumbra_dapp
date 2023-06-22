@@ -1,4 +1,6 @@
 import {
+	AddressByIndexRequest,
+	AddressByIndexResponse,
 	AssetsRequest,
 	ChainParametersRequest,
 	ChainParametersResponse,
@@ -7,6 +9,8 @@ import {
 	NotesRequest,
 	StatusRequest,
 	StatusResponse,
+	TransactionInfoByHashRequest,
+	TransactionInfoByHashResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 declare global {
@@ -52,6 +56,12 @@ export declare namespace Penumbra {
 		getBalanceByAddress: (request?: { address: string }) => Promise<any>
 		signTransaction: (data: any) => Promise<TransactionResponse>
 		getFullViewingKey: () => Promise<string>
+		getTransactionInfoByHash: (
+			request: TransactionInfoByHashRequest
+		) => Promise<TransactionInfoByHashResponse>
+		getAddressByIndex: (
+			request: AddressByIndexRequest
+		) => Promise<AddressByIndexResponse>
 	}
 
 	interface PublicStateResponse {

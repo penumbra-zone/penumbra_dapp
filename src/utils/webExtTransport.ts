@@ -1,6 +1,8 @@
 import { createRouterTransport } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import {
+	AddressByIndexRequest,
+	AddressByIndexResponse,
 	AssetsRequest,
 	AssetsResponse,
 	BalanceByAddressRequest,
@@ -15,6 +17,8 @@ import {
 	StatusResponse,
 	StatusStreamRequest,
 	StatusStreamResponse,
+	TransactionInfoByHashRequest,
+	TransactionInfoByHashResponse,
 	TransactionInfoRequest,
 	TransactionInfoResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
@@ -37,6 +41,15 @@ export const createWebExtTransport = (s: typeof ViewProtocolService) =>
 				const response = await window.penumbra.getStatus()
 
 				return new StatusResponse(response)
+			},
+			addressByIndex: async (request: AddressByIndexRequest) => {
+				const response = await window.penumbra.getAddressByIndex(request)
+				return response
+			},
+			transactionInfoByHash: async (message: TransactionInfoByHashRequest) => {
+				const response = await window.penumbra.getTransactionInfoByHash(message)
+
+				return new TransactionInfoByHashResponse(response)
 			},
 			fMDParameters: async (message: FMDParametersRequest) => {
 				const response = await window.penumbra.getFmdParameters()
@@ -77,9 +90,11 @@ export const createWebExtTransport = (s: typeof ViewProtocolService) =>
 				}
 			},
 			async *transactionInfo(message: TransactionInfoRequest) {
-				window.penumbra.on('transactions', tx => receiveMessage(tx), message.toJson())
-
-				
+				window.penumbra.on(
+					'transactions',
+					tx => receiveMessage(tx),
+					message.toJson()
+				)
 
 				for await (const res of createMessageStream()) {
 					yield new TransactionInfoResponse(res as any)

@@ -166,7 +166,7 @@ export const SendTx = () => {
 			const tx = await window.penumbra.signTransaction(transactionPlan)
 
 			if (tx.result.code === 0) {
-				navigate(routesPath.HOME)
+				navigate(routesPath.HOME, { state: { tab: 'Activity' } })
 			} else {
 				console.log(tx.result)
 			}
@@ -265,7 +265,7 @@ export const SendTx = () => {
 				</div>
 			) : (
 				<p className='h1 mt-[300px] text-center'>
-					Connect to Penumbra if you want to have access to request
+					Connect to Penumbra if you want to have access to dApp
 				</p>
 			)}
 		</>

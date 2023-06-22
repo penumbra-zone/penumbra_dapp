@@ -4,13 +4,14 @@ import { AssetsList } from '../../components/AssetsList'
 import { BalanceAction } from '../../components/BalanceAction'
 import { Tabs } from '../../components/Tab'
 import { Button } from '../../components/Tab/Button'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { routesPath } from '../../utils/constants'
 import { useBalance } from '../../context'
 
 export const Home = () => {
 	const auth = useAuth()
 	const navigate = useNavigate()
+	const { state } = useLocation()
 	const { balance } = useBalance()
 
 	const handleStake = () => navigate(routesPath.VALIDATORS)
@@ -35,6 +36,7 @@ export const Home = () => {
 						</div>
 						<Tabs
 							tabs={['Assets', 'Activity']}
+							initial={state ? state.tab : undefined}
 							children={(type: string) =>
 								type === 'Assets' ? (
 									<AssetsList assets={balance} />
@@ -48,7 +50,7 @@ export const Home = () => {
 				</div>
 			) : (
 				<p className='h1 mt-[300px] text-center'>
-					Connect to Penumbra if you want to have access to request
+					Connect to Penumbra if you want to have access to dApp
 				</p>
 			)}
 		</>

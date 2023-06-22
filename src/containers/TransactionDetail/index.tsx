@@ -1,24 +1,31 @@
-import { TransactionInfoResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { base64_to_bech32 } from 'penumbra-wasm'
-import { useMemo } from 'react'
-import { useBalance } from '../../../context'
-import { getAssetByAssetId } from '../../../utils/assets'
-import { uint8ToBase64 } from '../../../utils/uint8ToBase64'
-import { ModalProps, ModalWrapper } from '../../ModalWrapper'
+import { getAssetByAssetId } from '../../utils/assets'
+import { uint8ToBase64 } from '../../utils/uint8ToBase64'
+import { useEffect, useMemo, useState } from 'react'
+import { useBalance } from '../../context'
+import { createPromiseClient } from '@bufbuild/connect'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { createWebExtTransport } from '../../utils/webExtTransport'
+import {
+	TransactionInfoByHashRequest,
+	TransactionInfoByHashResponse,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useAuth } from '../../App'
+import { Button } from '../../components/Tab/Button'
+import { ChevronLeftIcon } from '../../components/Svg'
+import { routesPath } from '../../utils/constants'
 
-type TxDetailModalProps = {
-	transaction: TransactionInfoResponse
-}
-
-export const TxDetailModal: React.FC<TxDetailModalProps & ModalProps> = ({
-	show,
-	transaction,
-	onClose,
-}) => {
+export const TransactionDetail = () => {
+	const auth = useAuth()
+	const navigate = useNavigate()
+	const { slug } = useParams()
 	const { assets } = useBalance()
+	const [tx, setTx] = useState<TransactionInfoByHashResponse | null>(null)
 
 	const actionText = useMemo(() => {
-		return transaction.txInfo?.view?.bodyView?.actionViews.map(i => {
+		if (!tx) return []
+		return tx.txInfo?.view?.bodyView?.actionViews.map(i => {
 			const type = i.actionView.case
 
 			if (type === 'spend') {
@@ -217,24 +224,69 @@ export const TxDetailModal: React.FC<TxDetailModalProps & ModalProps> = ({
 				}
 			}
 		})
-	}, [transaction, assets])
+	}, [tx, assets])
+
+	useEffect(() => {
+		if (!auth.walletAddress) return
+		const getTransaction = async () => {
+			const client = createPromiseClient(
+				ViewProtocolService,
+				createWebExtTransport(ViewProtocolService)
+			)
+			const request = new TransactionInfoByHashRequest().fromJson({
+				id: {
+					hash: slug as any,
+				},
+			})
+
+			const tx = await client.transactionInfoByHash(request)
+
+			if (!Object.values(tx.txInfo!).length) return
+			setTx(tx)
+		}
+		getTransaction()
+	}, [slug, auth])
+
+	const handleBack = () =>
+		navigate(routesPath.HOME, { state: { tab: 'Activity' } })
 
 	return (
-		<ModalWrapper show={show} onClose={onClose}>
-			<div className='relative overflow-y-auto pt-[30px] pb-[52px] px-[24px]'>
-				<div className='w-[100%]'>
-					{actionText!.map((i, index) => {
-						return (
-							<div key={index} className='w-[100%] flex flex-col mt-[16px]'>
-								<p className='h2 mb-[8px] capitalize'>{i.type}</p>
-								<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-									{i.text}
-								</p>
+		<>
+			{auth.walletAddress ? (
+				<div className='w-[100%] flex justify-center '>
+					<div>
+						<Button
+							mode='icon_transparent'
+							onClick={handleBack}
+							title='Back'
+							iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
+							className='self-start mb-[8px]'
+						/>
+						<p className='h1 mb-[16px]'>Transaction Details</p>
+						<div className='relative overflow-y-auto pt-[30px] pb-[52px] px-[24px] w-[800px] bg-brown rounded-[15px]'>
+							<div className='w-[100%]'>
+								{actionText!.map((i, index) => {
+									return (
+										<div
+											key={index}
+											className='w-[100%] flex flex-col mt-[16px]'
+										>
+											<p className='h2 mb-[8px] capitalize'>{i.type}</p>
+											<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+												{i.text}
+											</p>
+										</div>
+									)
+								})}
 							</div>
-						)
-					})}
+						</div>
+					</div>
 				</div>
-			</div>
-		</ModalWrapper>
+			) : (
+				<p className='h1 mt-[300px] text-center'>
+					Connect to Penumbra if you want to have access to dApp
+				</p>
+			)}
+		</>
 	)
 }

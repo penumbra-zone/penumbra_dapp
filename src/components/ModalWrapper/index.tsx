@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 
+export type ModalProps = { show: boolean; onClose: () => void }
+
 type ModalWrapperPropsType = {
 	show: boolean
 	onClose?: () => void
@@ -48,19 +50,21 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 		// 	{/* </div> */}
 		// </div>
 		<div
-		data-te-modal-init
-		className="fixed left-0 top-0 z-[1055]  h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-background-0.7"
-		id="exampleModalScrollable"
-		tabIndex={-1}
-		aria-labelledby="exampleModalScrollableLabel"
-		aria-hidden="true"
-		onClick={onClose}>
-		<div
-			data-te-modal-dialog-ref
-			className="pointer-events-none relative flex items-center w-auto translate-y-[-50px]  transition-all duration-300 ease-in-out mx-auto mt-7 h-[calc(100%-3.5rem)] max-w-[500px]" onClick={stopPropagation}>
+			data-te-modal-init
+			className='fixed left-0 top-0 z-[1055]  h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-background-0.7'
+			id='exampleModalScrollable'
+			tabIndex={-1}
+			aria-labelledby='exampleModalScrollableLabel'
+			aria-hidden='true'
+			onClick={onClose}
+		>
 			<div
-				className="pointer-events-auto relative flex max-h-[75vh] w-full flex-col overflow-hidden rounded-[15px] bg-brown outline-none">
-				{/* <div
+				data-te-modal-dialog-ref
+				className='pointer-events-none relative flex items-center w-auto translate-y-[-50px]  transition-all duration-300 ease-in-out mx-auto mt-7 h-[calc(100%-3.5rem)] max-w-[500px]'
+				onClick={stopPropagation}
+			>
+				<div className='pointer-events-auto relative flex max-h-[75vh] w-full flex-col overflow-hidden rounded-[15px] bg-brown outline-none'>
+					{/* <div
 					className="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
 					<h5
 						className="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
@@ -86,12 +90,12 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 						</svg>
 					</button>
 				</div> */}
-	
-				{/* <!--Modal body--> */}
-				{children}
-	
-				{/* <!--Modal footer--> */}
-				{/* <div
+
+					{/* <!--Modal body--> */}
+					{children}
+
+					{/* <!--Modal footer--> */}
+					{/* <div
 					className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
 					<button
 						type="button"
@@ -109,9 +113,9 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 						Save changes
 					</button>
 				</div> */}
+				</div>
 			</div>
 		</div>
-	</div>
 	) : null
 
 	if (_document) {

@@ -8,7 +8,6 @@ import { routesPath } from '../../utils/constants'
 export const BalanceDetail = () => {
 	const navigate = useNavigate()
 	const { state } = useLocation()
-	
 
 	const handleBack = () => navigate(routesPath.HOME)
 
