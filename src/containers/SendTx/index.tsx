@@ -12,7 +12,8 @@ import {
 } from '../../utils/validate/validateAddress'
 import {
 	NotesRequest,
-	NotesResponse, TransactionPlannerRequest,
+	NotesResponse,
+	TransactionPlannerRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { useBalance } from '../../context'
 import { uint8ToBase64 } from '../../utils/uint8ToBase64'
@@ -22,7 +23,6 @@ import { createWebExtTransport } from '../../utils/webExtTransport'
 import { useAuth } from '../../App'
 
 let { bech32, bech32m } = require('bech32')
-
 
 export const SendTx = () => {
 	const { balance } = useBalance()
@@ -110,41 +110,45 @@ export const SendTx = () => {
 
 	const getTransactionPlan = async () => {
 		try {
-
-			const selectedAsset =
-				balance.find(i => i.display === select)?.asset?.inner!
-
+			const selectedAsset = balance.find(i => i.display === select)?.asset
+				?.inner!
 
 			const client = createPromiseClient(
 				ViewProtocolService,
 				createWebExtTransport(ViewProtocolService)
 			)
 
-			console.log(bech32m.decode(reciever, 160));
-
-			const transactionPlan = (await client.transactionPlanner(new TransactionPlannerRequest({
-				outputs: [
-					{
-						value: {
-							amount: {
-								lo: BigInt(
-									Number(amount) *
-									(balance.find(i => i.display === select)?.exponent!
-										? 10 ** balance.find(i => i.display === select)?.exponent!
-										: 1)),
-								hi: BigInt(0),
+			const transactionPlan = (
+				await client.transactionPlanner(
+					new TransactionPlannerRequest({
+						outputs: [
+							{
+								value: {
+									amount: {
+										lo: BigInt(
+											Number(amount) *
+												(balance.find(i => i.display === select)?.exponent!
+													? 10 **
+													  balance.find(i => i.display === select)?.exponent!
+													: 1)
+										),
+										hi: BigInt(0),
+									},
+									assetId: { inner: selectedAsset },
+								},
+								address: {
+									inner: new Uint8Array(bech32m.decode(reciever, 160).words),
+									altBech32m: reciever,
+								},
 							},
-							assetId: { inner: selectedAsset }
-						},
-						address: {
-							inner: new Uint8Array(bech32m.decode(reciever, 160).words),
-							altBech32m: reciever
-						}
-					}
-				]
-			}))).plan
+						],
+					})
+				)
+			).plan
 
-			const tx = await window.penumbra.signTransaction(transactionPlan)
+			const tx = await window.penumbra.signTransaction(
+				transactionPlan?.toJson()
+			)
 
 			if (tx.result.code === 0) {
 				navigate(routesPath.HOME, { state: { tab: 'Activity' } })
