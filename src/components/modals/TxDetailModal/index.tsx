@@ -1,10 +1,10 @@
 import { TransactionInfoResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { base64_to_bech32 } from 'penumbra-wasm'
 import { useMemo } from 'react'
 import { useBalance } from '../../../context'
 import { getAssetByAssetId } from '../../../utils/assets'
 import { uint8ToBase64 } from '../../../utils/uint8ToBase64'
 import { ModalProps, ModalWrapper } from '../../ModalWrapper'
+import {bech32m} from "bech32";
 
 type TxDetailModalProps = {
 	transaction: TransactionInfoResponse
@@ -72,9 +72,10 @@ export const TxDetailModal: React.FC<TxDetailModalProps & ModalProps> = ({
 					const addresView =
 						//@ts-ignore
 						i.actionView.value.outputView.value.note.address.addressView
-					const address = base64_to_bech32(
+					const address = bech32m.encode(
 						'penumbrav2t',
-						uint8ToBase64(addresView.value.address.inner)
+						addresView.value.address.inner,
+						160
 					)
 
 					const exponent = asset.denomUnits.find(

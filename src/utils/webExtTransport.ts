@@ -20,7 +20,7 @@ import {
 	TransactionInfoByHashRequest,
 	TransactionInfoByHashResponse,
 	TransactionInfoRequest,
-	TransactionInfoResponse,
+	TransactionInfoResponse, TransactionPlannerRequest, TransactionPlannerResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 export const createWebExtTransport = (s: typeof ViewProtocolService) =>
@@ -45,6 +45,12 @@ export const createWebExtTransport = (s: typeof ViewProtocolService) =>
 			addressByIndex: async (request: AddressByIndexRequest) => {
 				const response = await window.penumbra.getAddressByIndex(request)
 				return response
+			},
+
+			transactionPlanner: async (message: TransactionPlannerRequest) => {
+				const response = await window.penumbra.getTransactionPlanner(message)
+
+				return new TransactionPlannerResponse(response)
 			},
 			transactionInfoByHash: async (message: TransactionInfoByHashRequest) => {
 				const response = await window.penumbra.getTransactionInfoByHash(message)
@@ -100,5 +106,6 @@ export const createWebExtTransport = (s: typeof ViewProtocolService) =>
 					yield new TransactionInfoResponse(res as any)
 				}
 			},
+
 		})
 	})

@@ -57,7 +57,7 @@ module.exports = {
 		clean: true,
 		publicPath: '/',
 	},
-	experiments: {
-		asyncWebAssembly: true,
-	},
+	// experiments: {
+	// 	asyncWebAssembly: true,
+	// },
 }
