@@ -13,8 +13,10 @@ import {
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../App'
 import { Button } from '../../components/Tab/Button'
-import { ChevronLeftIcon } from '../../components/Svg'
+import { ChevronLeftIcon, CopySvg } from '../../components/Svg'
 import { routesPath } from '../../utils/constants'
+import { toast } from 'react-hot-toast'
+import { getTransactionType } from '../../utils/transactionType'
 
 export const TransactionDetail = () => {
 	const auth = useAuth()
@@ -250,35 +252,61 @@ export const TransactionDetail = () => {
 	const handleBack = () =>
 		navigate(routesPath.HOME, { state: { tab: 'Activity' } })
 
+	const copyToClipboard = () => {
+		navigator.clipboard.writeText(slug!)
+		toast.success('Successfully copied', {
+			position: 'top-center',
+			icon: '👏',
+			style: {
+				borderRadius: '15px',
+				background: '#141212',
+				color: '#fff',
+			},
+		})
+	}
+
 	return (
 		<>
 			{auth.walletAddress ? (
-				<div className='w-[100%] flex justify-center '>
+				<div className='w-[100%] flex justify-center mt-[24px]'>
 					<div>
 						<Button
 							mode='icon_transparent'
 							onClick={handleBack}
 							title='Back'
 							iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
-							className='self-start mb-[8px]'
+							className='self-start'
 						/>
-						<p className='h1 mb-[16px]'>Transaction Details</p>
-						<div className='relative overflow-y-auto pt-[30px] pb-[52px] px-[24px] w-[800px] bg-brown rounded-[15px]'>
-							<div className='w-[100%]'>
-								{actionText!.map((i, index) => {
-									return (
-										<div
-											key={index}
-											className='w-[100%] flex flex-col mt-[16px]'
-										>
-											<p className='h2 mb-[8px] capitalize'>{i.type}</p>
-											<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-												{i.text}
-											</p>
-										</div>
-									)
-								})}
+						<p className='h1 mb-[12px] mt-[24px]'>Transaction Details</p>
+						<div className='w-[800px] flex flex-col items-start rounded-[10px] p-[16px] bg-brown gap-y-[16px]'>
+							<p className='h2'>{tx && getTransactionType(tx!.txInfo?.view)}</p>
+							<div className='flex flex-col'>
+								<p className='h3'>Block height :</p>
+								<p className='text_body'>{Number(tx?.txInfo?.height)}</p>
 							</div>
+							<div className='flex flex-col'>
+								<p className='h3'>Hash :</p>
+								<div className='text_body flex gap-x-[8px]'>
+									<p>{slug}</p>
+									<p
+										className='cursor-pointer hover:no-underline hover:opacity-75'
+										onClick={copyToClipboard}
+									>
+										<CopySvg width='20' height='20' fill='#524B4B' />
+									</p>
+								</div>
+							</div>
+						</div>
+						<p className='h1 mb-[12px] mt-[16px]'>Actions</p>
+						<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
+							{actionText!.map((i, index) => (
+								<div key={index} className='w-[100%] flex flex-col'>
+									<p className='h2 mb-[8px] capitalize'>{i.type}</p>
+									<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+										{i.text}
+									</p>
+								</div>
+							))}
 						</div>
 					</div>
 				</div>
