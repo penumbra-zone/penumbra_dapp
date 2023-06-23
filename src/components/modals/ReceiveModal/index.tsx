@@ -34,13 +34,16 @@ export const ReceiveModal: React.FC<ModalProps> = ({ show, onClose }) => {
 
 	return (
 		<ModalWrapper show={show} onClose={onClose}>
-			<div className='relative overflow-y-auto pt-[30px] pb-[52px] px-[24px]'>
+			<div className='relative overflow-y-auto pt-[16px] pb-[52px] px-[24px]'>
 				<p className='text_numbers_ext text-light_grey mb-[8px]'>Address 1</p>
 				<div className='flex p-[10px] justify-center items-center gap-[8px] rounded-[15px] border-[1px] border-light_brown bg-dark_grey'>
 					<p className='text_numbers_ext text-light_grey break-all'>
 						{address}
 					</p>
-					<p className='cursor-pointer' onClick={copyToClipboard}>
+					<p
+						className='cursor-pointer hover:no-underline hover:opacity-75'
+						onClick={copyToClipboard}
+					>
 						<CopySvg width='16' height='16' fill='#524B4B' />
 					</p>
 				</div>

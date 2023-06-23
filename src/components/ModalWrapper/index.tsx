@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
+import { CloseSvg } from '../Svg'
 
 export type ModalProps = { show: boolean; onClose: () => void }
 
@@ -15,8 +16,6 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 	show,
 	onClose,
 	children,
-	className,
-	position = 'center',
 }) => {
 	const [_document, setDocument] = useState<Document | null>(null)
 
@@ -28,27 +27,6 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 		e.stopPropagation()
 
 	const modalContent = show ? (
-		// <div
-		// 	className='top-[0] w-[100%] h-[100vh] fixed bg-background-0.7 overflow-y-hidden z-150 flex items-center justify-center'
-		// 	onClick={onClose}
-		// >
-		// 	{/* <div className='flex items-center justify-center'> */}
-		// 		<div
-		// 			className={`w-[100%] overflow-auto flex ${
-		// 				position === 'center'
-		// 					? 'items-center justify-center'
-		// 					: 'items-start justify-end mt-[100px] ext:mx-[40px] laptop:mx-[312px]'
-		// 			}`}
-		// 		>
-		// 			<div
-		// 				className={`bg-brown rounded-[15px] p-[30px] ${className}`}
-		// 				onClick={stopPropagation}
-		// 			>
-		// 				{children}
-		// 			</div>
-		// 		</div>
-		// 	{/* </div> */}
-		// </div>
 		<div
 			data-te-modal-init
 			className='fixed left-0 top-0 z-[1055]  h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-background-0.7'
@@ -64,32 +42,17 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 				onClick={stopPropagation}
 			>
 				<div className='pointer-events-auto relative flex max-h-[75vh] w-full flex-col overflow-hidden rounded-[15px] bg-brown outline-none'>
-					{/* <div
-					className="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-					<h5
-						className="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
-						id="exampleModalScrollableLabel">
-						Modal title
-					</h5>
-					<button
-						type="button"
-						className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
-						data-te-modal-dismiss
-						aria-label="Close">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke-width="1.5"
-							stroke="currentColor"
-							className="h-6 w-6">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M6 18L18 6M6 6l12 12" />
-						</svg>
-					</button>
-				</div> */}
+					<div className='flex items-center justify-end pt-[8px] pr-[8px]'>
+						<button
+							type='button'
+							className='box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none'
+							data-te-modal-dismiss
+							aria-label='Close'
+							onClick={onClose}
+						>
+							<CloseSvg width='24' height='24' fill='#524B4B' />
+						</button>
+					</div>
 
 					{/* <!--Modal body--> */}
 					{children}
