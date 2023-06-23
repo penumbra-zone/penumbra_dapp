@@ -10,7 +10,7 @@ import {
 	StatusRequest,
 	StatusResponse,
 	TransactionInfoByHashRequest,
-	TransactionInfoByHashResponse,
+	TransactionInfoByHashResponse, TransactionPlannerRequest, TransactionPlannerResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 declare global {
@@ -62,6 +62,10 @@ export declare namespace Penumbra {
 		getAddressByIndex: (
 			request: AddressByIndexRequest
 		) => Promise<AddressByIndexResponse>
+
+		getTransactionPlanner: (
+			request: TransactionPlannerRequest
+		) => Promise<TransactionPlannerResponse>
 	}
 
 	interface PublicStateResponse {

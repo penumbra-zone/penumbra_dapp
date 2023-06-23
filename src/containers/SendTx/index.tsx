@@ -13,14 +13,16 @@ import {
 import {
 	NotesRequest,
 	NotesResponse,
+	TransactionPlannerRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { useBalance } from '../../context'
 import { uint8ToBase64 } from '../../utils/uint8ToBase64'
-import * as wasm from 'penumbra-wasm'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import { createWebExtTransport } from '../../utils/webExtTransport'
 import { useAuth } from '../../App'
+
+let { bech32, bech32m } = require('bech32')
 
 export const SendTx = () => {
 	const { balance } = useBalance()
@@ -108,69 +110,54 @@ export const SendTx = () => {
 
 	const getTransactionPlan = async () => {
 		try {
-			const fvk = await window.penumbra.getFullViewingKey()
-
-			if (!fvk) return
-			const selectedAsset = uint8ToBase64(
-				balance.find(i => i.display === select)?.asset?.inner!
-			)
-
-			const filteredNotes = notes
-				.filter(
-					note =>
-						!note.noteRecord?.heightSpent &&
-						uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
-							selectedAsset
-				)
-				.map(i => i.noteRecord?.toJson())
-
-			if (!filteredNotes.length) console.error('No notes found to spend')
+			const selectedAsset = balance.find(i => i.display === select)?.asset
+				?.inner!
 
 			const client = createPromiseClient(
 				ViewProtocolService,
 				createWebExtTransport(ViewProtocolService)
 			)
 
-			const fmdParameters = (await client.fMDParameters({})).parameters
+			const transactionPlan = (
+				await client.transactionPlanner(
+					new TransactionPlannerRequest({
+						outputs: [
+							{
+								value: {
+									amount: {
+										lo: BigInt(
+											Number(amount) *
+												(balance.find(i => i.display === select)?.exponent!
+													? 10 **
+													  balance.find(i => i.display === select)?.exponent!
+													: 1)
+										),
+										hi: BigInt(0),
+									},
+									assetId: { inner: selectedAsset },
+								},
+								address: {
+									inner: new Uint8Array(bech32m.decode(reciever, 160).words),
+									altBech32m: reciever,
+								},
+							},
+						],
+					})
+				)
+			).plan
 
-			if (!fmdParameters) console.error('No found FmdParameters')
-
-			const chainParameters = (await client.chainParameters({})).parameters
-			if (!chainParameters) console.error('No found chain parameters')
-
-			const viewServiceData = {
-				notes: filteredNotes,
-				chain_parameters: chainParameters,
-				fmd_parameters: fmdParameters,
-			}
-
-			const valueJs = {
-				amount: {
-					lo:
-						Number(amount) *
-						(balance.find(i => i.display === select)?.exponent!
-							? 10 ** balance.find(i => i.display === select)?.exponent!
-							: 1),
-					hi: 0,
-				},
-				assetId: { inner: selectedAsset },
-			}
-
-			const transactionPlan = await wasm.send_plan(
-				fvk,
-				valueJs,
-				reciever,
-				viewServiceData
+			const tx = await window.penumbra.signTransaction(
+				transactionPlan?.toJson()
 			)
-
-			const tx = await window.penumbra.signTransaction(transactionPlan)
 
 			if (tx.result.code === 0) {
 				navigate(routesPath.HOME, { state: { tab: 'Activity' } })
 			} else {
 				console.log(tx.result)
 			}
-		} catch (error) {}
+		} catch (error) {
+			console.log(error)
+		}
 	}
 
 	return (

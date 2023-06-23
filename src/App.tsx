@@ -191,13 +191,24 @@ let AuthContext = createContext<AuthContextType>(null!)
 function AuthProvider({ children }: { children: React.ReactNode }) {
 	let [user, setUser] = useState<null | (UserData & { fvk: string })>(null)
 	const [walletAddress, setWalletAddress] = useState<string | undefined>()
+	const [isPenumbra, setIsPenumbra] = useState<boolean>(false)
+
+	const checkIsPenumbraInstalled = async () => {
+		const isInstalled = await isPenumbraInstalled()
+		setIsPenumbra(isInstalled)
+	}
 
 	useEffect(() => {
-		addWalletListener()
+		checkIsPenumbraInstalled()
 	}, [])
 
-	const addWalletListener = async () => {
-		if (typeof window != 'undefined' && typeof window.penumbra != 'undefined') {
+	useEffect(() => {
+		if (!isPenumbra) return
+		addWalletListener(isPenumbra)
+	}, [isPenumbra])
+
+	const addWalletListener = async (isPenumbra: boolean) => {
+		if (isPenumbra) {
 			window.penumbra.on('accountsChanged', accounts => {
 				setWalletAddress(accounts[0])
 			})
@@ -212,7 +223,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 		// const data = await window.penumbra.requestAccounts()
 		// const account = data.account
 		// setUser(account)
-		if (typeof window != 'undefined' && typeof window.penumbra != 'undefined') {
+		if (isPenumbra) {
 			try {
 				/* Penumbra is installed */
 				const accounts = await window.penumbra.requestAccounts()
