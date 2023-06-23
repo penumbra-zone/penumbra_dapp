@@ -5,6 +5,7 @@ import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import { createWebExtTransport } from '../../../utils/webExtTransport'
 import { AddressByIndexRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { toast } from 'react-hot-toast'
 
 export const ReceiveModal: React.FC<ModalProps> = ({ show, onClose }) => {
 	const [address, setAddress] = useState<string>('')
@@ -30,7 +31,18 @@ export const ReceiveModal: React.FC<ModalProps> = ({ show, onClose }) => {
 		getAddressByIndex()
 	}, [])
 
-	const copyToClipboard = () => navigator.clipboard.writeText(address)
+	const copyToClipboard = () => {
+		navigator.clipboard.writeText(address)
+		toast.success('Successfully copied', {
+			position: 'top-center',
+			icon: '👏',
+			style: {
+				borderRadius: '15px',
+				background: '#141212',
+				color: '#fff',
+			},
+		})
+	}
 
 	return (
 		<ModalWrapper show={show} onClose={onClose}>

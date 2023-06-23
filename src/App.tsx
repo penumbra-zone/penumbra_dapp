@@ -25,6 +25,7 @@ import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connec
 import { createWebExtTransport } from './utils/webExtTransport'
 import { StatusStreamRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { createPromiseClient } from '@bufbuild/connect'
+import { Toaster } from 'react-hot-toast'
 
 export const getShortKey = (text: string) => {
 	if (!text) return ''
@@ -168,6 +169,7 @@ function Layout() {
 										/>
 									)}
 								</div>
+								<Toaster />
 								<Outlet />
 							</div>
 						</>
