@@ -266,19 +266,6 @@ export default function TransactionDetail() {
 		})
 	}
 
-	const copyToClipboard = () => {
-		navigator.clipboard.writeText(slug!)
-		toast.success('Successfully copied', {
-			position: 'top-center',
-			icon: '👏',
-			style: {
-				borderRadius: '15px',
-				background: '#141212',
-				color: '#fff',
-			},
-		})
-	}
-
 	return (
 		<>
 			{auth!.walletAddress ? (
@@ -327,29 +314,6 @@ export default function TransactionDetail() {
 									))}
 								</div>
 							</div>
-							<div className='flex flex-col'>
-								<p className='h3'>Hash :</p>
-								<div className='text_body flex gap-x-[8px]'>
-									<p>{slug}</p>
-									<p
-										className='cursor-pointer hover:no-underline hover:opacity-75'
-										onClick={copyToClipboard}
-									>
-										<CopySvg width='20' height='20' fill='#524B4B' />
-									</p>
-								</div>
-							</div>
-						</div>
-						<p className='h1 mb-[12px] mt-[16px]'>Actions</p>
-						<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
-							{actionText!.map((i, index) => (
-								<div key={index} className='w-[100%] flex flex-col'>
-									<p className='h2 mb-[8px] capitalize'>{i.type}</p>
-									<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-										{i.text}
-									</p>
-								</div>
-							))}
 						</div>
 					)}
 				</>

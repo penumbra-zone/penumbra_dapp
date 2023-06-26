@@ -104,14 +104,6 @@
         "async": false
       }
     },
-    "(app-client)/./src/app/send/page.tsx": {
-      "*": {
-        "id": "(sc_client)/./src/app/send/page.tsx",
-        "name": "*",
-        "chunks": [],
-        "async": false
-      }
-    },
     "(app-client)/./src/app/tx/page.tsx": {
       "*": {
         "id": "(sc_client)/./src/app/tx/page.tsx",
@@ -287,7 +279,7 @@
       "id": "(app-client)/./node_modules/next/dist/client/link.js",
       "name": "*",
       "chunks": [
-        "app/send/page:static/chunks/app/send/page.js"
+        "app/layout:static/chunks/app/layout.js"
       ],
       "async": false
     },
@@ -295,7 +287,7 @@
       "id": "(app-client)/./node_modules/next/dist/client/link.js",
       "name": "*",
       "chunks": [
-        "app/send/page:static/chunks/app/send/page.js"
+        "app/layout:static/chunks/app/layout.js"
       ],
       "async": false
     },
@@ -355,14 +347,6 @@
       ],
       "async": false
     },
-    "/Users/vadimolijnik/Documents/work_projects/penumbra_dapp/src/app/send/page.tsx": {
-      "id": "(app-client)/./src/app/send/page.tsx",
-      "name": "*",
-      "chunks": [
-        "app/send/page:static/chunks/app/send/page.js"
-      ],
-      "async": false
-    },
     "/Users/vadimolijnik/Documents/work_projects/penumbra_dapp/src/app/tx/page.tsx": {
       "id": "(app-client)/./src/app/tx/page.tsx",
       "name": "*",
@@ -384,10 +368,6 @@
       "files": [
         "static/css/app/layout.css"
       ]
-    },
-    "/Users/vadimolijnik/Documents/work_projects/penumbra_dapp/src/app/send/page": {
-      "modules": [],
-      "files": []
     },
     "/Users/vadimolijnik/Documents/work_projects/penumbra_dapp/src/app/tx/page": {
       "modules": [],
