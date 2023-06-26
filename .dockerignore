@@ -1,5 +1,0 @@
-# ignore everything, then allow JS & JSON files, as well as src/
-**
-!*.json
-!*.js
-!src/
