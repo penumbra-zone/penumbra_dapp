@@ -16,7 +16,7 @@ import { ChevronLeftIcon, CopySvg } from '../../components/Svg'
 import { routesPath } from '../../utils/constants'
 import { toast } from 'react-hot-toast'
 import { getTransactionType } from '../../utils/transactionType'
-import {bech32m} from "bech32";
+import { bech32m } from 'bech32'
 
 export const TransactionDetail = () => {
 	const auth = useAuth()
@@ -269,48 +269,54 @@ export const TransactionDetail = () => {
 	return (
 		<>
 			{auth.walletAddress ? (
-				<div className='w-[100%] flex justify-center mt-[24px]'>
-					<div>
-						<Button
-							mode='icon_transparent'
-							onClick={handleBack}
-							title='Back'
-							iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
-							className='self-start'
-						/>
-						<p className='h1 mb-[12px] mt-[24px]'>Transaction Details</p>
-						<div className='w-[800px] flex flex-col items-start rounded-[10px] p-[16px] bg-brown gap-y-[16px]'>
-							<p className='h2'>{tx && getTransactionType(tx!.txInfo?.view)}</p>
-							<div className='flex flex-col'>
-								<p className='h3'>Block height :</p>
-								<p className='text_body'>{Number(tx?.txInfo?.height)}</p>
-							</div>
-							<div className='flex flex-col'>
-								<p className='h3'>Hash :</p>
-								<div className='text_body flex gap-x-[8px]'>
-									<p>{slug}</p>
-									<p
-										className='cursor-pointer hover:no-underline hover:opacity-75'
-										onClick={copyToClipboard}
-									>
-										<CopySvg width='20' height='20' fill='#524B4B' />
+				<>
+					{tx && (
+						<div className='w-[100%] flex justify-center mt-[24px]'>
+							<div>
+								<Button
+									mode='icon_transparent'
+									onClick={handleBack}
+									title='Back'
+									iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
+									className='self-start'
+								/>
+								<p className='h1 mb-[12px] mt-[24px]'>Transaction Details</p>
+								<div className='w-[800px] flex flex-col items-start rounded-[10px] p-[16px] bg-brown gap-y-[16px]'>
+									<p className='h2'>
+										{tx && getTransactionType(tx!.txInfo?.view)}
 									</p>
+									<div className='flex flex-col'>
+										<p className='h3'>Block height :</p>
+										<p className='text_body'>{Number(tx?.txInfo?.height)}</p>
+									</div>
+									<div className='flex flex-col'>
+										<p className='h3'>Hash :</p>
+										<div className='text_body flex gap-x-[8px]'>
+											<p>{slug}</p>
+											<p
+												className='cursor-pointer hover:no-underline hover:opacity-75'
+												onClick={copyToClipboard}
+											>
+												<CopySvg width='20' height='20' fill='#524B4B' />
+											</p>
+										</div>
+									</div>
+								</div>
+								<p className='h1 mb-[12px] mt-[16px]'>Actions</p>
+								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
+									{actionText!.map((i, index) => (
+										<div key={index} className='w-[100%] flex flex-col'>
+											<p className='h2 mb-[8px] capitalize'>{i.type}</p>
+											<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+												{i.text}
+											</p>
+										</div>
+									))}
 								</div>
 							</div>
 						</div>
-						<p className='h1 mb-[12px] mt-[16px]'>Actions</p>
-						<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
-							{actionText!.map((i, index) => (
-								<div key={index} className='w-[100%] flex flex-col'>
-									<p className='h2 mb-[8px] capitalize'>{i.type}</p>
-									<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-										{i.text}
-									</p>
-								</div>
-							))}
-						</div>
-					</div>
-				</div>
+					)}
+				</>
 			) : (
 				<p className='h1 mt-[300px] text-center'>
 					Connect to Penumbra if you want to have access to dApp
