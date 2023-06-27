@@ -13,8 +13,10 @@
     "@buf/penumbra-zone_penumbra.bufbuild_connect-web": "^0.8.6-20230622200008-2b9632c2d2bb.1",
     "@buf/penumbra-zone_penumbra.bufbuild_es": "^1.2.1-20230622200008-2b9632c2d2bb.1",
     "@bufbuild/connect-web": "^0.8.6",
+    "@cosmjs/encoding": "^0.31.0",
     "autoprefixer": "10.4.14",
     "bech32": "^2.0.0",
+    "bech32-buffer": "^0.2.1",
     "eslint": "8.43.0",
     "eslint-config-next": "13.4.7",
     "next": "13.4.7",
@@ -30,6 +32,18 @@
     "@types/node": "20.3.1",
     "@types/react": "18.2.13",
     "@types/react-dom": "18.2.6",
+    "ts-jest": "^29.1.0",
     "typescript": "5.1.3"
+  },
+
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "node_modules/variables/.+\\.(j|t)sx?$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!variables/.*)"
+    ]
   }
 }

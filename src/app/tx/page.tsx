@@ -3,11 +3,12 @@ import { useAuth } from '@/context/AuthContextProvider'
 import { useBalance } from '@/context/BalanceContextProvider'
 import { getAssetByAssetId } from '@/lib/assets'
 import { uint8ToBase64 } from '@/lib/uint8ToBase64'
+
 import {
 	TransactionInfoByHashRequest,
 	TransactionInfoByHashResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { bech32m } from 'bech32'
+import {bech32, bech32m} from 'bech32'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { createPromiseClient } from '@bufbuild/connect'
@@ -18,6 +19,8 @@ import { toast } from 'react-hot-toast'
 import { Button } from '@/components/Button'
 import { ChevronLeftIcon, CopySvg } from '@/components/Svg'
 import { getTransactionType } from '@/lib/transactionType'
+import {toBech32} from "@cosmjs/encoding";
+
 
 export default function TransactionDetail() {
 	const auth = useAuth()
@@ -82,10 +85,10 @@ export default function TransactionDetail() {
 					const addresView =
 						//@ts-ignore
 						i.actionView.value.outputView.value.note.address.addressView
-					const address = bech32m.encode(
+					const address = bech32.encode(
 						'penumbrav2t',
-						addresView.value.address.inner,
-						160
+						bech32.toWords(addresView.value.address.inner),
+						156
 					)
 
 					const exponent = asset.denomUnits.find(
@@ -107,6 +110,7 @@ export default function TransactionDetail() {
 						type: addresView.case === 'opaque' ? 'Output' : 'Output',
 					}
 				} catch (error) {
+					console.error(error)
 					return {
 						type,
 						text: 'Encrypted',
