@@ -12,6 +12,7 @@
 /.next/
 .next/
 /out/
+/docroot/
 
 # production
 /build
