@@ -1,5 +1,5 @@
 {
-  "name": "penumbra_dapp_next",
+  "name": "penumbra_dapp",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,9 +13,6 @@
     "@buf/penumbra-zone_penumbra.bufbuild_connect-web": "^0.8.6-20230622200008-2b9632c2d2bb.1",
     "@buf/penumbra-zone_penumbra.bufbuild_es": "^1.2.1-20230622200008-2b9632c2d2bb.1",
     "@bufbuild/connect-web": "^0.8.6",
-    "@types/node": "20.3.1",
-    "@types/react": "18.2.13",
-    "@types/react-dom": "18.2.6",
     "autoprefixer": "10.4.14",
     "bech32": "^2.0.0",
     "eslint": "8.43.0",
@@ -27,7 +24,12 @@
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-select": "^5.7.3",
-    "tailwindcss": "3.3.2",
+    "tailwindcss": "3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "20.3.1",
+    "@types/react": "18.2.13",
+    "@types/react-dom": "18.2.6",
     "typescript": "5.1.3"
   }
 }
