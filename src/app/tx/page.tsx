@@ -84,7 +84,7 @@ export default function TransactionDetail() {
 						i.actionView.value.outputView.value.note.address.addressView
 					const address = bech32m.encode(
 						'penumbrav2t',
-						addresView.value.address.inner,
+						bech32m.toWords(addresView.value.address.inner),
 						160
 					)
 
