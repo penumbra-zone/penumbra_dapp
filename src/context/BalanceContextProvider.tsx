@@ -1,3 +1,4 @@
+'use client'
 import {
 	AssetsRequest,
 	AssetsResponse,
@@ -90,7 +91,7 @@ export const BalanceContextProvider = (props: Props) => {
 			}
 		}
 		getAssets()
-	}, [auth])
+	}, [auth.walletAddress])
 
 	useEffect(() => {
 		if (!auth!.walletAddress) return setBalance({})
@@ -112,7 +113,7 @@ export const BalanceContextProvider = (props: Props) => {
 			}
 		}
 		getBalances()
-	}, [auth])
+	}, [auth.walletAddress])
 
 	return (
 		<BalanceContext.Provider value={{ balance: assetBalance, assets }}>

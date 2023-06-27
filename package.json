@@ -4,12 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next",
-    "build": "next build",
+    "build": "next build && next export",
     "start": "next start",
-    "serve": "npm run build && firebase emulators:start --only functions,hosting",
-    "shell": "npm run build && firebase functions:shell",
-    "deploy": "firebase deploy --only hosting",
-    "logs": "firebase functions:log"
+    "deploy": "firebase deploy --only hosting"
   },
   "dependencies": {
     "@buf/penumbra-zone_penumbra.bufbuild_connect-es": "^0.10.1-20230622200008-2b9632c2d2bb.1",

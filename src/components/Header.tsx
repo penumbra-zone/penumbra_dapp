@@ -1,3 +1,4 @@
+'use client'
 import { useAuth } from '@/context/AuthContextProvider'
 import React, { useEffect, useState } from 'react'
 import { Button } from './Button'

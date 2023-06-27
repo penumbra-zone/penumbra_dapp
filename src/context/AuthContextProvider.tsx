@@ -1,11 +1,14 @@
+'use client'
 import { createContext, useContext, useEffect, useState } from 'react'
 
 interface AuthContextType {
 	walletAddress: string
-	signin: () => Promise<void>
+	signin?: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | null>(null)
+const AuthContext = createContext<AuthContextType>({
+	walletAddress: '',
+})
 
 const poll = (
 	resolve: (result: boolean) => void,

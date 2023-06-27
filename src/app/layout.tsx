@@ -1,4 +1,4 @@
-'use client'
+
 import { AuthContextProvider } from '@/context/AuthContextProvider'
 import './globals.css'
 import { Header } from '@/components/Header'

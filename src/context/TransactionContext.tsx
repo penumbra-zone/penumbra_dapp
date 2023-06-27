@@ -1,3 +1,4 @@
+'use client'
 import {
 	TransactionInfoRequest,
 	TransactionInfoResponse,
@@ -43,7 +44,7 @@ export const TransactionContextProvider = (props: Props) => {
 			}
 		}
 		getTxs()
-	}, [auth])
+	}, [auth.walletAddress])
 
 	return (
 		<TransactionsContext.Provider value={{ transactions }}>
