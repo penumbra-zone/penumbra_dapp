@@ -1,3 +1,4 @@
+'use client'
 import {
 	AssetsRequest,
 	AssetsResponse,
@@ -5,12 +6,12 @@ import {
 	BalanceByAddressResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { useAuth } from '../App'
-import { uint8ToBase64 } from '../utils/uint8ToBase64'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
-import { createWebExtTransport } from '../utils/webExtTransport'
 import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import { useAuth } from './AuthContextProvider'
+import { extensionTransport } from '@/lib/extensionTransport'
+import { uint8ToBase64 } from '@/lib/uint8ToBase64'
 
 export type AssetBalance = {
 	asset?: AssetId
@@ -41,7 +42,6 @@ export const BalanceContextProvider = (props: Props) => {
 	const [balance, setBalance] = useState<
 		Record<string, BalanceByAddressResponse>
 	>({})
-	// const [balances, setBalances] = useState<BalanceByAddressResponse[]>([])
 	const [assets, setAssets] = useState<AssetsResponse[]>([])
 
 	const assetBalance: AssetBalance[] = useMemo(() => {
@@ -77,11 +77,11 @@ export const BalanceContextProvider = (props: Props) => {
 	}, [balance, assets])
 
 	useEffect(() => {
-		if (!auth.walletAddress) return setAssets([])
+		if (!auth!.walletAddress) return setAssets([])
 		const getAssets = async () => {
 			const client = createPromiseClient(
 				ViewProtocolService,
-				createWebExtTransport(ViewProtocolService)
+				extensionTransport(ViewProtocolService)
 			)
 
 			const assetsRequest = new AssetsRequest({})
@@ -94,11 +94,11 @@ export const BalanceContextProvider = (props: Props) => {
 	}, [auth.walletAddress])
 
 	useEffect(() => {
-		if (!auth.walletAddress) return setBalance({})
+		if (!auth!.walletAddress) return setBalance({})
 		const getBalances = async () => {
 			const client = createPromiseClient(
 				ViewProtocolService,
-				createWebExtTransport(ViewProtocolService)
+				extensionTransport(ViewProtocolService)
 			)
 
 			const request = new BalanceByAddressRequest({})
