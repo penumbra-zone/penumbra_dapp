@@ -1,4 +1,3 @@
-
 import { AuthContextProvider } from '@/context/AuthContextProvider'
 import './globals.css'
 import { Header } from '@/components/Header'
@@ -14,6 +13,9 @@ export default function RootLayout({
 	return (
 		<html lang='en'>
 			<body>
+				<link rel='icon' href='/favicon.ico' sizes='any' />
+				<meta name='description' content='app.testnet.penumbra.zone' />
+				<title>Penumbra dApp</title>
 				<AuthContextProvider>
 					<BalanceContextProvider>
 						<TransactionContextProvider>
