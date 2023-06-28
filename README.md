@@ -40,7 +40,7 @@ Add library to your app.
 - Configure registry
 
   ```bash
-   npm config set @buf:registry https://buf.build/gen/npm/v1/
+  npm config set @buf:registry https://buf.build/gen/npm/v1/
   ```
 
 - Packages
@@ -48,19 +48,19 @@ Add library to your app.
   - bufbuild/connect-es
 
   ```bash
-  	npm install @buf/penumbra-zone_penumbra.bufbuild_connect-es@latest
+  npm install @buf/penumbra-zone_penumbra.bufbuild_connect-es@latest
   ```
 
   - bufbuild/es
 
   ```bash
-  	npm install @buf/penumbra-zone_penumbra.bufbuild_es@latest
+  npm install @buf/penumbra-zone_penumbra.bufbuild_es@latest
   ```
 
   - bufbuild/connect-web
 
   ```bash
-  	npm install @buf/penumbra-zone_penumbra.bufbuild_connect-web@latest
+  npm install @buf/penumbra-zone_penumbra.bufbuild_connect-web@latest
   ```
 
 ### 3. Types for window object penumbra
@@ -447,6 +447,8 @@ for await (const status of client.statusStream(statusRequest)) {
 
 [**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.StatusStreamResponse)
 
+<a id="notes"></a>
+
 ## Notes
 
 Queries for notes that have been accepted by the core.chain.v1alpha1.
@@ -461,6 +463,8 @@ for await (const note of client.notes(statusRequest)) {
 [**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.NotesRequest)
 
 [**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.NotesResponse)
+
+<a id="assets"></a>
 
 ## Assets
 
@@ -477,6 +481,8 @@ for await (const asset of client.assets(request)) {
 
 [**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.AssetsResponse)
 
+<a id="chain_parameters"></a>
+
 ## ChainParameters
 
 Query for the current chain parameters.
@@ -489,6 +495,8 @@ const response = await client.chainParameters(request)
 [**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.ChainParametersRequest)
 
 [**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.ChainParametersResponse)
+
+<a id="fmd_parameters"></a>
 
 ## FMDParameters
 
@@ -503,6 +511,8 @@ const response = await client.fMDParameters(request)
 
 [**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.FMDParametersResponse)
 
+<a id="address_by_index"></a>
+
 ## AddressByIndex
 
 Query for an address given an address index
@@ -515,6 +525,8 @@ const response = await client.addressByIndex(request)
 [**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.AddressByIndexRequest)
 
 [**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.AddressByIndexResponse)
+
+<a id="balance_by_address"></a>
 
 ## BalanceByAddress
 
@@ -531,6 +543,8 @@ for await (const balance of client.balanceByAddress(request)) {
 
 [**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.BalanceByAddressResponse)
 
+<a id="tx_by_hash"></a>
+
 ## TransactionInfoByHash
 
 Query for a given transaction by its hash.
@@ -543,6 +557,8 @@ const response = await client.transactionInfoByHash(request)
 [**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionInfoByHashRequest)
 
 [**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionInfoByHashResponse)
+
+<a id="tx_info"></a>
 
 ## TransactionInfo
 
@@ -558,6 +574,8 @@ for await (const balance of client.transactionInfo(request)) {
 [**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionInfoRequest)
 
 [**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionInfoResponse)
+
+<a id="tx_planner"></a>
 
 ## TransactionPlanner
 
