@@ -620,10 +620,11 @@ const transactionPlan = (await client.transactionPlanner(new TransactionPlannerR
 				altBech32m: [reciever],
 			},
 		},
-		],
-	}))).plan
+	],
+}))).plan
 
-	const tx = await window.penumbra.signTransaction(transactionPlan?.toJson())
+	
+const tx = await window.penumbra.signTransaction(transactionPlan?.toJson())
 ```
 
 ## Error Codes
