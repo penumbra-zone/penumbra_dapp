@@ -321,16 +321,16 @@ export default function TransactionDetail() {
 										(Height {Number(tx?.txInfo?.height)})
 									</p>
 								</div>
-								<p className='h1 mb-[12px] mt-[16px]'>Memo</p>
+								<p className='h2 mb-[12px] mt-[16px]'>Memo</p>
 								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
 									{
 										memoSender === 'Encrypted' ? (
 											<div className='w-[100%] flex flex-col'>
-												<p className='h2 mb-[8px] capitalize encrypted'>Sender Address</p>
+												<p className='h3 mb-[8px] capitalize encrypted'>Sender Address</p>
 											</div>
 										) : (
 											<div className='w-[100%] flex flex-col'>
-												<p className='h2 mb-[8px] capitalize'>Sender Address</p>
+												<p className='h3 mb-[8px] capitalize'>Sender Address</p>
 												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
 													{memoSender}&nbsp; {/* the nbsp is supposed to ensure that an empty memoSender still results in a non-zero-height container, but something is stripping it? */}
 												</p>
@@ -339,27 +339,27 @@ export default function TransactionDetail() {
 									}
 									{memoText === 'Encrypted' ? (
 										<div className='w-[100%] flex flex-col'>
-											<p className='h2 mb-[8px] capitalize encrypted'>Message</p>
+											<p className='h3 mb-[8px] capitalize encrypted'>Message</p>
 										</div>
 									) : (
 										<div className='w-[100%] flex flex-col'>
-											<p className='h2 mb-[8px] capitalize'>Message</p>
+											<p className='h3 mb-[8px] capitalize'>Message</p>
 											<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
 												{memoText}
 											</p>
 										</div>
 									)}
 								</div>
-								<p className='h1 mb-[12px] mt-[16px]'>Actions</p>
+								<p className='h2 mb-[12px] mt-[16px]'>Actions</p>
 								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
 									{actionText!.map((i, index) => (
 										i.text === 'Encrypted' ? (
 											<div key={index} className='w-[100%] flex flex-col'>
-												<p className='h2 mb-[8px] capitalize encrypted'>{i.type}</p>
+												<p className='h3 mb-[8px] capitalize encrypted'>{i.type}</p>
 											</div>
 										) : (
 											<div key={index} className='w-[100%] flex flex-col'>
-												<p className='h2 mb-[8px] capitalize'>{i.type}</p>
+												<p className='h3 mb-[8px] capitalize'>{i.type}</p>
 												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
 													{i.text}
 												</p>
@@ -372,7 +372,7 @@ export default function TransactionDetail() {
 					)}
 				</>
 			) : (
-				<p className='h1 mt-[300px] text-center'>
+				<p className='h2 mt-[300px] text-center'>
 					Connect to Penumbra if you want to have access to dApp
 				</p>
 			)}
