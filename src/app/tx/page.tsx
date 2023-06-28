@@ -323,12 +323,20 @@ export default function TransactionDetail() {
 								</div>
 								<p className='h1 mb-[12px] mt-[16px]'>Memo</p>
 								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
-									<div className='w-[100%] flex flex-col'>
-										<p className='h2 mb-[8px] capitalize'>Sender</p>
-										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-											{memoSender}
-										</p>
-									</div>
+									{
+										memoSender === 'Encrypted' ? (
+											<div className='w-[100%] flex flex-col'>
+												<p className='h2 mb-[8px] capitalize encrypted'>Sender Address (Encrypted)</p>
+											</div>
+										) : (
+											<div className='w-[100%] flex flex-col'>
+												<p className='h2 mb-[8px] capitalize'>Sender Address</p>
+												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+													{memoSender}
+												</p>
+											</div>
+										)
+									}
 									{memoText !== '' ? (
 										<div className='w-[100%] flex flex-col'>
 											<p className='h2 mb-[8px] capitalize'>Message</p>
