@@ -375,8 +375,8 @@ const signin = async () => {
 **Output example:**
 
 ```js
-;[
-	'penumbrav2t13vh0fkf3qkqjacpm59g23ufea9n5us45e4p5h6hty8vg73r2t8g5l3kynad87uvn9eragf3hhkgkhqe5vhngq2cw493k48c9qg9ms4epllcmndd6ly4v4dwwjcnxaxzjqnlvnw',
+[
+'penumbrav2t13vh0fkf3qkqjacpm59g23ufea9n5us45e4p5h6hty8vg73r2t8g5l3kynad87uvn9eragf3hhkgkhqe5vhngq2cw493k48c9qg9ms4epllcmndd6ly4v4dwwjcnxaxzjqnlvnw',
 ]
 ```
 
