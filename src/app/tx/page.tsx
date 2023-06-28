@@ -19,6 +19,16 @@ import { Button } from '@/components/Button'
 import { ChevronLeftIcon, CopySvg } from '@/components/Svg'
 import { getTransactionType } from '@/lib/transactionType'
 
+function truncateHash(hash: string | null, length: number = 6): string {
+	if (hash === null) {
+		return '';
+	}
+	if (hash.length <= 2 * length) {
+		return hash;
+	}
+	return hash.slice(0, length) + '…' + hash.slice(-length);
+}
+
 export default function TransactionDetail() {
 	const auth = useAuth()
 	const { push } = useRouter()
@@ -26,6 +36,37 @@ export default function TransactionDetail() {
 
 	const { assets } = useBalance()
 	const [tx, setTx] = useState<TransactionInfoByHashResponse | null>(null)
+
+	const bodyView =
+		//@ts-ignore
+		tx?.txInfo?.view?.bodyView!
+	const memoView =
+		//@ts-ignore
+		tx?.txInfo?.view?.bodyView?.memoView?.memoView!
+
+	let memoText = 'Encrypted';
+	let memoSender = 'Encrypted';
+	//console.log(memoView)
+	//console.log(bodyView)
+	if (memoView?.case == 'visible') {
+		memoText = memoView.value.plaintext!.text;
+		memoSender = bech32m.encode(
+			'penumbrav2t',
+			bech32m.toWords(memoView.value.plaintext!.sender!.inner),
+			160
+		);
+	}
+
+	let chainId = bodyView?.chainId;
+	const feeAmount =
+		(Number(bodyView?.fee?.amount?.lo) +
+			2 ** 64 * Number(bodyView?.fee?.amount?.hi))
+	let feeText = `${feeAmount} upenumbra`
+	let expiryText = 'None'
+	if (bodyView?.expiryHeight != BigInt(0)) {
+		expiryText = `${bodyView?.expiryHeight}`
+	}
+
 
 	const actionText = useMemo(() => {
 		if (!tx) return []
@@ -203,16 +244,14 @@ export default function TransactionDetail() {
 
 					if (delta1I) {
 						return {
-							text: `${Number(delta1I) / (exponent1 ? 10 ** exponent1 : 1)} ${
-								asset1.display
-							} for ${asset2.display}`,
+							text: `${Number(delta1I) / (exponent1 ? 10 ** exponent1 : 1)} ${asset1.display
+								} for ${asset2.display}`,
 							type,
 						}
 					}
 					return {
-						text: `${Number(delta2I) / (exponent2 ? 10 ** exponent2 : 1)} ${
-							asset2.display
-						} for ${asset1.display}`,
+						text: `${Number(delta2I) / (exponent2 ? 10 ** exponent2 : 1)} ${asset2.display
+							} for ${asset1.display}`,
 						type,
 					}
 				} catch (error) {
@@ -280,45 +319,96 @@ export default function TransactionDetail() {
 									iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
 									className='self-start'
 								/>
-								<p className='h1 mb-[12px] mt-[24px]'>Transaction Details</p>
-								<div className='w-[800px] flex flex-col items-start rounded-[10px] p-[16px] bg-brown gap-y-[16px]'>
-									<p className='h2'>
-										{tx && getTransactionType(tx!.txInfo?.view)}
+								<div className='h1 mb-[12px] mt-[24px]'>
+									<p
+										style={{ display: "inline-block" }}
+									>Transaction <span className='monospace'>{truncateHash(params.get('hash'), 8)}</span></p>
+									<p
+										className='cursor-pointer hover:no-underline hover:opacity-75'
+										onClick={copyToClipboard}
+										style={{ display: "inline-block", margin: "0 5px" }}
+									>
+										<CopySvg width='20' height='20' fill='#524B4B' />
 									</p>
-									<div className='flex flex-col'>
-										<p className='h3'>Block height :</p>
-										<p className='text_body'>{Number(tx?.txInfo?.height)}</p>
-									</div>
-									<div className='flex flex-col'>
-										<p className='h3'>Hash :</p>
-										<div className='text_body flex gap-x-[8px]'>
-											<p>{params.get('hash')}</p>
-											<p
-												className='cursor-pointer hover:no-underline hover:opacity-75'
-												onClick={copyToClipboard}
-											>
-												<CopySvg width='20' height='20' fill='#524B4B' />
+									<p
+										style={{ display: "inline-block" }}
+									>
+										(Height {Number(tx?.txInfo?.height)})
+									</p>
+								</div>
+								<p className='h2 mb-[12px] mt-[16px]'>Memo</p>
+								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
+									{
+										memoSender === 'Encrypted' ? (
+											<div className='w-[100%] flex flex-col'>
+												<p className='h3 mb-[8px] capitalize encrypted'>Sender Address</p>
+											</div>
+										) : (
+											<div className='w-[100%] flex flex-col'>
+												<p className='h3 mb-[8px] capitalize'>Sender Address</p>
+												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+													{memoSender}&nbsp; {/* the nbsp is supposed to ensure that an empty memoSender still results in a non-zero-height container, but something is stripping it? */}
+												</p>
+											</div>
+										)
+									}
+									{memoText === 'Encrypted' ? (
+										<div className='w-[100%] flex flex-col'>
+											<p className='h3 mb-[8px] capitalize encrypted'>Message</p>
+										</div>
+									) : (
+										<div className='w-[100%] flex flex-col'>
+											<p className='h3 mb-[8px] capitalize'>Message</p>
+											<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+												{memoText}
 											</p>
 										</div>
-									</div>
+									)}
 								</div>
-								<p className='h1 mb-[12px] mt-[16px]'>Actions</p>
+								<p className='h2 mb-[12px] mt-[16px]'>Actions</p>
 								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
 									{actionText!.map((i, index) => (
-										<div key={index} className='w-[100%] flex flex-col'>
-											<p className='h2 mb-[8px] capitalize'>{i.type}</p>
-											<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-												{i.text}
-											</p>
-										</div>
+										i.text === 'Encrypted' ? (
+											<div key={index} className='w-[100%] flex flex-col'>
+												<p className='h3 mb-[8px] capitalize encrypted'>{i.type}</p>
+											</div>
+										) : (
+											<div key={index} className='w-[100%] flex flex-col'>
+												<p className='h3 mb-[8px] capitalize'>{i.type}</p>
+												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+													{i.text}
+												</p>
+											</div>
+										)
 									))}
+								</div>
+								<p className='h2 mb-[12px] mt-[16px]'>Transaction Data</p>
+								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
+									<div className='w-[100%] flex flex-col'>
+										<p className='h3 mb-[8px] capitalize'>Chain ID</p>
+										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+											<span className='monospace'>{chainId}</span>
+										</p>
+									</div>
+									<div className='w-[100%] flex flex-col'>
+										<p className='h3 mb-[8px] capitalize'>Fee</p>
+										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+											{feeText}
+										</p>
+									</div>
+									<div className='w-[100%] flex flex-col'>
+										<p className='h3 mb-[8px] capitalize'>Expiry Height</p>
+										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+											{expiryText}
+										</p>
+									</div>
 								</div>
 							</div>
 						</div>
 					)}
 				</>
 			) : (
-				<p className='h1 mt-[300px] text-center'>
+				<p className='h2 mt-[300px] text-center'>
 					Connect to Penumbra if you want to have access to dApp
 				</p>
 			)}
