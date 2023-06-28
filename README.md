@@ -278,23 +278,25 @@ const client = createPromiseClient(
 
 - [service ViewProtocolService](#view_service)
 
-	- [Status](#status)
-	- [Status Stream](#status_stream)
-	- [Notes](#notes)
-	- [Assets](#assets)
-	- [ChainParameters](#chain_parameters)
-	- [FMDParameters](#fmd_parameters)
-	- [AddressByIndex](#address_by_index)
-	- [BalanceByAddress](#balance_by_address)
-	- [TransactionInfoByHash](#tx_by_hash)
-	- [TransactionInfo](#tx_info)
-	- [TransactionPlanner](#tx_planner)
+  - [Status](#status)
+  - [Status Stream](#status_stream)
+  - [Notes](#notes)
+  - [Assets](#assets)
+  - [ChainParameters](#chain_parameters)
+  - [FMDParameters](#fmd_parameters)
+  - [AddressByIndex](#address_by_index)
+  - [BalanceByAddress](#balance_by_address)
+  - [TransactionInfoByHash](#tx_by_hash)
+  - [TransactionInfo](#tx_info)
+  - [TransactionPlanner](#tx_planner)
 
-In code you can use [TypeScript types](https://github.com/wavesplatform/ts-types/blob/master/transactions/index.ts).
+- [other](#other)
+
+  - [send transaction](#send_tx)
 
 <a id="user-info"></a>
 
-### User Info
+# User Info
 
 <a id="login"></a>
 
@@ -373,14 +375,14 @@ const signin = async () => {
 **Output example:**
 
 ```js
-[
+;[
 	'penumbrav2t13vh0fkf3qkqjacpm59g23ufea9n5us45e4p5h6hty8vg73r2t8g5l3kynad87uvn9eragf3hhkgkhqe5vhngq2cw493k48c9qg9ms4epllcmndd6ly4v4dwwjcnxaxzjqnlvnw',
 ]
 ```
 
 <a id="view_service"></a>
 
-### service ViewProtocolService
+# service ViewProtocolService
 
 The view protocol is used by a view client, who wants to do some transaction-related actions, to request data from a view service, which is responsible for synchronizing and scanning the public chain state with one or more full viewing keys.
 
@@ -422,7 +424,7 @@ Queries for notes that have been accepted by the core.chain.v1alpha1.
 ```js
 const request = new StatusStreamRequest({})
 for await (const status of client.statusStream(statusRequest)) {
-	console.log(status)	
+	console.log(status)
 }
 ```
 
@@ -439,7 +441,7 @@ Queries for notes that have been accepted by the core.chain.v1alpha1.
 ```js
 const request = new StatusStreamRequest({})
 for await (const status of client.statusStream(statusRequest)) {
-	console.log(status)	
+	console.log(status)
 }
 ```
 
@@ -456,7 +458,7 @@ Queries for notes that have been accepted by the core.chain.v1alpha1.
 ```js
 const request = new NotesRequest({})
 for await (const note of client.notes(statusRequest)) {
-	console.log(note)	
+	console.log(note)
 }
 ```
 
@@ -473,7 +475,7 @@ Queries for assets that have been accepted by the core.chain.v1alpha1.
 ```js
 const request = new AssetsRequest({})
 for await (const asset of client.assets(request)) {
-	console.log(asset)	
+	console.log(asset)
 }
 ```
 
@@ -535,7 +537,7 @@ Query for balance of a given address
 ```js
 const request = new BalanceByAddressRequest({})
 for await (const balance of client.balanceByAddress(request)) {
-	console.log(balance)	
+	console.log(balance)
 }
 ```
 
@@ -567,7 +569,7 @@ Query for the full transactions in the given range of blocks.
 ```js
 const request = new TransactionInfoRequest({})
 for await (const balance of client.transactionInfo(request)) {
-	console.log(balance)	
+	console.log(balance)
 }
 ```
 
@@ -589,6 +591,40 @@ const response = await client.transactionPlanner(request)
 [**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionPlannerRequest)
 
 [**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionPlannerResponse)
+
+<a id="other"></a>
+
+# Other
+
+<a id="send_tx"></a>
+
+## Send transaction
+
+```js
+const client = createPromiseClient(ViewProtocolService,extensionTransport(ViewProtocolService))
+
+const transactionPlan = (await client.transactionPlanner(new TransactionPlannerRequest({
+	outputs: [
+		{
+			value: {
+				amount: {
+					lo: [amont * 10 ** exponents],
+					hi: 0
+				},
+			assetId:
+				{ inner: [assetId]
+				},
+			},
+			address: {
+				inner: [receiver as Uint8Array],
+				altBech32m: [reciever],
+			},
+		},
+		],
+	}))).plan
+
+	const tx = await window.penumbra.signTransaction(transactionPlan?.toJson())
+```
 
 ## Error Codes
 
