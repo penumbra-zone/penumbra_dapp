@@ -37,13 +37,17 @@ export default function TransactionDetail() {
 	const { assets } = useBalance()
 	const [tx, setTx] = useState<TransactionInfoByHashResponse | null>(null)
 
+	const bodyView =
+		//@ts-ignore
+		tx?.txInfo?.view?.bodyView!
 	const memoView =
 		//@ts-ignore
 		tx?.txInfo?.view?.bodyView?.memoView?.memoView!
 
 	let memoText = 'Encrypted';
 	let memoSender = 'Encrypted';
-	console.log(memoView)
+	//console.log(memoView)
+	//console.log(bodyView)
 	if (memoView?.case == 'visible') {
 		memoText = memoView.value.plaintext!.text;
 		memoSender = bech32m.encode(
@@ -52,6 +56,17 @@ export default function TransactionDetail() {
 			160
 		);
 	}
+
+	let chainId = bodyView?.chainId;
+	const feeAmount =
+		(Number(bodyView?.fee?.amount?.lo) +
+			2 ** 64 * Number(bodyView?.fee?.amount?.hi))
+	let feeText = `${feeAmount} upenumbra`
+	let expiryText = 'None'
+	if (bodyView?.expiryHeight != BigInt(0)) {
+		expiryText = `${bodyView?.expiryHeight}`
+	}
+
 
 	const actionText = useMemo(() => {
 		if (!tx) return []
@@ -366,6 +381,27 @@ export default function TransactionDetail() {
 											</div>
 										)
 									))}
+								</div>
+								<p className='h2 mb-[12px] mt-[16px]'>Transaction Data</p>
+								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
+									<div className='w-[100%] flex flex-col'>
+										<p className='h3 mb-[8px] capitalize'>Chain ID</p>
+										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+											<span className='monospace'>{chainId}</span>
+										</p>
+									</div>
+									<div className='w-[100%] flex flex-col'>
+										<p className='h3 mb-[8px] capitalize'>Fee</p>
+										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+											{feeText}
+										</p>
+									</div>
+									<div className='w-[100%] flex flex-col'>
+										<p className='h3 mb-[8px] capitalize'>Expiry Height</p>
+										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+											{expiryText}
+										</p>
+									</div>
 								</div>
 							</div>
 						</div>
