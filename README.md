@@ -1,220 +1,579 @@
 # Penumbra dApp
+
+- [Overview](#overview)
+- [Getting Started](#getting-started)
+- [Extension Buf Transport](#extension_transport)
+- [Methods](#methods)
+- [Error Codes](#error-codes)
+
+<a id="overview"></a>
+
+## Overview
+
 Penumbra dApp is the canonical wallet functionality interface for the [Penumbra network](https://penumbra.zone).
 
-## Getting started
-To use the Penumbra dApp, you must first install the Penumbra wallet extension and import/create a new wallet.
-The Penumbra wallet extension is available for installation [in the Chrome store](https://chrome.google.com/webstore/detail/penumbra-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe/).
-You can also build the wallet extension locally by following the [build instructions](https://github.com/penumbra-zone/wallet).
+<a id="getting-started"></a>
 
-After you've installed the extension, navigate to the dApp: https://app.testnet.penumbra.zone
+## Getting Started
 
-## Building the site locally
-You can start the site using `npm`:
-```
-npm install
-npm run start
-```
+To use the Penumbra dApp, you must first install the Penumbra wallet extension and import/create a new wallet. </br>
+The Penumbra wallet extension is available for installation [in the Chrome store](https://chrome.google.com/webstore/detail/penumbra-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe/). </br>
+You can also build the wallet extension locally by following the [build instructions](https://github.com/penumbra-zone/wallet).</br>
+After you've installed the extension, navigate to the dApp: https://app.testnet.penumbra.zone </br>
 
-Or you can use docker:
+### 1.Building the site locally
 
-```
-docker build -t penumbra_dapp .
-docker run -p 9012:9012 -it penumbra_dapp
-```
+- Building the site locally
 
-In either case, the site will be available at http://localhost:9012.
+  ```bash
+  npm install
+  ```
 
-## Developer documentation
-Below we document common uses for developers who want to use the code in their own projects.
+  ```bash
+  npm run dev
+  ```
 
-### Web3 Browser Detection
+### 2. Remote packages
 
-To verify if the browser is running Penumbra, copy and paste the code snippet below in the developer console of your web browser:
+Add library to your app.
 
-	const checkIsPenumbraInstalled = async () => {
-		const isInstalled = await isPenumbraInstalled() // import from ProviderPenumbra
-		if(isInstalled){
-			console.log('Penumbra is installed!');
-		} else {
-			console.log('Please, install penumbra');
-		}
+- Configure registry
+
+  ```bash
+   npm config set @buf:registry https://buf.build/gen/npm/v1/
+  ```
+
+- Packages
+
+  - bufbuild/connect-es
+
+  ```bash
+  	npm install @buf/penumbra-zone_penumbra.bufbuild_connect-es@latest
+  ```
+
+  - bufbuild/es
+
+  ```bash
+  	npm install @buf/penumbra-zone_penumbra.bufbuild_es@latest
+  ```
+
+  - bufbuild/connect-web
+
+  ```bash
+  	npm install @buf/penumbra-zone_penumbra.bufbuild_connect-web@latest
+  ```
+
+### 3. Types for window object penumbra
+
+Add to global.d.ts
+
+```ts
+import {
+	AddressByIndexRequest,
+	AddressByIndexResponse,
+	AssetsRequest,
+	AssetsResponse,
+	ChainParametersRequest,
+	ChainParametersResponse,
+	FMDParametersRequest,
+	FMDParametersResponse,
+	NotesRequest,
+	StatusRequest,
+	StatusResponse,
+	TransactionInfoByHashRequest,
+	TransactionInfoByHashResponse,
+	TransactionPlannerRequest,
+	TransactionPlannerResponse,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+
+declare global {
+	interface Window {
+		penumbra: Penumbra.PenumbraApi
 	}
+}
 
-### Connecting to Penumbra
-
-"Connecting" or "logging in" to Penumbra effectively means "to access the user's account(s)".
-
-We recommend that you provide a button to allow the user to connect Penumbra to your dapp. Clicking this button should call the following method:
-
-	const handleConnect = async () => {
-		const data = await window.penumbra.publicState()
-		const account = data.account
+export declare namespace Penumbra {
+	type PenumbraApi = {
+		requestAccounts: () => Promise<[string]>
+		on(event: Events, cb: (state: any) => any, args?: any): object
+		getChainParameters: (
+			request?: ChainParametersRequest
+		) => Promise<ChainParametersResponse>
+		getStatus: (request?: StatusRequest) => Promise<StatusResponse>
+		getFmdParameters: (
+			request?: FMDParametersRequest
+		) => Promise<FMDParametersResponse>
+		signTransaction: (request: any) => Promise<TransactionResponse>
+		getTransactionInfoByHash: (
+			request: TransactionInfoByHashRequest
+		) => Promise<TransactionInfoByHashResponse>
+		getAddressByIndex: (
+			request: AddressByIndexRequest
+		) => Promise<AddressByIndexResponse>
+		getTransactionPlanner: (
+			request: TransactionPlannerRequest
+		) => Promise<TransactionPlannerResponse>
 	}
+}
 
-### Accessing Accounts
+export type TransactionResponse = {
+	id: number
+	jsonrpc: string
+	result: {
+		code: 1 | 0
+		codespace: string
+		data: string
+		hash: string
+		log: string
+	}
+}
 
-If you'd like to be notified when the user state changes, we have an event you can subscribe to:
+export type Events =
+	| 'state'
+	| 'status'
+	| 'balance'
+	| 'assets'
+	| 'transactions'
+	| 'notes'
+	| 'accountsChanged'
+```
 
-	window.penumbra.on('state', state => {
-		console.log(state)
-	})
+<a id="extension_transport"></a>
 
-### Sending Transactions
+## Extension Buf Transport
 
-Transactions are a formal action on a blockchain. They are always initiated in Penumbra with a call to the signTransaction method. They can involve a simple sending of token. They are always initiated by a signature from an external account, or a simple key pair.
+```ts
+import { createRouterTransport } from '@bufbuild/connect'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import {
+	AddressByIndexRequest,
+	AssetsRequest,
+	AssetsResponse,
+	BalanceByAddressRequest,
+	BalanceByAddressResponse,
+	ChainParametersRequest,
+	ChainParametersResponse,
+	FMDParametersRequest,
+	FMDParametersResponse,
+	NotesRequest,
+	NotesResponse,
+	StatusRequest,
+	StatusResponse,
+	StatusStreamRequest,
+	StatusStreamResponse,
+	TransactionInfoByHashRequest,
+	TransactionInfoByHashResponse,
+	TransactionInfoRequest,
+	TransactionInfoResponse,
+	TransactionPlannerRequest,
+	TransactionPlannerResponse,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
-In Penumbra, using the penumbra.signTransaction method directly, sending a transaction will involve composing an options object like this:
-
-	const sendTx = async () => {
-
-		const fullViewingKey = userData.fvk  // fullViewingKey get`s from window.penumbra.publicState()
-
-		if (!fullViewingKey) return;
-
-		const selectedAsset = uint8ToBase64(balance.find(i => i.denom?.denom === select)?.asset
-			?.inner!)
-
-		const filteredNotes = notes
-			.filter(
-				note =>
-					!note.noteRecord?.heightSpent &&
-					uint8ToBase64(note.noteRecord?.note?.value?.assetId?.inner!) ===
-					selectedAsset
-			)
-			.map(i => i.noteRecord?.toJson())
-
-		if (!filteredNotes.length) console.error('No notes found to spend')
-
-		const client = createPromiseClient(
-			ViewProtocolService,
-			createWebExtTransport(ViewProtocolService)
-		)
-
-		const fmdParameters = (await client.fMDParameters({})).parameters
-
-		if (!fmdParameters) console.error('No found FmdParameters')
-
-		const chainParameters = (await client.chainParameters({})).parameters
-		if (!chainParameters) console.error('No found chain parameters')
-
-		const viewServiceData = {
-			notes: filteredNotes,
-			chain_parameters: chainParameters,
-			fmd_parameters: fmdParameters,
+export const extensionTransport = (s: typeof ViewProtocolService) =>
+	createRouterTransport(({ service }) => {
+		let receiveMessage: (value: unknown) => void = function () {}
+		function waitForNextMessage() {
+			return new Promise(resolve => {
+				receiveMessage = resolve
+			})
 		}
+		async function* createMessageStream() {
+			while (true) {
+				yield waitForNextMessage()
+			}
+		}
+		service(s, {
+			status: async (message: StatusRequest) => {
+				const response = await window.penumbra.getStatus()
 
-		const valueJs = {
-			amount: {
-				lo: Number(amount) * 1000000,
-				hi: 0,
+				return new StatusResponse(response)
 			},
-			assetId: { inner: selectedAsset },
-		}
+			addressByIndex: async (request: AddressByIndexRequest) => {
+				const response = await window.penumbra.getAddressByIndex(request)
+				return response
+			},
 
-		const transactionPlan = await wasm.send_plan(
-			fvk,
-			valueJs,
-			reciever,
-			viewServiceData
-		)
+			transactionPlanner: async (message: TransactionPlannerRequest) => {
+				const response = await window.penumbra.getTransactionPlanner(message)
 
-		await window.penumbra.signTransaction(transactionPlan)
+				return new TransactionPlannerResponse(response)
+			},
+			transactionInfoByHash: async (message: TransactionInfoByHashRequest) => {
+				const response = await window.penumbra.getTransactionInfoByHash(message)
+
+				return new TransactionInfoByHashResponse(response)
+			},
+			fMDParameters: async (message: FMDParametersRequest) => {
+				const response = await window.penumbra.getFmdParameters()
+
+				return new FMDParametersResponse(response)
+			},
+			chainParameters: async (message: ChainParametersRequest) => {
+				const response = await window.penumbra.getChainParameters()
+
+				return new ChainParametersResponse(response)
+			},
+			async *statusStream(message: StatusStreamRequest) {
+				window.penumbra.on('status', status => receiveMessage(status))
+
+				for await (const res of createMessageStream()) {
+					yield new StatusStreamResponse(res)
+				}
+			},
+			async *assets(message: AssetsRequest) {
+				window.penumbra.on('assets', asset => receiveMessage(asset))
+
+				for await (const res of createMessageStream()) {
+					yield new AssetsResponse(res)
+				}
+			},
+			async *balanceByAddress(message: BalanceByAddressRequest) {
+				window.penumbra.on('balance', balance => receiveMessage(balance))
+
+				for await (const res of createMessageStream()) {
+					yield new BalanceByAddressResponse(res)
+				}
+			},
+			async *notes(message: NotesRequest) {
+				window.penumbra.on('notes', note => receiveMessage(note))
+
+				for await (const res of createMessageStream()) {
+					yield new NotesResponse(res)
+				}
+			},
+			async *transactionInfo(message: TransactionInfoRequest) {
+				window.penumbra.on(
+					'transactions',
+					tx => receiveMessage(tx),
+					message.toJson()
+				)
+
+				for await (const res of createMessageStream()) {
+					yield new TransactionInfoResponse(res)
+				}
+			},
+		})
+	})
+```
+
+## Create promise client
+
+```ts
+import { createPromiseClient } from '@bufbuild/connect'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+
+const client = createPromiseClient(
+	ViewProtocolService,
+	extensionTransport(ViewProtocolService)
+)
+```
+
+<a id="methods"></a>
+
+## Methods
+
+- [User Info](#user-info)
+
+  - [login](#login)
+
+- [service ViewProtocolService](#view_service)
+
+	- [Status](#status)
+	- [Status Stream](#status_stream)
+	- [Notes](#notes)
+	- [Assets](#assets)
+	- [ChainParameters](#chain_parameters)
+	- [FMDParameters](#fmd_parameters)
+	- [AddressByIndex](#address_by_index)
+	- [BalanceByAddress](#balance_by_address)
+	- [TransactionInfoByHash](#tx_by_hash)
+	- [TransactionInfo](#tx_info)
+	- [TransactionPlanner](#tx_planner)
+
+In code you can use [TypeScript types](https://github.com/wavesplatform/ts-types/blob/master/transactions/index.ts).
+
+<a id="user-info"></a>
+
+### User Info
+
+<a id="login"></a>
+
+#### login
+
+Authenticates user with his/her account;
+
+**Usage:**
+
+```ts
+const poll = (
+	resolve: (result: boolean) => void,
+	reject: (...args: unknown[]) => void,
+	attempt = 0,
+	retries = 30,
+	interval = 100
+) => {
+	if (attempt > retries) return resolve(false)
+
+	if (typeof window !== 'undefined' && 'undefined') {
+		return resolve(true)
+	} else setTimeout(() => poll(resolve, reject, ++attempt), interval)
+}
+
+const _isPenumbraInstalled = new Promise(poll)
+
+export async function isPenumbraInstalled() {
+	return _isPenumbraInstalled
+}
+
+const [walletAddress, setWalletAddress] = useState<string>('')
+const [isPenumbra, setIsPenumbra] = useState<boolean>(false)
+
+const checkIsPenumbraInstalled = async () => {
+	const isInstalled = await isPenumbraInstalled()
+	setIsPenumbra(isInstalled)
+}
+
+useEffect(() => {
+	checkIsPenumbraInstalled()
+}, [])
+
+useEffect(() => {
+	if (!isPenumbra) return
+	addWalletListener(isPenumbra)
+}, [isPenumbra])
+
+const addWalletListener = async (isPenumbra: boolean) => {
+	if (isPenumbra) {
+		window.penumbra.on('accountsChanged', (accounts: [string]) => {
+			setWalletAddress(accounts[0])
+		})
+	} else {
+		/* Penumbra is not installed */
+		setWalletAddress('')
+		console.log('Please install Penumbra Wallet')
 	}
+}
 
-### View Service
+const signin = async () => {
+	if (isPenumbra) {
+		try {
+			/* Penumbra is installed */
+			const accounts = await window.penumbra.requestAccounts()
+			setWalletAddress(accounts[0])
+		} catch (err) {
+			console.error(err)
+		}
+	} else {
+		/* Penumbra is not installed */
+		console.log('Please install Penumbra Wallet')
+	}
+}
+```
 
-### Create client 
-	const client = createPromiseClient(
-		ViewProtocolService,
-		createWebExtTransport(ViewProtocolService)
-	)
+**Output example:**
 
-#### rpc Status
+```js
+[
+	'penumbrav2t13vh0fkf3qkqjacpm59g23ufea9n5us45e4p5h6hty8vg73r2t8g5l3kynad87uvn9eragf3hhkgkhqe5vhngq2cw493k48c9qg9ms4epllcmndd6ly4v4dwwjcnxaxzjqnlvnw',
+]
+```
+
+<a id="view_service"></a>
+
+### service ViewProtocolService
+
+The view protocol is used by a view client, who wants to do some transaction-related actions, to request data from a view service, which is responsible for synchronizing and scanning the public chain state with one or more full viewing keys.
+
+View protocol requests optionally include the account group ID, used to identify which set of data to query.
+
+- [Status](#status)
+- [Status Stream](#status_stream)
+- [Notes](#notes)
+- [Assets](#assets)
+- [ChainParameters](#chain_parameters)
+- [FMDParameters](#fmd_parameters)
+- [AddressByIndex](#address_by_index)
+- [BalanceByAddress](#balance_by_address)
+- [TransactionInfoByHash](#tx_by_hash)
+- [TransactionInfo](#tx_info)
+- [TransactionPlanner](#tx_planner)
+
+<a id="status"></a>
+
+## Status
 
 Get current status of chain sync
 
-	await client.status({})
+```js
+const request = new StatusRequest({})
+const response = await client.status(request)
+```
 
-#### rpc StatusStream
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.StatusRequest)
 
-Stream sync status updates until the view service has caught up with the core.chain.v1alpha1.
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.StatusResponse)
 
-	for await (const note of client.statusStream({})) {
-		console.log(note)
-	}
+<a id="status_stream"></a>
 
-#### rpc Notes
+## Status Stream
 
 Queries for notes that have been accepted by the core.chain.v1alpha1.
 
-	for await (const note of client.notes({})) {
-		console.log(note)
-	}
-#### rpc Assets
+```js
+const request = new StatusStreamRequest({})
+for await (const status of client.statusStream(statusRequest)) {
+	console.log(status)	
+}
+```
 
-Queries for assets.
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.StatusStreamRequest)
 
-	for await (const note of client.assets({})) {
-		console.log(note)
-	}
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.StatusStreamResponse)
 
-#### rpc ChainParameters
+<a id="status_stream"></a>
+
+## Status Stream
+
+Queries for notes that have been accepted by the core.chain.v1alpha1.
+
+```js
+const request = new StatusStreamRequest({})
+for await (const status of client.statusStream(statusRequest)) {
+	console.log(status)	
+}
+```
+
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.StatusStreamRequest)
+
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.StatusStreamResponse)
+
+## Notes
+
+Queries for notes that have been accepted by the core.chain.v1alpha1.
+
+```js
+const request = new NotesRequest({})
+for await (const note of client.notes(statusRequest)) {
+	console.log(note)	
+}
+```
+
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.NotesRequest)
+
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.NotesResponse)
+
+## Assets
+
+Queries for assets that have been accepted by the core.chain.v1alpha1.
+
+```js
+const request = new AssetsRequest({})
+for await (const asset of client.assets(request)) {
+	console.log(asset)	
+}
+```
+
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.AssetsRequest)
+
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.AssetsResponse)
+
+## ChainParameters
 
 Query for the current chain parameters.
 
-	await client.chainParameters({})
+```js
+const request = new ChainParametersRequest({})
+const response = await client.chainParameters(request)
+```
 
-#### rpc FMDParameters
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.ChainParametersRequest)
+
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.ChainParametersResponse)
+
+## FMDParameters
 
 Query for the current FMD parameters.
 
-	await client.fMDParameters({})
+```js
+const request = new FMDParametersRequest({})
+const response = await client.fMDParameters(request)
+```
 
-#### rpc BalanceByAddress
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.FMDParametersRequest)
+
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.FMDParametersResponse)
+
+## AddressByIndex
+
+Query for an address given an address index
+
+```js
+const request = new AddressByIndexRequest({})
+const response = await client.addressByIndex(request)
+```
+
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.AddressByIndexRequest)
+
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.AddressByIndexResponse)
+
+## BalanceByAddress
 
 Query for balance of a given address
 
-	for await (const note of client.balanceByAddress({})) {
-		console.log(note)
-	}
+```js
+const request = new BalanceByAddressRequest({})
+for await (const balance of client.balanceByAddress(request)) {
+	console.log(balance)	
+}
+```
 
-#### rpc TransactionInfo
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.BalanceByAddressRequest)
+
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.BalanceByAddressResponse)
+
+## TransactionInfoByHash
+
+Query for a given transaction by its hash.
+
+```js
+const request = new BalanceByAddressRequest({})
+const response = await client.transactionInfoByHash(request)
+```
+
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionInfoByHashRequest)
+
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionInfoByHashResponse)
+
+## TransactionInfo
 
 Query for the full transactions in the given range of blocks.
 
-	for await (const note of client.transactionInfo({})) {
-		console.log(note)
-	}
-
-### Penumbra web assembly usage
-
-WASM bindings can be generated following the procedure documented here:
-https://github.com/penumbra-zone/penumbra/tree/main/wasm
-
-#### Creating TransactionPlan for send transaction
+```js
+const request = new TransactionInfoRequest({})
+for await (const balance of client.transactionInfo(request)) {
+	console.log(balance)	
+}
 ```
-export function send_plan(full_viewing_key: string, valueJs: any, dest_address: string, view_service_data: any): TransactionPlan;
-```
-#### Example of use
-```
-const viewServiceData = {
-			notes: filteredNotes,
-			chain_parameters: chainParameters,
-			fmd_parameters: fmdParameters,
-		}
 
-		const valueJs = {
-			amount: {
-				lo: amount * 1000000,
-				hi: 0,
-			},
-			assetId: { inner: assetId },
-		}
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionInfoRequest)
 
-		const transactionPlan = await wasm.send_plan(
-			fvk,
-			valueJs,
-			reciever,
-			viewServiceData
-		)
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionInfoResponse)
+
+## TransactionPlanner
+
+Query for a transaction plan
+
+```js
+const request = new TransactionPlannerRequest({})
+const response = await client.transactionPlanner(request)
 ```
+
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionPlannerRequest)
+
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.TransactionPlannerResponse)
+
+## Error Codes
+
+| Error's class | Code | Type | Example |
+| :------------ | :--- | :--- | :------ |
+|               |      |      |         |
