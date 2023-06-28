@@ -12,6 +12,7 @@ import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/c
 import { useAuth } from './AuthContextProvider'
 import { extensionTransport } from '@/lib/extensionTransport'
 import { uint8ToBase64 } from '@/lib/uint8ToBase64'
+import {createGrpcWebTransport} from "@bufbuild/connect-web";
 
 export type AssetBalance = {
 	asset?: AssetId
@@ -81,7 +82,11 @@ export const BalanceContextProvider = (props: Props) => {
 		const getAssets = async () => {
 			const client = createPromiseClient(
 				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
+
+				// extensionTransport(ViewProtocolService)
+			createGrpcWebTransport({
+				baseUrl: "http://127.0.0.1:8081",
+			})
 			)
 
 			const assetsRequest = new AssetsRequest({})
