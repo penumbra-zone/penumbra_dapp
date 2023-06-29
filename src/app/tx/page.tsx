@@ -315,7 +315,7 @@ export default function TransactionDetail() {
 										) : (
 											<div key={index} className='w-[100%] flex flex-col '>
 												<p className='h3 mb-[8px] capitalize'>{i.type}</p>
-												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-words min-h-[44px] flex items-center'>
+												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-all min-h-[44px] flex items-center'>
 													{i.text}
 												</p>
 											</div>

@@ -37,7 +37,7 @@ export const Input: React.FC<InputProps> = ({
 		<div className={className}>
 			<p className={labelClassName}>{label}</p>
 			<div
-				className={`w-[100%] h-[52px] rounded-[10px] flex items-center justify-center  
+				className={`w-[100%] h-[44px] rounded-[10px] flex items-center justify-center  
         ${
 					isError
 						? 'bg-red'
@@ -54,7 +54,7 @@ export const Input: React.FC<InputProps> = ({
 					}`}
 				>
 					<div
-						className={`w-[100%] h-[50px] ${
+						className={`w-[100%] h-[42px] ${
 							props.value && !isError ? 'input_typing_bg' : 'bg-brown'
 						} cursor-text rounded-[10px] flex justify-center items-center`}
 					>
@@ -65,7 +65,7 @@ export const Input: React.FC<InputProps> = ({
 								customType === 'password'
 									? 'w-[calc(100%-80px)]'
 									: 'w-[calc(100%-40px)]'
-							} h-[50px] rounded-[10px] border-[none] px-[5px] bg-transparent text_body
+							} h-[42px] rounded-[10px] border-[none] px-[5px] bg-transparent text_body
               active:outline-none focus:outline-none placeholder:text-[#524B4B] placeholder:text_body`}
 							onBlur={inputBlurHandler}
 							placeholder={placeholder}
@@ -77,7 +77,7 @@ export const Input: React.FC<InputProps> = ({
 				</div>
 			</div>
 			{helperText && (
-				<div className='pt-[8px] h-[30px] '>
+				<div className='pt-[4px] h-[24px] '>
 					{isError && (
 						<p className='w-[100%]  text-red text_body'>{helperText}</p>
 					)}

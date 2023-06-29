@@ -135,7 +135,7 @@ select {
 	font-family: 'Faktum Medium';
 	font-style: normal;
 	font-weight: 500;
-	font-size: 14px;
+	font-size: 16px;
 	line-height: 20px;
 }
 
@@ -281,9 +281,9 @@ select {
 	background-color: #141212 !important;
 	border: none !important;
 	border: 0 !important;
-	border-radius: 15px !important;
+	border-radius: 10px !important;
 	box-shadow: none !important;
-	height: 50px !important;
+	height: 70px !important;
 }
 
 .custom_select__control--menu-is-open .custom_select__dropdown-indicator svg {

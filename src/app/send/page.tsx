@@ -10,7 +10,7 @@ import { extensionTransport } from '@/lib/extensionTransport'
 import { setOnlyNumberInput } from '@/lib/setOnlyNumberInput'
 import Link from 'next/link'
 import { routesPath } from '@/lib/constants'
-import { CloseSvg, SearchSvg } from '@/components/Svg'
+import { ChevronLeftIcon, CloseSvg, SearchSvg } from '@/components/Svg'
 import { Input } from '@/components/Input'
 import { Button } from '@/components/Button'
 import { Select } from '@/components/Select'
@@ -136,89 +136,80 @@ export default function Send() {
 	return (
 		<>
 			{auth!.walletAddress ? (
-				<div className='w-[100%]  flex flex-col items-center justify-center ext:py-[40px] tablet:py-[0px] tablet:mb-[20px]'>
-					<div className='w-[400px]'>
-						<div className='w-[100%]  flex flex-col items-center justify-center ext:py-[40px] tablet:py-[0px] tablet:mb-[20px]'>
-							<div className='w-[100%] flex justify-center items-center mb-[8px]'>
-								<p className='h1 ml-[auto]'>Send to address</p>
-								<Link
-									className='ml-[auto] svg_hover cursor-pointer'
-									href={routesPath.HOME}
-									role='button'
-									tabIndex={0}
-								>
-									<CloseSvg width='24' height='24' fill='#E0E0E0' />
-								</Link>
-							</div>
-							<Input
-								placeholder='Search, address...'
-								value={reciever}
-								isError={Object.values(isValidate).includes(false)}
-								onChange={handleChangeSearch}
-								leftSvg={
-									<span className='ml-[24px] mr-[9px]'>
-										<SearchSvg />
-									</span>
-								}
-								helperText='Invalid recipient address'
-								className='w-[100%]'
+				<div className='w-[100%] flex flex-col items-center'>
+					<div className='w-[400px] flex flex-col justify-center mt-[24px] mb-[40px]'>
+						<Button
+							mode='icon_transparent'
+							onClick={handleBack}
+							title='Back'
+							iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
+							className='self-start'
+						/>
+						<p className='h1 mt-[24px]'>Send to address</p>
+						<Input
+							placeholder='Search address...'
+							value={reciever}
+							isError={Object.values(isValidate).includes(false)}
+							onChange={handleChangeSearch}
+							leftSvg={
+								<span className='ml-[24px] mr-[9px]'>
+									<SearchSvg stroke='#E0E0E0' />
+								</span>
+							}
+							helperText='Invalid recipient address'
+							className='w-[100%]'
+						/>
+						<div className='bg-brown rounded-[10px] w-[100%] flex flex-col justify-between p-[16px]'>
+							<Select
+								labelClassName='h3 mb-[16px]'
+								label='Assets :'
+								options={options}
+								handleChange={handleChangeSelect}
+								initialValue={select}
 							/>
-							<div className='bg-brown rounded-[10px] w-[100%]'>
-								<div className='h-[100%] flex flex-col justify-between px-[16px] py-[24px]'>
-									<div className='flex flex-col'>
-										<Select
-											labelClassName='h3 text-light_grey mb-[16px]'
-											label='Assets :'
-											options={options}
-											handleChange={handleChangeSelect}
-											initialValue={select}
-										/>
-										<Input
-											labelClassName='h3 text-light_grey mb-[16px]'
-											label='Total :'
-											value={amount}
-											isError={
-												select
-													? balance.find(i => select === i.display)!.amount <
-													  Number(amount)
-													: false
-											}
-											onChange={handleChangeAmout}
-											className='mt-[24px]'
-											helperText={'You do not have enough token'}
-											rightElement={
-												<div
-													className='flex items-center bg-dark_grey h-[50px] px-[25px] rounded-r-[15px] text_button_ext cursor-pointer'
-													onClick={handleMax}
-												>
-													Max
-												</div>
-											}
-										/>
+							<Input
+								labelClassName='h3 text-light_grey mb-[8px]'
+								label='Total :'
+								value={amount}
+								isError={
+									select
+										? balance.find(i => select === i.display)!.amount <
+										  Number(amount)
+										: false
+								}
+								onChange={handleChangeAmout}
+								className='mt-[16px]'
+								helperText={'You do not have enough token'}
+								rightElement={
+									<div
+										className='flex items-center bg-dark_grey h-[42px] px-[25px] rounded-r-[10px] text_button_ext cursor-pointer'
+										onClick={handleMax}
+									>
+										Max
 									</div>
-									<div className='w-[100%] flex pt-[8px]'>
-										<Button
-											mode='transparent'
-											onClick={handleBack}
-											title='Cancel'
-											className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] mr-[8px]'
-										/>
-										<Button
-											mode='gradient'
-											onClick={getTransactionPlan}
-											title='Send'
-											className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
-											disabled={
-												!Number(amount) ||
-												!select ||
-												balance.find(i => select === i.display)!.amount <
-													Number(amount) ||
-												!reciever ||
-												Object.values(isValidate).includes(false)
-											}
-										/>
-									</div>
-								</div>
+								}
+							/>
+							<div className='w-[100%] flex items-center gap-x-[8px]'>
+								<Button
+									mode='transparent'
+									onClick={handleBack}
+									title='Cancel'
+									className='h-[44px]'
+								/>
+								<Button
+									mode='gradient'
+									onClick={getTransactionPlan}
+									title='Send'
+									className='h-[44px]'
+									disabled={
+										!Number(amount) ||
+										!select ||
+										balance.find(i => select === i.display)!.amount <
+											Number(amount) ||
+										!reciever ||
+										Object.values(isValidate).includes(false)
+									}
+								/>
 							</div>
 						</div>
 					</div>

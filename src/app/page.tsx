@@ -27,7 +27,7 @@ export default function Home() {
 								mode='transparent'
 								disabled
 								title='Stake'
-								className='w-[119px]'
+								className='w-[119px] h-[36px]'
 							/>
 						</div>
 						<Tabs

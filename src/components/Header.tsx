@@ -71,7 +71,7 @@ export const Header = () => {
 				<Button
 					mode='gradient'
 					title='Connect'
-					className='w-[200px]'
+					className='w-[200px] h-[44px]'
 					onClick={auth!.signin}
 				/>
 			)}
