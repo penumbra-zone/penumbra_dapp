@@ -41,8 +41,9 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 				className='pointer-events-none relative flex items-center w-auto translate-y-[-50px]  transition-all duration-300 ease-in-out mx-auto mt-7 h-[calc(100%-3.5rem)] max-w-[500px]'
 				onClick={stopPropagation}
 			>
-				<div className='pointer-events-auto relative flex max-h-[75vh] w-full flex-col overflow-hidden rounded-[15px] bg-brown outline-none'>
-					<div className='flex items-center justify-end pt-[8px] pr-[8px]'>
+				<div className='pointer-events-auto  flex max-h-[75vh] w-full flex-col overflow-hidden rounded-[10px] bg-brown outline-none'>
+					<div className='flex items-center justify-between p-[16px] border-b-[1px] border-dark_grey'>
+						<p className='h2'>Receive</p>
 						<button
 							type='button'
 							className='box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none'
@@ -50,7 +51,7 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 							aria-label='Close'
 							onClick={onClose}
 						>
-							<CloseSvg width='24' height='24' fill='#524B4B' />
+							<CloseSvg width='24' height='24' fill='#E0E0E0' />
 						</button>
 					</div>
 

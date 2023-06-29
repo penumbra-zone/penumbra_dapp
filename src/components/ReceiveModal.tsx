@@ -32,9 +32,9 @@ export const ReceiveModal: React.FC<ModalProps> = ({ show, onClose }) => {
 
 	return (
 		<ModalWrapper show={show} onClose={onClose}>
-			<div className='relative overflow-y-auto pt-[16px] pb-[52px] px-[24px]'>
-				<p className='text_numbers_ext text-light_grey mb-[8px]'>Address 1</p>
-				<div className='flex p-[10px] justify-center items-center gap-[8px] rounded-[15px] border-[1px] border-light_brown bg-dark_grey text_numbers_ext text-light_grey'>
+			<div className='relative overflow-y-auto pt-[22px] pb-[90px] px-[16px]'>
+				<p className='h3 mb-[8px]'>Address 1</p>
+				<div className='flex p-[10px] justify-center items-center gap-[8px] rounded-[10px] bg-dark_grey text_body text-light_grey'>
 					<Copy text={address} type='full' />
 				</div>
 			</div>

@@ -16,18 +16,18 @@ export default function Home() {
 	return (
 		<>
 			{auth!.walletAddress ? (
-				<div className='flex flex-col items-center justify-center '>
-					<div className='py-[16px] w-[800px] bg-brown rounded-[15px]'>
+				<div className='flex flex-col items-center justify-center mb-[40px]'>
+					<div className='pt-[40px] pb-[20px] w-[816px] bg-brown rounded-[10px]'>
 						<BalanceAction />
-						<div className='w-[100%] flex items-center justify-between ext:py-[15.5px] tablet:py-[13.5px] px-[16px] border-y-[1px] border-solid border-dark_grey'>
+						<div className='w-[100%] flex items-center justify-between p-[16px] border-y-[1px] border-solid border-dark_grey'>
 							<div className='flex flex-col'>
-								<p className='text_button mb-[4px]'>Stake</p>
+								<p className='h2'>Stake</p>
 							</div>
 							<Button
 								mode='transparent'
 								disabled
 								title='Stake'
-								className='w-[119px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
+								className='w-[119px]'
 							/>
 						</div>
 						<Tabs

@@ -57,15 +57,15 @@ export const Header = () => {
 				/>
 			</Link>
 			{auth!.walletAddress ? (
-				<div className='flex items-center justify-center h-[44px] py-[13px] px-[21px] gap-[8px] rounded-[10px] border-[1px] border-dark_grey bg-brown'>
+				<div className='flex items-center justify-center h-[44px] px-[16px] gap-[12px] rounded-[10px] border-[1px] border-dark_grey bg-brown'>
 					{percent > 100 ? (
 						<></>
 					) : (
-						<div className='ext:w-[25px] ext:h-[25px] tablet:w-[35px] tablet:h-[35px] ext:mr-[6px] tablet:mr-[16px] flex items-center'>
+						<div className='w-[35px] h-[35px]  flex items-center'>
 							<ProgressBar percent={percent} width='42px' />
 						</div>
 					)}
-					<p className='h3'>{truncateAddress(auth!.walletAddress)}</p>
+					<p className='text_button'>{truncateAddress(auth!.walletAddress)}</p>
 				</div>
 			) : (
 				<Button

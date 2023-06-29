@@ -163,7 +163,7 @@ export default function Send() {
 								helperText='Invalid recipient address'
 								className='w-[100%]'
 							/>
-							<div className='bg-brown rounded-[15px] w-[100%]'>
+							<div className='bg-brown rounded-[10px] w-[100%]'>
 								<div className='h-[100%] flex flex-col justify-between px-[16px] py-[24px]'>
 									<div className='flex flex-col'>
 										<Select
