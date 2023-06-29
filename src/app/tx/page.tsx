@@ -1,32 +1,32 @@
 'use client'
+import { Button } from '@/components/Button'
+import { Copy } from '@/components/Copy'
+import { ChevronLeftIcon, EncryptedSvg } from '@/components/Svg'
 import { useAuth } from '@/context/AuthContextProvider'
 import { useBalance } from '@/context/BalanceContextProvider'
 import { getAssetByAssetId } from '@/lib/assets'
+import { routesPath } from '@/lib/constants'
+import { extensionTransport } from '@/lib/extensionTransport'
 import { uint8ToBase64 } from '@/lib/uint8ToBase64'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import {
 	TransactionInfoByHashRequest,
 	TransactionInfoByHashResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { createPromiseClient } from '@bufbuild/connect'
 import { bech32m } from 'bech32'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
-import { createPromiseClient } from '@bufbuild/connect'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
-import { extensionTransport } from '@/lib/extensionTransport'
-import { routesPath } from '@/lib/constants'
-import { toast } from 'react-hot-toast'
-import { Button } from '@/components/Button'
-import { ChevronLeftIcon, CopySvg } from '@/components/Svg'
-import { getTransactionType } from '@/lib/transactionType'
 
-function truncateHash(hash: string | null, length: number = 6): string {
-	if (hash === null) {
-		return '';
-	}
-	if (hash.length <= 2 * length) {
-		return hash;
-	}
-	return hash.slice(0, length) + '…' + hash.slice(-length);
+const EncryptedValue: React.FC<{ label: string }> = ({ label }) => {
+	return (
+		<div className='flex items-center'>
+			<EncryptedSvg />
+			<p className='ml-[8px] text-light_brown capitalize'>
+				{label} (Encrypted)
+			</p>
+		</div>
+	)
 }
 
 export default function TransactionDetail() {
@@ -37,36 +37,39 @@ export default function TransactionDetail() {
 	const { assets } = useBalance()
 	const [tx, setTx] = useState<TransactionInfoByHashResponse | null>(null)
 
-	const bodyView =
-		//@ts-ignore
-		tx?.txInfo?.view?.bodyView!
-	const memoView =
-		//@ts-ignore
-		tx?.txInfo?.view?.bodyView?.memoView?.memoView!
+	const { memoText, memoSender, chainId, feeText, expiryText } = useMemo(() => {
+		const bodyView = tx?.txInfo?.view?.bodyView
+		const memoView = bodyView?.memoView?.memoView
 
-	let memoText = 'Encrypted';
-	let memoSender = 'Encrypted';
-	//console.log(memoView)
-	//console.log(bodyView)
-	if (memoView?.case == 'visible') {
-		memoText = memoView.value.plaintext!.text;
-		memoSender = bech32m.encode(
-			'penumbrav2t',
-			bech32m.toWords(memoView.value.plaintext!.sender!.inner),
-			160
-		);
-	}
+		let memoText = 'Encrypted'
+		let memoSender = 'Encrypted'
 
-	let chainId = bodyView?.chainId;
-	const feeAmount =
-		(Number(bodyView?.fee?.amount?.lo) +
-			2 ** 64 * Number(bodyView?.fee?.amount?.hi))
-	let feeText = `${feeAmount} upenumbra`
-	let expiryText = 'None'
-	if (bodyView?.expiryHeight != BigInt(0)) {
-		expiryText = `${bodyView?.expiryHeight}`
-	}
+		if (memoView?.case == 'visible') {
+			memoText = memoView.value.plaintext!.text
+			memoSender = bech32m.encode(
+				'penumbrav2t',
+				bech32m.toWords(memoView.value.plaintext!.sender!.inner),
+				160
+			)
+		}
 
+		const chainId = bodyView?.chainId
+		const feeAmount =
+			Number(bodyView?.fee?.amount?.lo) +
+			2 ** 64 * Number(bodyView?.fee?.amount?.hi)
+		const feeText = `${feeAmount} upenumbra`
+		let expiryText = 'None'
+		if (bodyView?.expiryHeight != BigInt(0))
+			expiryText = `${bodyView?.expiryHeight}`
+
+		return {
+			memoText,
+			memoSender,
+			chainId,
+			feeText,
+			expiryText,
+		}
+	}, [tx])
 
 	const actionText = useMemo(() => {
 		if (!tx) return []
@@ -104,13 +107,6 @@ export default function TransactionDetail() {
 				}
 			} else if (type === 'output') {
 				try {
-					// const assetId = getAssetByAssetId(
-					// 	assets,
-					// 	uint8ToBase64(
-					// 		i.actionView.value.outputView.value.note.value.valueView.value
-					// 			.assetId.inner as Uint8Array
-					// 	)
-					// )
 					const asset = getAssetByAssetId(
 						assets,
 						uint8ToBase64(
@@ -155,13 +151,6 @@ export default function TransactionDetail() {
 				}
 			} else if (type === 'positionOpen') {
 				try {
-					// const asset1 = getAssetByAssetId(
-					// 	assets,
-					// 	uint8ToBase64(
-					// 		i.actionView.value.position?.phi?.pair?.asset1
-					// 			?.inner as Uint8Array
-					// 	)
-					// )
 					const asset1 = getAssetByAssetId(
 						assets,
 						uint8ToBase64(
@@ -178,13 +167,6 @@ export default function TransactionDetail() {
 						)
 					).denomMetadata!
 
-					// const asset2 = getAssetByAssetId(
-					// 	assets,
-					// 	uint8ToBase64(
-					// 		i.actionView.value.position?.phi?.pair?.asset2
-					// 			?.inner as Uint8Array
-					// 	)
-					// )
 					return {
 						text: `Trading Pair: (${asset1.display}, ${asset2.display})`,
 						type,
@@ -203,13 +185,6 @@ export default function TransactionDetail() {
 					const delta2I =
 						i.actionView.value.swapView.value?.swap?.body?.delta2I?.lo
 
-					// const asset1 = getAssetByAssetId(
-					// 	assets,
-					// 	uint8ToBase64(
-					// 		i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset1
-					// 			?.inner as Uint8Array
-					// 	)
-					// )
 					const asset1 = getAssetByAssetId(
 						assets,
 						uint8ToBase64(
@@ -221,14 +196,6 @@ export default function TransactionDetail() {
 					const exponent1 = asset1.denomUnits.find(
 						i => i.denom === asset1.display
 					)?.exponent
-
-					// const asset2 = getAssetByAssetId(
-					// 	assets,
-					// 	uint8ToBase64(
-					// 		i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset2
-					// 			?.inner as Uint8Array
-					// 	)
-					// )
 
 					const asset2 = getAssetByAssetId(
 						assets,
@@ -244,14 +211,16 @@ export default function TransactionDetail() {
 
 					if (delta1I) {
 						return {
-							text: `${Number(delta1I) / (exponent1 ? 10 ** exponent1 : 1)} ${asset1.display
-								} for ${asset2.display}`,
+							text: `${Number(delta1I) / (exponent1 ? 10 ** exponent1 : 1)} ${
+								asset1.display
+							} for ${asset2.display}`,
 							type,
 						}
 					}
 					return {
-						text: `${Number(delta2I) / (exponent2 ? 10 ** exponent2 : 1)} ${asset2.display
-							} for ${asset1.display}`,
+						text: `${Number(delta2I) / (exponent2 ? 10 ** exponent2 : 1)} ${
+							asset2.display
+						} for ${asset1.display}`,
 						type,
 					}
 				} catch (error) {
@@ -292,26 +261,13 @@ export default function TransactionDetail() {
 
 	const handleBack = () => push(`${routesPath.HOME}?tab=Activity`)
 
-	const copyToClipboard = () => {
-		navigator.clipboard.writeText(params.get('hash') as string)
-		toast.success('Successfully copied', {
-			position: 'top-center',
-			icon: '👏',
-			style: {
-				borderRadius: '15px',
-				background: '#141212',
-				color: '#fff',
-			},
-		})
-	}
-
 	return (
 		<>
 			{auth!.walletAddress ? (
 				<>
 					{tx && (
-						<div className='w-[100%] flex justify-center mt-[24px]'>
-							<div>
+						<div className='w-[100%] flex justify-center mt-[24px] mb-[40px]'>
+							<div className='flex flex-col'>
 								<Button
 									mode='icon_transparent'
 									onClick={handleBack}
@@ -319,86 +275,70 @@ export default function TransactionDetail() {
 									iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
 									className='self-start'
 								/>
-								<div className='h1 mb-[12px] mt-[24px]'>
-									<p
-										style={{ display: "inline-block" }}
-									>Transaction <span className='monospace'>{truncateHash(params.get('hash'), 8)}</span></p>
-									<p
-										className='cursor-pointer hover:no-underline hover:opacity-75'
-										onClick={copyToClipboard}
-										style={{ display: "inline-block", margin: "0 5px" }}
-									>
-										<CopySvg width='20' height='20' fill='#524B4B' />
-									</p>
-									<p
-										style={{ display: "inline-block" }}
-									>
-										(Height {Number(tx?.txInfo?.height)})
+								<div className='flex items-center mb-[16px] mt-[26px] gap-x-[16px] text_numbers_s'>
+									<p className='h1'>Transaction</p>
+									{params.get('hash') && (
+										<Copy text={params.get('hash') as string} type='center' />
+									)}
+									<p className='text-green text_numbers_s '>
+										Block height : {Number(tx?.txInfo?.height)}
 									</p>
 								</div>
-								<p className='h2 mb-[12px] mt-[16px]'>Memo</p>
-								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
-									{
-										memoSender === 'Encrypted' ? (
-											<div className='w-[100%] flex flex-col'>
-												<p className='h3 mb-[8px] capitalize encrypted'>Sender Address</p>
-											</div>
-										) : (
-											<div className='w-[100%] flex flex-col'>
-												<p className='h3 mb-[8px] capitalize'>Sender Address</p>
-												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-													{memoSender}&nbsp; {/* the nbsp is supposed to ensure that an empty memoSender still results in a non-zero-height container, but something is stripping it? */}
-												</p>
-											</div>
-										)
-									}
-									{memoText === 'Encrypted' ? (
+								<p className='h2 pb-[8px]'>Memo</p>
+								<div className='flex flex-col px-[16px] pt-[16px] pb-[22px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
+									{memoSender === 'Encrypted' ? (
+										<EncryptedValue label='Sender Address' />
+									) : (
 										<div className='w-[100%] flex flex-col'>
-											<p className='h3 mb-[8px] capitalize encrypted'>Message</p>
+											<p className='h3 mb-[8px] capitalize'>Sender Address</p>
+											<div className='flex items-center gap-x-[8px] min-h-[44px] py-[8px] px-[16px] bg-dark_grey rounded-[10px] text-light_grey text_numbers_s'>
+												<Copy text={memoSender} type='last' />
+											</div>
 										</div>
+									)}
+									{memoText === 'Encrypted' ? (
+										<EncryptedValue label='Message' />
 									) : (
 										<div className='w-[100%] flex flex-col'>
 											<p className='h3 mb-[8px] capitalize'>Message</p>
-											<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+											<p className='min-h-[44px] py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-words flex items-center'>
 												{memoText}
 											</p>
 										</div>
 									)}
 								</div>
-								<p className='h2 mb-[12px] mt-[16px]'>Actions</p>
-								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
-									{actionText!.map((i, index) => (
+								<p className='h2 mb-[8px] mt-[16px]'>Actions</p>
+								<div className='flex flex-col px-[16px] py-[16px] pb-[22px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
+									{actionText!.map((i, index) =>
 										i.text === 'Encrypted' ? (
-											<div key={index} className='w-[100%] flex flex-col'>
-												<p className='h3 mb-[8px] capitalize encrypted'>{i.type}</p>
-											</div>
+											<EncryptedValue key={index} label={i.type as string} />
 										) : (
-											<div key={index} className='w-[100%] flex flex-col'>
+											<div key={index} className='w-[100%] flex flex-col '>
 												<p className='h3 mb-[8px] capitalize'>{i.type}</p>
-												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-words min-h-[44px] flex items-center'>
 													{i.text}
 												</p>
 											</div>
 										)
-									))}
+									)}
 								</div>
-								<p className='h2 mb-[12px] mt-[16px]'>Transaction Data</p>
-								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
+								<p className='h2 mb-[8px] mt-[16px]'>Transaction Data</p>
+								<div className='flex flex-col px-[16px] py-[16px] pb-[22px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
 									<div className='w-[100%] flex flex-col'>
 										<p className='h3 mb-[8px] capitalize'>Chain ID</p>
-										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-											<span className='monospace'>{chainId}</span>
+										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-words min-h-[44px] flex items-center'>
+											{chainId}
 										</p>
 									</div>
 									<div className='w-[100%] flex flex-col'>
 										<p className='h3 mb-[8px] capitalize'>Fee</p>
-										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-words min-h-[44px] flex items-center'>
 											{feeText}
 										</p>
 									</div>
 									<div className='w-[100%] flex flex-col'>
 										<p className='h3 mb-[8px] capitalize'>Expiry Height</p>
-										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-words min-h-[44px] flex items-center'>
 											{expiryText}
 										</p>
 									</div>

@@ -15,9 +15,7 @@ enum TransactionType {
 }
 
 export const getTransactionType = (txv: TransactionView | undefined) => {
-
 	try {
-
 		if (!txv) return TransactionType.Unknown
 
 		const actions = txv.bodyView?.actionViews
@@ -53,18 +51,22 @@ export const getTransactionType = (txv: TransactionView | undefined) => {
 			return TransactionType.Swap
 
 		if (actions.find(e => e.actionView.case === 'output')) {
-			if (actions.filter(e => e.actionView.case === 'output').find(e =>
-				//@ts-ignore
-				e.actionView.value.outputView.value.note.address.addressView.case === 'opaque'))
+			if (
+				actions
+					.filter(e => e.actionView.case === 'output')
+					.find(
+						e =>
+							//@ts-ignore
+							e.actionView.value.outputView.value.note.address.addressView
+								.case === 'opaque'
+					)
+			)
 				return TransactionType.Send
-			else
-				return TransactionType.InternalSend
-
+			else return TransactionType.InternalSend
 		}
 
 		return TransactionType.Unknown
 	} catch (e) {
-		console.log(txv, e)
 		return TransactionType.Unknown
 	}
 }
