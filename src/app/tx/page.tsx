@@ -19,8 +19,6 @@ import { Button } from '@/components/Button'
 import { ChevronLeftIcon, CopySvg } from '@/components/Svg'
 import { getTransactionType } from '@/lib/transactionType'
 
-import ReactJson from '@microlink/react-json-view';
-
 function truncateHash(hash: string | null, length: number = 6): string {
 	if (hash === null) {
 		return '';
@@ -39,7 +37,6 @@ export default function TransactionDetail() {
 	const { assets } = useBalance()
 	const [tx, setTx] = useState<TransactionInfoByHashResponse | null>(null)
 
-	console.log(tx?.txInfo?.view)
 	const bodyView =
 		//@ts-ignore
 		tx?.txInfo?.view?.bodyView!
@@ -308,12 +305,6 @@ export default function TransactionDetail() {
 		})
 	}
 
-	//const rawView = tx?.txInfo?.view?;
-	// react-json-view was unhappy with the view object directly, and complained
-	// it didn't know how to JSONify an internal bigint, so just do an extra round trip to JSON
-	const rawTx = JSON.parse(tx?.txInfo?.transaction?.toJsonString() || "{}");
-	const rawView = JSON.parse(tx?.txInfo?.view?.toJsonString() || "{}");
-
 	return (
 		<>
 			{auth!.walletAddress ? (
@@ -355,8 +346,8 @@ export default function TransactionDetail() {
 										) : (
 											<div className='w-[100%] flex flex-col'>
 												<p className='h3 mb-[8px] capitalize'>Sender Address</p>
-												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words monospace'>
-													{memoSender}
+												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+													{memoSender}&nbsp; {/* the nbsp is supposed to ensure that an empty memoSender still results in a non-zero-height container, but something is stripping it? */}
 												</p>
 											</div>
 										)
@@ -368,11 +359,7 @@ export default function TransactionDetail() {
 									) : (
 										<div className='w-[100%] flex flex-col'>
 											<p className='h3 mb-[8px] capitalize'>Message</p>
-											{/* HACK: 40px = 24px lineHeight + 8px * 2 padding 
-											This ensures an empty memo doesn't collapse the container but doesn't interact
-											with any of the other styling. it's very brittle but good enough for now
-											*/}
-											<p style={{ minHeight: '40px' }} className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
+											<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
 												{memoText}
 											</p>
 										</div>
@@ -414,33 +401,6 @@ export default function TransactionDetail() {
 										<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
 											{expiryText}
 										</p>
-									</div>
-								</div>
-								<p className='h2 mb-[12px] mt-[16px]'>Raw Transaction</p>
-								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
-									<div style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
-										<ReactJson src={rawTx}
-											theme="twilight"
-											name={false}
-											displayDataTypes={false}
-											collapseStringsAfterLength={48}
-											collapsed={true}
-											style={{ fontFamily: "'Iosevka', 'Menlo', 'Courier New', Courier, monospace" }}
-										/>
-									</div>
-								</div>
-								<p className='h2 mb-[12px] mt-[16px]'>Raw View</p>
-								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
-									<div style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
-										<ReactJson src={rawView}
-											theme="twilight"
-											name={false}
-											displayDataTypes={false}
-											collapseStringsAfterLength={48}
-											collapsed={true}
-											/* HACK: the component adds inline styles that don't seem easily overridden by normal CSS rules, replicate .monospace here */
-											style={{ fontFamily: "'Iosevka', 'Menlo', 'Courier New', Courier, monospace" }}
-										/>
 									</div>
 								</div>
 							</div>
