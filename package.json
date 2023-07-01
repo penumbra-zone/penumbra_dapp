@@ -13,6 +13,7 @@
     "@buf/penumbra-zone_penumbra.bufbuild_connect-web": "^0.8.6-20230622200008-2b9632c2d2bb.1",
     "@buf/penumbra-zone_penumbra.bufbuild_es": "^1.2.1-20230622200008-2b9632c2d2bb.1",
     "@bufbuild/connect-web": "^0.8.6",
+    "@microlink/react-json-view": "^1.22.2",
     "autoprefixer": "10.4.14",
     "bech32": "^2.0.0",
     "eslint": "8.43.0",
