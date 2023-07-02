@@ -20,6 +20,8 @@ import { ChevronLeftIcon, CopySvg } from '@/components/Svg'
 import { getTransactionType } from '@/lib/transactionType'
 
 import dynamic from 'next/dynamic'
+import { AddressComponent } from '@/components/penumbra/Address'
+import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 //import ReactJson from '@microlink/react-json-view';
 const DynamicReactJson = dynamic(() => import('@microlink/react-json-view'), {
 	ssr: false // This line is important. It's what prevents server-side rendering.
@@ -55,6 +57,7 @@ export default function TransactionDetail() {
 	let memoSender = 'Encrypted';
 	//console.log(memoView)
 	//console.log(bodyView)
+	let memoReturnAddress: Address | undefined = undefined;
 	if (memoView?.case == 'visible') {
 		memoText = memoView.value.plaintext!.text;
 		memoSender = bech32m.encode(
@@ -62,6 +65,7 @@ export default function TransactionDetail() {
 			bech32m.toWords(memoView.value.plaintext!.sender!.inner),
 			160
 		);
+		memoReturnAddress = memoView.value.plaintext?.sender
 	}
 
 	let chainId = bodyView?.chainId;
@@ -351,20 +355,6 @@ export default function TransactionDetail() {
 								</div>
 								<p className='h2 mb-[12px] mt-[16px]'>Memo</p>
 								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
-									{
-										memoSender === 'Encrypted' ? (
-											<div className='w-[100%] flex flex-col'>
-												<p className='h3 mb-[8px] capitalize encrypted'>Sender Address</p>
-											</div>
-										) : (
-											<div className='w-[100%] flex flex-col'>
-												<p className='h3 mb-[8px] capitalize'>Sender Address</p>
-												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words monospace'>
-													{memoSender}
-												</p>
-											</div>
-										)
-									}
 									{memoText === 'Encrypted' ? (
 										<div className='w-[100%] flex flex-col'>
 											<p className='h3 mb-[8px] capitalize encrypted'>Message</p>
@@ -381,6 +371,20 @@ export default function TransactionDetail() {
 											</p>
 										</div>
 									)}
+									{
+										memoSender === 'Encrypted' ? (
+											<div className='w-[100%] flex flex-col'>
+												<p className='h3 mb-[8px] capitalize encrypted'>Return Address</p>
+											</div>
+										) : (
+											<div className='w-[100%] flex flex-col'>
+												<p className='h3 mb-[8px] capitalize'>Return Address</p>
+												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words monospace'>
+													<AddressComponent address={memoReturnAddress!} />
+												</p>
+											</div>
+										)
+									}
 								</div>
 								<p className='h2 mb-[12px] mt-[16px]'>Actions</p>
 								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
