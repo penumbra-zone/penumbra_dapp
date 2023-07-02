@@ -22,20 +22,11 @@ import { getTransactionType } from '@/lib/transactionType'
 import dynamic from 'next/dynamic'
 import { AddressComponent } from '@/components/penumbra/Address'
 import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import { TransactionHashComponent } from '@/components/penumbra/TransactionHash'
 //import ReactJson from '@microlink/react-json-view';
 const DynamicReactJson = dynamic(() => import('@microlink/react-json-view'), {
 	ssr: false // This line is important. It's what prevents server-side rendering.
 })
-
-function truncateHash(hash: string | null, length: number = 6): string {
-	if (hash === null) {
-		return '';
-	}
-	if (hash.length <= 2 * length) {
-		return hash;
-	}
-	return hash.slice(0, length) + '…' + hash.slice(-length);
-}
 
 export default function TransactionDetail() {
 	const auth = useAuth()
@@ -337,21 +328,12 @@ export default function TransactionDetail() {
 									className='self-start'
 								/>
 								<div className='h1 mb-[12px] mt-[24px]'>
-									<p
-										style={{ display: "inline-block" }}
-									>Transaction <span className='monospace'>{truncateHash(params.get('hash'), 8)}</span></p>
-									<p
-										className='cursor-pointer hover:no-underline hover:opacity-75'
-										onClick={copyToClipboard}
-										style={{ display: "inline-block", margin: "0 5px" }}
-									>
-										<CopySvg width='20' height='20' fill='#524B4B' />
-									</p>
-									<p
-										style={{ display: "inline-block" }}
-									>
-										(Height {Number(tx?.txInfo?.height)})
-									</p>
+									<span>Transaction </span>
+									<TransactionHashComponent
+										hash={params.get('hash') as string}
+										short_form={true}
+									/>
+									<span>(Height {Number(tx?.txInfo?.height)})</span>
 								</div>
 								<p className='h2 mb-[12px] mt-[16px]'>Memo</p>
 								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
