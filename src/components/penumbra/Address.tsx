@@ -8,7 +8,7 @@ import { CopySvg } from '../Svg';
 import { copyToClipboard } from '@/lib/copyToClipboard';
 
 // A Penumbra address in short form with a copy button
-export const AddressComponent: React.FC<{ address: Address }> = ({ address }) => {
+export const AddressComponent: React.FC<{ address: Address, show_full?: boolean }> = ({ address, show_full }) => {
     const prefix = 'penumbrav2t';
     const address_str = bech32m.encode(
         prefix,
@@ -16,11 +16,12 @@ export const AddressComponent: React.FC<{ address: Address }> = ({ address }) =>
         160,
     );
     const address_str_short = address_str.slice(0, prefix.length + 1 + 24) + "…";
+    const display_address = show_full ? address_str : address_str_short;
 
     return (
         <> {
             <div style={{ display: "inline-block" }}>
-                <span className="monospace">{address_str_short}</span>
+                <span className="monospace">{display_address}</span>
                 <span
                     className='cursor-pointer hover:no-underline hover:opacity-75'
                     onClick={() => copyToClipboard(address_str)}
