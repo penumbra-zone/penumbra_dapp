@@ -14,7 +14,7 @@ export const ActionViewComponent: React.FC<{ actionView: ActionView }> = ({ acti
         //    return <SwapViewComponent view={actionView.actionView.value} />;
         default:
             return <div className='w-[100%] flex flex-col'>
-                <p className='h3 mb-[8px] capitalize'>Unknown Action</p>
+                <p className='h3 mb-[8px] capitalize'>Unsupported Action {actionView.actionView.case}</p>
             </div>
     }
 }
