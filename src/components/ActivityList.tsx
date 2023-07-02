@@ -4,6 +4,7 @@ import { ArrowUpRightSvg, ChevronLeftIcon } from './Svg'
 import { getTransactionType } from '@/lib/transactionType'
 import Link from 'next/link'
 import { routesPath } from '@/lib/constants'
+import { TransactionHashComponent } from './penumbra/TransactionHash'
 
 export const ActivityList = () => {
 	const { transactions } = useTransactions()
@@ -24,14 +25,13 @@ export const ActivityList = () => {
 										<p className='h3 w-[80px] mb-[8px]'>
 											{getTransactionType(i.txInfo?.view)}
 										</p>
-										<p className='text_body text-green'>Block height :</p>
+										<p className='text_body text-green'>Height</p>
 										<p className='text_body text-green'>
 											{String(i.txInfo?.height)}
 										</p>
 									</div>
-									<p className='text_body ml-[14px]'>Hash: </p>
-									<p className='text_body ml-[14px] break-all'>
-										{uint8ToBase64(i.txInfo?.id?.hash!)}
+									<p className='text_body ml-[14px]'>
+										<TransactionHashComponent short_form={false} hash={uint8ToBase64(i.txInfo?.id?.hash!)} />
 									</p>
 								</div>
 								<Link
