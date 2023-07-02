@@ -2,7 +2,7 @@ import { useBalance } from "@/context/BalanceContextProvider";
 import { getAssetByAssetId } from "@/lib/assets";
 import { uint8ToBase64 } from "@/lib/uint8ToBase64";
 import { SpendView, SpendView_Opaque, SpendView_Visible } from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb"
-import { AddressComponent } from "../Address";
+import { AddressViewComponent } from "../Address";
 
 export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
     // TODO: can the asset info be put in the view correctly instead?
@@ -13,7 +13,7 @@ export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
             // spendView.spendView.value is SpendView_Visible
             const visibleSpend: SpendView_Visible = view.spendView.value;
             const valueView = visibleSpend.note?.value?.valueView;
-            const address = visibleSpend.note?.address?.addressView.value?.address!;
+            const addressView = visibleSpend.note?.address!;
 
             // TODO: handle known/unknown denoms
             // TODO: may need fixes to view protos
@@ -43,7 +43,7 @@ export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
                     <span>
                         {humanAmount} {humanDenom} from
                     </span>
-                    <AddressComponent address={address} />
+                    <AddressViewComponent addressView={addressView} />
                 </p>
             </div>
         }

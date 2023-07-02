@@ -40,6 +40,15 @@ export const AddressViewComponent: React.FC<{ addressView: AddressView }> = ({ a
 
     switch (addressView.addressView.case) {
         case 'visible':
+            const view = addressView.addressView.value;
+            const account = view.index?.account || 0;
+            return (
+                <>
+                    <AddressComponent address={address} />
+                    {account === 0 ? (<span>(Self)</span >)
+                        : (<span>(Self Account {account})</span>)}
+                </>
+            )
         case 'opaque':
             return <AddressComponent address={address} />;
     }

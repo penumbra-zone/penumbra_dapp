@@ -2,7 +2,7 @@ import { useBalance } from "@/context/BalanceContextProvider";
 import { getAssetByAssetId } from "@/lib/assets";
 import { uint8ToBase64 } from "@/lib/uint8ToBase64";
 import { OutputView } from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb"
-import { AddressComponent } from "../Address";
+import { AddressComponent, AddressViewComponent } from "../Address";
 
 
 export const OutputViewComponent: React.FC<{ view: OutputView }> = ({ view }) => {
@@ -15,7 +15,7 @@ export const OutputViewComponent: React.FC<{ view: OutputView }> = ({ view }) =>
             // view.outputView.value is OutputView_Visible
             const visibleOutput = view.outputView.value;
 
-            const address = visibleOutput.note?.address?.addressView.value?.address!;
+            const addressView = visibleOutput.note?.address!;
             const valueView = visibleOutput.note?.value?.valueView;
 
             // TODO: handle known/unknown denoms
@@ -46,7 +46,7 @@ export const OutputViewComponent: React.FC<{ view: OutputView }> = ({ view }) =>
                     <span>
                         {humanAmount} {humanDenom} to
                     </span>
-                    <AddressComponent address={address} />
+                    <AddressViewComponent addressView={addressView} />
                 </p>
             </div>
         }
