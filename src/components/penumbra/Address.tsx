@@ -1,6 +1,6 @@
 
 
-import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb';
+import { Address, AddressView } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb';
 import { bech32m } from 'bech32';
 import React from 'react';
 import toast from 'react-hot-toast';
@@ -19,7 +19,6 @@ export const AddressComponent: React.FC<{ address: Address }> = ({ address }) =>
 
     return (
         <> {
-
             <div style={{ display: "inline-block" }}>
                 <span className="monospace">{address_str_short}</span>
                 <span
@@ -33,4 +32,15 @@ export const AddressComponent: React.FC<{ address: Address }> = ({ address }) =>
         }
         </>
     )
+}
+
+// A Penumbra address in short form with a copy button and info on the account it represents.
+export const AddressViewComponent: React.FC<{ addressView: AddressView }> = ({ addressView }) => {
+    const address = addressView.addressView.value?.address!;
+
+    switch (addressView.addressView.case) {
+        case 'visible':
+        case 'opaque':
+            return <AddressComponent address={address} />;
+    }
 }

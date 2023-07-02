@@ -23,6 +23,7 @@ import dynamic from 'next/dynamic'
 import { AddressComponent } from '@/components/penumbra/Address'
 import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { TransactionHashComponent } from '@/components/penumbra/TransactionHash'
+import { ActionViewComponent } from '@/components/penumbra/view/ActionView'
 //import ReactJson from '@microlink/react-json-view';
 const DynamicReactJson = dynamic(() => import('@microlink/react-json-view'), {
 	ssr: false // This line is important. It's what prevents server-side rendering.
@@ -46,8 +47,6 @@ export default function TransactionDetail() {
 
 	let memoText = 'Encrypted';
 	let memoSender = 'Encrypted';
-	//console.log(memoView)
-	//console.log(bodyView)
 	let memoReturnAddress: Address | undefined = undefined;
 	if (memoView?.case == 'visible') {
 		memoText = memoView.value.plaintext!.text;
@@ -56,6 +55,7 @@ export default function TransactionDetail() {
 			bech32m.toWords(memoView.value.plaintext!.sender!.inner),
 			160
 		);
+		// https://github.com/penumbra-zone/penumbra/issues/2782
 		memoReturnAddress = memoView.value.plaintext?.sender
 	}
 
@@ -68,208 +68,6 @@ export default function TransactionDetail() {
 	if (bodyView?.expiryHeight != BigInt(0)) {
 		expiryText = `${bodyView?.expiryHeight}`
 	}
-
-
-	const actionText = useMemo(() => {
-		if (!tx) return []
-		return tx.txInfo?.view?.bodyView?.actionViews.map(i => {
-			const type = i.actionView.case
-
-			if (type === 'spend') {
-				try {
-					const assetValue =
-						//@ts-ignore
-						i.actionView.value.spendView.value?.note.value.valueView.value
-					const asset = getAssetByAssetId(
-						assets,
-						uint8ToBase64(assetValue.assetId.inner)
-					).denomMetadata!
-
-					const exponent = asset.denomUnits.find(
-						i => i.denom === asset.display
-					)?.exponent
-
-					const amount =
-						(Number(assetValue.amount?.lo) +
-							2 ** 64 * Number(assetValue.amount?.hi)) /
-						(exponent ? 10 ** exponent : 1)
-
-					return {
-						type,
-						text: `${amount} ${asset.display}`,
-					}
-				} catch (error) {
-					return {
-						type,
-						text: 'Encrypted',
-					}
-				}
-			} else if (type === 'output') {
-				try {
-					// const assetId = getAssetByAssetId(
-					// 	assets,
-					// 	uint8ToBase64(
-					// 		i.actionView.value.outputView.value.note.value.valueView.value
-					// 			.assetId.inner as Uint8Array
-					// 	)
-					// )
-					const asset = getAssetByAssetId(
-						assets,
-						uint8ToBase64(
-							//@ts-ignore
-							i.actionView.value.outputView.value.note.value.valueView.value
-								.assetId.inner as Uint8Array
-						)
-					).denomMetadata!
-
-					const addresView =
-						//@ts-ignore
-						i.actionView.value.outputView.value.note.address.addressView
-					const address = bech32m.encode(
-						'penumbrav2t',
-						bech32m.toWords(addresView.value.address.inner),
-						160
-					)
-
-					const exponent = asset.denomUnits.find(
-						i => i.denom === asset.display
-					)?.exponent
-
-					const amount =
-						Number(
-							//@ts-ignore
-							i.actionView.value.outputView.value.note.value.valueView.value
-								.amount.lo
-						) / (exponent ? 10 ** exponent : 1)
-
-					return {
-						text:
-							addresView.case === 'opaque'
-								? `${amount} ${asset.display} to ${address}`
-								: `${amount} ${asset.display}`,
-						type: addresView.case === 'opaque' ? 'Output' : 'Output',
-					}
-				} catch (error) {
-					return {
-						type,
-						text: 'Encrypted',
-					}
-				}
-			} else if (type === 'positionOpen') {
-				try {
-					// const asset1 = getAssetByAssetId(
-					// 	assets,
-					// 	uint8ToBase64(
-					// 		i.actionView.value.position?.phi?.pair?.asset1
-					// 			?.inner as Uint8Array
-					// 	)
-					// )
-					const asset1 = getAssetByAssetId(
-						assets,
-						uint8ToBase64(
-							i.actionView.value.position?.phi?.pair?.asset1
-								?.inner as Uint8Array
-						)
-					).denomMetadata!
-
-					const asset2 = getAssetByAssetId(
-						assets,
-						uint8ToBase64(
-							i.actionView.value.position?.phi?.pair?.asset2
-								?.inner as Uint8Array
-						)
-					).denomMetadata!
-
-					// const asset2 = getAssetByAssetId(
-					// 	assets,
-					// 	uint8ToBase64(
-					// 		i.actionView.value.position?.phi?.pair?.asset2
-					// 			?.inner as Uint8Array
-					// 	)
-					// )
-					return {
-						text: `Trading Pair: (${asset1.display}, ${asset2.display})`,
-						type,
-					}
-				} catch (error) {
-					return {
-						type,
-						text: 'Encrypted',
-					}
-				}
-			} else if (type === 'swap') {
-				try {
-					const delta1I = Number(
-						i.actionView.value.swapView.value?.swap?.body?.delta1I?.lo
-					)
-					const delta2I =
-						i.actionView.value.swapView.value?.swap?.body?.delta2I?.lo
-
-					// const asset1 = getAssetByAssetId(
-					// 	assets,
-					// 	uint8ToBase64(
-					// 		i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset1
-					// 			?.inner as Uint8Array
-					// 	)
-					// )
-					const asset1 = getAssetByAssetId(
-						assets,
-						uint8ToBase64(
-							i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset1
-								?.inner as Uint8Array
-						)
-					).denomMetadata!
-
-					const exponent1 = asset1.denomUnits.find(
-						i => i.denom === asset1.display
-					)?.exponent
-
-					// const asset2 = getAssetByAssetId(
-					// 	assets,
-					// 	uint8ToBase64(
-					// 		i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset2
-					// 			?.inner as Uint8Array
-					// 	)
-					// )
-
-					const asset2 = getAssetByAssetId(
-						assets,
-						uint8ToBase64(
-							i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset2
-								?.inner as Uint8Array
-						)
-					).denomMetadata!
-
-					const exponent2 = asset2.denomUnits.find(
-						i => i.denom === asset2.display
-					)?.exponent
-
-					if (delta1I) {
-						return {
-							text: `${Number(delta1I) / (exponent1 ? 10 ** exponent1 : 1)} ${asset1.display
-								} for ${asset2.display}`,
-							type,
-						}
-					}
-					return {
-						text: `${Number(delta2I) / (exponent2 ? 10 ** exponent2 : 1)} ${asset2.display
-							} for ${asset1.display}`,
-						type,
-					}
-				} catch (error) {
-					return {
-						type,
-						text: 'Encrypted',
-					}
-				}
-			} else {
-				return {
-					text: '',
-					type,
-				}
-			}
-		})
-	}, [tx, assets])
 
 	useEffect(() => {
 		if (!auth!.walletAddress) return
@@ -293,19 +91,6 @@ export default function TransactionDetail() {
 	}, [params, auth])
 
 	const handleBack = () => push(`${routesPath.HOME}?tab=Activity`)
-
-	const copyToClipboard = () => {
-		navigator.clipboard.writeText(params.get('hash') as string)
-		toast.success('Successfully copied', {
-			position: 'top-center',
-			icon: '👏',
-			style: {
-				borderRadius: '15px',
-				background: '#141212',
-				color: '#fff',
-			},
-		})
-	}
 
 	//const rawView = tx?.txInfo?.view?;
 	// react-json-view was unhappy with the view object directly, and complained
@@ -336,6 +121,7 @@ export default function TransactionDetail() {
 									<span>(Height {Number(tx?.txInfo?.height)})</span>
 								</div>
 								<p className='h2 mb-[12px] mt-[16px]'>Memo</p>
+								{ /* TODO: replace with a MemoViewComponent */}
 								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
 									{memoText === 'Encrypted' ? (
 										<div className='w-[100%] flex flex-col'>
@@ -370,21 +156,12 @@ export default function TransactionDetail() {
 								</div>
 								<p className='h2 mb-[12px] mt-[16px]'>Actions</p>
 								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
-									{actionText!.map((i, index) => (
-										i.text === 'Encrypted' ? (
-											<div key={index} className='w-[100%] flex flex-col'>
-												<p className='h3 mb-[8px] capitalize encrypted'>{i.type}</p>
-											</div>
-										) : (
-											<div key={index} className='w-[100%] flex flex-col'>
-												<p className='h3 mb-[8px] capitalize'>{i.type}</p>
-												<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-													{i.text}
-												</p>
-											</div>
-										)
-									))}
+									{
+										tx.txInfo?.view?.bodyView?.actionViews.map((actionView, index) =>
+											<ActionViewComponent key={index} actionView={actionView} />
+										)}
 								</div>
+								{/* TODO: replace by a TransactionDataComponent with everything other than Memo + Actions */}
 								<p className='h2 mb-[12px] mt-[16px]'>Transaction Data</p>
 								<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
 									<div className='w-[100%] flex flex-col'>
