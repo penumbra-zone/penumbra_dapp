@@ -77,27 +77,26 @@ export default function TransactionDetail() {
 			const type = i.actionView.case
 
 			if (type === 'spend') {
-				try {
-					const assetValue =
-						//@ts-ignore
-						i.actionView.value.spendView.value?.note.value.valueView.value
-					const asset = getAssetByAssetId(
-						assets,
-						uint8ToBase64(assetValue.assetId.inner)
-					).denomMetadata!
 
-					const exponent = asset.denomUnits.find(
-						i => i.denom === asset.display
+				console.log(i)
+				try {
+					const knownDenom =
+						//@ts-ignore
+						i.actionView.value.spendView.value?.note.value.valueView?.value;
+
+
+					const exponent = knownDenom.denom.denomUnits.find(
+						i => i.denom === knownDenom.denom.display
 					)?.exponent
 
 					const amount =
-						(Number(assetValue.amount?.lo) +
-							2 ** 64 * Number(assetValue.amount?.hi)) /
+						(Number(knownDenom.amount?.lo) +
+							2 ** 64 * Number(knownDenom.amount?.hi)) /
 						(exponent ? 10 ** exponent : 1)
 
 					return {
 						type,
-						text: `${amount} ${asset.display}`,
+						text: `${amount} ${knownDenom.denom.display}`,
 					}
 				} catch (error) {
 					return {
@@ -107,26 +106,24 @@ export default function TransactionDetail() {
 				}
 			} else if (type === 'output') {
 				try {
-					const asset = getAssetByAssetId(
-						assets,
-						uint8ToBase64(
-							//@ts-ignore
-							i.actionView.value.outputView.value.note.value.valueView.value
-								.assetId.inner as Uint8Array
-						)
-					).denomMetadata!
+					console.log(i)
 
-					const addresView =
+					const addressView =
 						//@ts-ignore
 						i.actionView.value.outputView.value.note.address.addressView
+
+					const knownDenom =
+						//@ts-ignore
+						i.actionView.value.outputView.value?.note.value.valueView?.value;
+
 					const address = bech32m.encode(
 						'penumbrav2t',
-						bech32m.toWords(addresView.value.address.inner),
+						bech32m.toWords(addressView.value.address.inner),
 						160
 					)
 
-					const exponent = asset.denomUnits.find(
-						i => i.denom === asset.display
+					const exponent = knownDenom.denom.denomUnits.find(
+						i => i.denom === knownDenom.denom.display
 					)?.exponent
 
 					const amount =
@@ -138,12 +135,13 @@ export default function TransactionDetail() {
 
 					return {
 						text:
-							addresView.case === 'opaque'
-								? `${amount} ${asset.display} to ${address}`
-								: `${amount} ${asset.display}`,
-						type: addresView.case === 'opaque' ? 'Output' : 'Output',
+							addressView.case === 'opaque'
+								? `${amount} ${knownDenom.denom.display} to ${address}`
+								: `${amount} ${knownDenom.denom.display} to Account ${addressView.value?.index.account}`,
+						type: addressView.case === 'opaque' ? 'Output' : 'Output',
 					}
 				} catch (error) {
+					console.log(error)
 					return {
 						type,
 						text: 'Encrypted',
