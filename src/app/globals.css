@@ -91,14 +91,6 @@ select {
 
 /* font styles */
 
-.encrypted {
-	color: #888 !important;
-}
-
-.monospace {
-	font-family: 'Iosevka', 'Menlo', 'Courier New', Courier, monospace;
-}
-
 .h1 {
 	font-family: 'Faktum Medium';
 	font-style: normal;
@@ -149,9 +141,8 @@ select {
 
 .text_button {
 	font-family: 'Faktum Medium';
-	font-style: normal;
-	font-weight: 500;
 	font-size: 15px;
+	font-weight: 500;
 	line-height: 22px;
 }
 
