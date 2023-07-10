@@ -17,6 +17,7 @@ version: '3'
 services:
    penumbra_frontend:
     container_name: penumbra_frontend
+    image: leverage:penumbra 
     build:
       context: ./
       dockerfile: Dockerfile
