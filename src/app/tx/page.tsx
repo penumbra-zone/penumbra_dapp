@@ -114,7 +114,7 @@ export default function TransactionDetail() {
 									<span>Transaction </span>
 									<TransactionHashComponent
 										hash={params.get('hash') as string}
-										short_form={true}
+										shortForm={true}
 									/>
 									<span>(Height {Number(tx?.txInfo?.height)})</span>
 								</div>

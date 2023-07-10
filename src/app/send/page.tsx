@@ -3,7 +3,7 @@ import { useAuth } from '@/context/AuthContextProvider'
 import { useBalance } from '@/context/BalanceContextProvider'
 import { AddressValidatorsType, validateAddress } from '@/lib/validateAddress'
 import { TransactionPlannerRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import { extensionTransport } from '@/lib/extensionTransport'
@@ -27,6 +27,15 @@ export default function Send() {
 	const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
 		{} as AddressValidatorsType
 	)
+
+	useEffect(() => {
+		if (!auth.walletAddress) {
+			setAmount('')
+			setReciever('')
+			setSelect('')
+			setIsValidate({} as AddressValidatorsType)
+		}
+	}, [auth.walletAddress])
 
 	const options = useMemo(() => {
 		if (!balance.length) return []

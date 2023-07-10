@@ -31,7 +31,6 @@ export const ActivityList = () => {
 								</div>
 								<p className='text_body ml-[14px]'>
 									<TransactionHashComponent
-										short_form={false}
 										hash={uint8ToBase64(i.txInfo?.id?.hash!)}
 									/>
 								</p>
