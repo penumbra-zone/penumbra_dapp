@@ -36,203 +36,36 @@ export default function TransactionDetail() {
 	const { assets } = useBalance()
 	const [tx, setTx] = useState<TransactionInfoByHashResponse | null>(null)
 
-	const { memoText, memoSender, chainId, feeText, expiryText } = useMemo(() => {
-		const bodyView = tx?.txInfo?.view?.bodyView
-		const memoView = bodyView?.memoView?.memoView
+	console.log(tx?.txInfo?.view)
+	const bodyView =
+		//@ts-ignore
+		tx?.txInfo?.view?.bodyView!
+	const memoView =
+		//@ts-ignore
+		tx?.txInfo?.view?.bodyView?.memoView?.memoView!
 
-		let memoText = 'Encrypted'
-		let memoSender = 'Encrypted'
+	let memoText = 'Encrypted'
+	let memoSender = 'Encrypted'
+	let memoReturnAddress: Address | undefined = undefined
+	if (memoView?.case == 'visible') {
+		memoText = memoView.value.plaintext!.text
+		memoSender = bech32m.encode(
+			'penumbrav2t',
+			bech32m.toWords(memoView.value.plaintext!.sender!.inner),
+			160
+		)
+		// https://github.com/penumbra-zone/penumbra/issues/2782
+		memoReturnAddress = memoView.value.plaintext?.sender
+	}
 
-		if (memoView?.case == 'visible') {
-			memoText = memoView.value.plaintext!.text
-			memoSender = bech32m.encode(
-				'penumbrav2t',
-				bech32m.toWords(memoView.value.plaintext!.sender!.inner),
-				160
-			)
-		}
-
-		const chainId = bodyView?.chainId
-		const feeAmount =
-			Number(bodyView?.fee?.amount?.lo) +
-			2 ** 64 * Number(bodyView?.fee?.amount?.hi)
-		const feeText = `${feeAmount} upenumbra`
-		let expiryText = 'None'
-		if (bodyView?.expiryHeight != BigInt(0))
-			expiryText = `${bodyView?.expiryHeight}`
-
-		return {
-			memoText,
-			memoSender,
-			chainId,
-			feeText,
-			expiryText,
-		}
-	}, [tx])
-
-	// const actionText = useMemo(() => {
-	// 	if (!tx) return []
-	// 	return tx.txInfo?.view?.bodyView?.actionViews.map(i => {
-	// 		const type = i.actionView.case
-
-	// 		if (type === 'spend') {
-
-	// 			console.log(i)
-	// 			try {
-	// 				const knownDenom =
-	// 					//@ts-ignore
-	// 					i.actionView.value.spendView.value?.note.value.valueView?.value;
-
-	// 				const exponent = knownDenom.denom.denomUnits.find(
-	// 					i => i.denom === knownDenom.denom.display
-	// 				)?.exponent
-
-	// 				const amount =
-	// 					(Number(knownDenom.amount?.lo) +
-	// 						2 ** 64 * Number(knownDenom.amount?.hi)) /
-	// 					(exponent ? 10 ** exponent : 1)
-
-	// 				return {
-	// 					type,
-	// 					text: `${amount} ${knownDenom.denom.display}`,
-	// 				}
-	// 			} catch (error) {
-	// 				return {
-	// 					type,
-	// 					text: 'Encrypted',
-	// 				}
-	// 			}
-	// 		} else if (type === 'output') {
-	// 			try {
-	// 				console.log(i)
-
-	// 				const addressView =
-	// 					//@ts-ignore
-	// 					i.actionView.value.outputView.value.note.address.addressView
-
-	// 				const knownDenom =
-	// 					//@ts-ignore
-	// 					i.actionView.value.outputView.value?.note.value.valueView?.value;
-
-	// 				const address = bech32m.encode(
-	// 					'penumbrav2t',
-	// 					bech32m.toWords(addressView.value.address.inner),
-	// 					160
-	// 				)
-
-	// 				const exponent = knownDenom.denom.denomUnits.find(
-	// 					i => i.denom === knownDenom.denom.display
-	// 				)?.exponent
-
-	// 				const amount =
-	// 					Number(
-	// 						//@ts-ignore
-	// 						i.actionView.value.outputView.value.note.value.valueView.value
-	// 							.amount.lo
-	// 					) / (exponent ? 10 ** exponent : 1)
-
-	// 				return {
-	// 					text:
-	// 						addressView.case === 'opaque'
-	// 							? `${amount} ${knownDenom.denom.display} to ${address}`
-	// 							: `${amount} ${knownDenom.denom.display} to Account ${addressView.value?.index.account}`,
-	// 					type: addressView.case === 'opaque' ? 'Output' : 'Output',
-	// 				}
-	// 			} catch (error) {
-	// 				console.log(error)
-	// 				return {
-	// 					type,
-	// 					text: 'Encrypted',
-	// 				}
-	// 			}
-	// 		} else if (type === 'positionOpen') {
-	// 			try {
-	// 				const asset1 = getAssetByAssetId(
-	// 					assets,
-	// 					uint8ToBase64(
-	// 						i.actionView.value.position?.phi?.pair?.asset1
-	// 							?.inner as Uint8Array
-	// 					)
-	// 				).denomMetadata!
-
-	// 				const asset2 = getAssetByAssetId(
-	// 					assets,
-	// 					uint8ToBase64(
-	// 						i.actionView.value.position?.phi?.pair?.asset2
-	// 							?.inner as Uint8Array
-	// 					)
-	// 				).denomMetadata!
-
-	// 				return {
-	// 					text: `Trading Pair: (${asset1.display}, ${asset2.display})`,
-	// 					type,
-	// 				}
-	// 			} catch (error) {
-	// 				return {
-	// 					type,
-	// 					text: 'Encrypted',
-	// 				}
-	// 			}
-	// 		} else if (type === 'swap') {
-	// 			try {
-	// 				const delta1I = Number(
-	// 					i.actionView.value.swapView.value?.swap?.body?.delta1I?.lo
-	// 				)
-	// 				const delta2I =
-	// 					i.actionView.value.swapView.value?.swap?.body?.delta2I?.lo
-
-	// 				const asset1 = getAssetByAssetId(
-	// 					assets,
-	// 					uint8ToBase64(
-	// 						i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset1
-	// 							?.inner as Uint8Array
-	// 					)
-	// 				).denomMetadata!
-
-	// 				const exponent1 = asset1.denomUnits.find(
-	// 					i => i.denom === asset1.display
-	// 				)?.exponent
-
-	// 				const asset2 = getAssetByAssetId(
-	// 					assets,
-	// 					uint8ToBase64(
-	// 						i.actionView.value.swapView.value?.swap?.body?.tradingPair?.asset2
-	// 							?.inner as Uint8Array
-	// 					)
-	// 				).denomMetadata!
-
-	// 				const exponent2 = asset2.denomUnits.find(
-	// 					i => i.denom === asset2.display
-	// 				)?.exponent
-
-	// 				if (delta1I) {
-	// 					return {
-	// 						text: `${Number(delta1I) / (exponent1 ? 10 ** exponent1 : 1)} ${
-	// 							asset1.display
-	// 						} for ${asset2.display}`,
-	// 						type,
-	// 					}
-	// 				}
-	// 				return {
-	// 					text: `${Number(delta2I) / (exponent2 ? 10 ** exponent2 : 1)} ${
-	// 						asset2.display
-	// 					} for ${asset1.display}`,
-	// 					type,
-	// 				}
-	// 			} catch (error) {
-	// 				return {
-	// 					type,
-	// 					text: 'Encrypted',
-	// 				}
-	// 			}
-	// 		} else {
-	// 			return {
-	// 				text: '',
-	// 				type,
-	// 			}
-	// 		}
-	// 	})
-	// }, [tx, assets])
+	const chainId = bodyView?.chainId
+	const feeAmount =
+		Number(bodyView?.fee?.amount?.lo) +
+		2 ** 64 * Number(bodyView?.fee?.amount?.hi)
+	const feeText = `${feeAmount} upenumbra`
+	let expiryText = 'None'
+	if (bodyView?.expiryHeight != BigInt(0))
+		expiryText = `${bodyView?.expiryHeight}`
 
 	useEffect(() => {
 		if (!auth!.walletAddress) return
