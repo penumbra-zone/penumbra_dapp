@@ -46,7 +46,7 @@ COPY package.json package-lock.json* ./
 RUN npm config set @buf:registry https://buf.build/gen/npm/v1/
 RUN \
   if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
+  elif [ -f package-lock.json ]; then npm install; \
   elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
   # Allow install without lockfile, so example works even without Node.js installed locally
   else echo "Warning: Lockfile not found. It is recommended to commit lockfiles to version control." && yarn install; \
