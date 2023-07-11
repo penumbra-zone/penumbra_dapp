@@ -1,11 +1,8 @@
-import { useBalance } from '@/context/BalanceContextProvider'
-import { getAssetByAssetId } from '@/lib/assets'
-import { uint8ToBase64 } from '@/lib/uint8ToBase64'
 import {
 	OutputView,
 	OutputView_Visible,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
-import { AddressComponent, AddressViewComponent } from '../Address'
+import { AddressViewComponent } from '../Address'
 import {
 	AssetId,
 	DenomMetadata,
@@ -16,8 +13,6 @@ export const OutputViewComponent: React.FC<{ view: OutputView }> = ({
 	view,
 }) => {
 	// TODO: can the asset info be put in the view correctly instead?
-	const { assets } = useBalance()
-	console.log(assets)
 
 	switch (view.outputView.case) {
 		case 'visible': {
@@ -62,7 +57,7 @@ export const OutputViewComponent: React.FC<{ view: OutputView }> = ({
 					<p className='h3 mb-[8px] capitalize'>Output</p>
 					<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
 						<span>
-							{humanAmount} {humanDenom} to {' '}
+							{humanAmount} {humanDenom} to{' '}
 						</span>
 						<AddressViewComponent addressView={addressView} />
 					</p>
