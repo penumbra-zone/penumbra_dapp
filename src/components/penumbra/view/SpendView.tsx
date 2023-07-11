@@ -1,28 +1,16 @@
-import { useBalance } from '@/context/BalanceContextProvider'
-import { getAssetByAssetId } from '@/lib/assets'
-import { uint8ToBase64 } from '@/lib/uint8ToBase64'
 import {
 	SpendView,
-	SpendView_Opaque,
 	SpendView_Visible,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 import { AddressViewComponent } from '../Address'
 import { calculateAmount } from '@/lib/calculateAmount'
-import { KnownAssets } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import {
 	AssetId,
 	DenomMetadata,
-	ValueView,
-	ValueView_KnownDenom,
-	ValueView_UnknownDenom,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { bech32 } from 'bech32'
 
 export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
-	// TODO: can the asset info be put in the view correctly instead?
-	const { assets } = useBalance()
-	console.log({ assets })
-
 	switch (view.spendView.case) {
 		case 'visible': {
 			// spendView.spendView.value is SpendView_Visible
@@ -67,7 +55,7 @@ export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
 					<p className='h3 mb-[8px] capitalize'>Spend</p>
 					<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
 						<span>
-							{humanAmount} {humanDenom} from {' '}
+							{humanAmount} {humanDenom} from{' '}
 						</span>
 						<AddressViewComponent addressView={addressView} />
 					</p>
