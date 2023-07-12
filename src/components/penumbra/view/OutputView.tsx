@@ -39,8 +39,8 @@ export const OutputViewComponent: React.FC<{ view: OutputView }> = ({
 			const exponent = denomMetadata
 				? denomMetadata?.denomUnits.find(
 						i => i.denom === denomMetadata?.display
-				  )?.exponent || 1
-				: 1
+				  )?.exponent || 0
+				: 0
 
 			const humanAmount = calculateAmount(
 				Number(amount?.lo),
@@ -50,7 +50,7 @@ export const OutputViewComponent: React.FC<{ view: OutputView }> = ({
 
 			let humanDenom = denomMetadata
 				? denomMetadata?.display
-				: '' /* TODO: || passet1... for unknown denoms */
+				: 'qwasdasd' /* TODO: || passet1... for unknown denoms */
 
 			return (
 				<div className='w-[100%] flex flex-col'>
