@@ -1,15 +1,21 @@
+'use client'
 import { AuthContextProvider } from '@/context/AuthContextProvider'
 import './globals.css'
 import { Header } from '@/components/Header'
 import { BalanceContextProvider } from '@/context/BalanceContextProvider'
 import { TransactionContextProvider } from '@/context/TransactionContext'
 import { Toaster } from 'react-hot-toast'
+import { useEffect } from 'react'
 
 export default function RootLayout({
 	children,
 }: {
 	children: React.ReactNode
 }) {
+	useEffect(() => {
+		console.log('12.07.23');
+		
+	}, [])
 	return (
 		<html lang='en'>
 			<body>

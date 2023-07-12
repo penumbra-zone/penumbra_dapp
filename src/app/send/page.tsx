@@ -135,7 +135,7 @@ export default function Send() {
 				console.log(tx.result)
 			}
 		} catch (error) {
-			console.log(error)
+			console.error(error)
 		}
 	}
 

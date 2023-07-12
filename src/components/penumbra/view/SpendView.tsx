@@ -18,8 +18,6 @@ export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
 			const valueView = visibleSpend.note?.value?.valueView
 			const addressView = visibleSpend.note?.address!
 
-			console.log(valueView)
-
 			// handle known/unknown denoms
 			let denomMetadata: DenomMetadata | undefined
 			let assetId: AssetId | undefined
