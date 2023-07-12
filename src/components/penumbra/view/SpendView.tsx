@@ -37,8 +37,8 @@ export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
 			const exponent = denomMetadata
 				? denomMetadata?.denomUnits.find(
 						i => i.denom === denomMetadata?.display
-				  )?.exponent || 1
-				: 1
+				  )?.exponent || 0
+				: 0
 
 			const humanAmount = calculateAmount(
 				Number(amount?.lo),
