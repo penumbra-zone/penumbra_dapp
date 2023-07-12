@@ -29,11 +29,11 @@ export const ActivityList = () => {
 										{String(i.txInfo?.height)}
 									</p>
 								</div>
-								<p className='text_body ml-[14px]'>
+								<div className='text_body ml-[14px]'>
 									<TransactionHashComponent
 										hash={uint8ToBase64(i.txInfo?.id?.hash!)}
 									/>
-								</p>
+								</div>
 							</div>
 							<Link
 								href={`${routesPath.TRANSACTION}?hash=${uint8ToBase64(
