@@ -5,7 +5,7 @@ import {
 	BalanceByAddressRequest,
 	BalanceByAddressResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
@@ -76,7 +76,7 @@ export const BalanceContextProvider = (props: Props) => {
 			.filter(i => Number(i.amount))
 	}, [balance, assets])
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (!auth!.walletAddress) return setAssets([])
 		const getAssets = async () => {
 			const client = createPromiseClient(

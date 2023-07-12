@@ -8,6 +8,7 @@ import {
 	DenomMetadata,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { calculateAmount } from '@/lib/calculateAmount'
+import { bech32, bech32m } from 'bech32'
 
 export const OutputViewComponent: React.FC<{ view: OutputView }> = ({
 	view,
@@ -50,7 +51,7 @@ export const OutputViewComponent: React.FC<{ view: OutputView }> = ({
 
 			let humanDenom = denomMetadata
 				? denomMetadata?.display
-				: 'qwasdasd' /* TODO: || passet1... for unknown denoms */
+				: bech32m.encode('passet1', bech32m.toWords(assetId?.inner!))
 
 			return (
 				<div className='w-[100%] flex flex-col'>

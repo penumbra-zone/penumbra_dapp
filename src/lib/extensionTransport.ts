@@ -51,9 +51,6 @@ export const extensionTransport = (s: typeof ViewProtocolService) =>
 			transactionPlanner: async (message: TransactionPlannerRequest) => {
 				const response = await window.penumbra.getTransactionPlanner(message)
 
-				console.log({response});
-				
-
 				return new TransactionPlannerResponse(response)
 			},
 			transactionInfoByHash: async (message: TransactionInfoByHashRequest) => {
@@ -110,6 +107,5 @@ export const extensionTransport = (s: typeof ViewProtocolService) =>
 					yield new TransactionInfoResponse(res as any)
 				}
 			},
-
 		})
 	})

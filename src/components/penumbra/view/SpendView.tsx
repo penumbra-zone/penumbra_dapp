@@ -8,7 +8,7 @@ import {
 	AssetId,
 	DenomMetadata,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
-import { bech32 } from 'bech32'
+import { bech32, bech32m } from 'bech32'
 
 export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
 	switch (view.spendView.case) {
@@ -17,8 +17,6 @@ export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
 			const visibleSpend: SpendView_Visible = view.spendView.value
 			const valueView = visibleSpend.note?.value?.valueView
 			const addressView = visibleSpend.note?.address!
-
-			console.log(valueView)
 
 			// handle known/unknown denoms
 			let denomMetadata: DenomMetadata | undefined
@@ -48,7 +46,7 @@ export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
 
 			let humanDenom = denomMetadata
 				? denomMetadata.display
-				: bech32.encode('passet1', bech32.toWords(assetId?.inner!))
+				: bech32m.encode('passet1', bech32m.toWords(assetId?.inner!))
 
 			return (
 				<div className='w-[100%] flex flex-col'>
