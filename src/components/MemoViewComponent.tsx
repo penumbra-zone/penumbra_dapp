@@ -57,9 +57,9 @@ export const MemoViewComponent: React.FC<MemoViewComponentProps> = ({
 			) : (
 				<div className='w-[100%] flex flex-col'>
 					<p className='h3 mb-[8px] capitalize'>Return Address</p>
-					<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words monospace'>
+					<div className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words monospace'>
 						<AddressComponent address={memoReturnAddress!} />
-					</p>
+					</div>
 				</div>
 			)}
 		</div>
