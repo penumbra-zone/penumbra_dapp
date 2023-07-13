@@ -43,7 +43,6 @@ export const BalanceAction: React.FC<IBalanceAction> = () => {
 								</div>
 								
 							}
-							disabled
 							className='rounded-[50%] w-[51px]  ext:pt-[14px] tablet:pt-[14px]  ext:pb-[14px] tablet:pb-[14px]'
 						/>
 						<p className='text_button pt-[8px]'>Receive</p>

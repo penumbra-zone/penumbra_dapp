@@ -13,11 +13,10 @@ export const AddressComponent: React.FC<{
 	show_full?: boolean
 }> = ({ address, show_full }) => {
 	const prefix = 'penumbrav2t'
-	const address_str = bech32m.encode(
-		prefix,
-		bech32m.toWords(address.inner),
-		160
-	)
+	//TODO: delete address.altBech32m
+	const address_str = address.altBech32m
+		? address.altBech32m
+		: bech32m.encode(prefix, bech32m.toWords(address.inner), 160)
 	const address_str_short = address_str.slice(0, prefix.length + 1 + 24) + '…'
 	const display_address = show_full ? address_str : address_str_short
 
