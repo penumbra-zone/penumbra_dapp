@@ -1,3 +1,4 @@
+import { ActionCell } from '@/components/ActionCell'
 import { useBalance } from '@/context/BalanceContextProvider'
 import { getAssetByAssetId, getHumanReadableValue } from '@/lib/assets'
 import { uint8ToBase64 } from '@/lib/uint8ToBase64'
@@ -24,17 +25,14 @@ export const PositionOpenViewComponent: React.FC<{ view: PositionOpen }> = ({
 	const {
 		assetHumanAmount: asset2HumanAmount,
 		asssetHumanDenom: assset2HumanDenom,
-	} = getHumanReadableValue(asset2, asset2Amount, asset1Id!)
+	} = getHumanReadableValue(asset2, asset2Amount, asset2Id!)
 
 	const fee = positionOpen?.phi?.component?.fee
 
 	// TODO: add ID:  plpid1ckppehweenlpnskhnt37s4sr2jw6tegmh9h43r627x39ydusg9es3762qz to values
 	return (
-		<div className='w-[100%] flex flex-col'>
-			<p className='h3 mb-[8px] capitalize'>Open Liquidity Position Reserves</p>
-			<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-				{`(${asset1HumanAmount} ${assset1HumanDenom}, ${asset2HumanAmount} ${assset2HumanDenom})  Fee: ${fee}`}
-			</p>
-		</div>
+		<ActionCell title='Swap'>
+			{`(${asset1HumanAmount} ${assset1HumanDenom}, ${asset2HumanAmount} ${assset2HumanDenom})  Fee: ${fee}`}
+		</ActionCell>
 	)
 }

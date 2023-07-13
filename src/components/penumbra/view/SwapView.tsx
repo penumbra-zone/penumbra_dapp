@@ -1,3 +1,4 @@
+import { ActionCell } from '@/components/ActionCell'
 import { useBalance } from '@/context/BalanceContextProvider'
 import { getAssetByAssetId, getHumanReadableValue } from '@/lib/assets'
 import { calculateAmount } from '@/lib/calculateAmount'
@@ -31,7 +32,7 @@ export const SwapViewComponent: React.FC<{ view: SwapView }> = ({ view }) => {
 			const {
 				assetHumanAmount: asset2HumanAmount,
 				asssetHumanDenom: assset2HumanDenom,
-			} = getHumanReadableValue(asset2, asset2Amount, asset1Id!)
+			} = getHumanReadableValue(asset2, asset2Amount, asset2Id!)
 
 			// TODO: add getActionAssetDetail when visibleSwap.swapPlaintext?.claimFee include assetID
 			const feeAssetId = visibleSwap.swapPlaintext?.claimFee?.assetId
@@ -68,22 +69,15 @@ export const SwapViewComponent: React.FC<{ view: SwapView }> = ({ view }) => {
 			)
 
 			return (
-				<div className='w-[100%] flex flex-col'>
-					<p className='h3 mb-[8px] capitalize'>Swap</p>
-					<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-						{asset1HumanAmount
-							? `${asset1HumanAmount} ${assset1HumanDenom} for ${assset2HumanDenom} and paid claim fee ${feeHumanAmount} ${feeHumanDenom}`
-							: `${asset2HumanAmount} ${assset2HumanDenom} for ${assset1HumanDenom} and paid claim fee ${feeHumanAmount} ${feeHumanDenom}`}
-					</p>
-				</div>
+				<ActionCell title='Swap'>
+					{asset1HumanAmount
+						? `${asset1HumanAmount} ${assset1HumanDenom} for ${assset2HumanDenom} and paid claim fee ${feeHumanAmount} ${feeHumanDenom}`
+						: `${asset2HumanAmount} ${assset2HumanDenom} for ${assset1HumanDenom} and paid claim fee ${feeHumanAmount} ${feeHumanDenom}`}
+				</ActionCell>
 			)
 		}
 		default: {
-			return (
-				<div className='w-[100%] flex flex-col'>
-					<p className='h3 mb-[8px] capitalize encrypted'>Swap</p>
-				</div>
-			)
+			return <ActionCell title='Swap' isEncrypted={true} />
 		}
 	}
 }

@@ -5,6 +5,7 @@ import {
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 import { AssetsResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { AddressViewComponent } from '../Address'
+import { ActionCell } from '@/components/ActionCell'
 
 export const OutputViewComponent: React.FC<{ view: OutputView }> = ({
 	view,
@@ -30,21 +31,14 @@ export const OutputViewComponent: React.FC<{ view: OutputView }> = ({
 			)
 
 			return (
-				<div className='w-[100%] flex flex-col'>
-					<p className='h3 mb-[8px] capitalize'>Output</p>
-					<div className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-						<span>{`${assetHumanAmount} ${asssetHumanDenom} to `}</span>
-						<AddressViewComponent addressView={addressView} />
-					</div>
-				</div>
+				<ActionCell title='Output'>
+					{assetHumanAmount} {asssetHumanDenom} to&nbsp;
+					<AddressViewComponent addressView={addressView} />
+				</ActionCell>
 			)
 		}
 		default: {
-			return (
-				<div className='w-[100%] flex flex-col'>
-					<p className='h3 mb-[8px] capitalize encrypted'>Output</p>
-				</div>
-			)
+			return <ActionCell title='Output' isEncrypted={true} />
 		}
 	}
 }

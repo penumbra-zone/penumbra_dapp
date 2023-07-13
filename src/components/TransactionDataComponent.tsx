@@ -1,6 +1,7 @@
 import { calculateAmount } from '@/lib/calculateAmount'
 import { TransactionBodyView } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 import React, { useMemo } from 'react'
+import { ActionCell } from './ActionCell'
 
 type TransactionDataComponentProps = {
 	bodyView: TransactionBodyView
@@ -31,24 +32,9 @@ export const TransactionDataComponent: React.FC<
 
 	return (
 		<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
-			<div className='w-[100%] flex flex-col'>
-				<p className='h3 mb-[8px] capitalize'>Chain ID</p>
-				<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-words min-h-[44px] flex items-center'>
-					{chainId}
-				</p>
-			</div>
-			<div className='w-[100%] flex flex-col'>
-				<p className='h3 mb-[8px] capitalize'>Fee</p>
-				<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-words min-h-[44px] flex items-center'>
-					{feeText}
-				</p>
-			</div>
-			<div className='w-[100%] flex flex-col'>
-				<p className='h3 mb-[8px] capitalize'>Expiry Height</p>
-				<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-words min-h-[44px] flex items-center'>
-					{expiryText}
-				</p>
-			</div>
+			<ActionCell title='Chain ID'>{chainId}</ActionCell>
+			<ActionCell title='Fee'>{feeText}</ActionCell>
+			<ActionCell title='Expiry Height'>{expiryText}</ActionCell>
 		</div>
 	)
 }

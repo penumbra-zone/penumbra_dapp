@@ -3,6 +3,7 @@ import { SpendViewComponent } from './SpendView'
 import { OutputViewComponent } from './OutputView'
 import { SwapViewComponent } from './SwapView'
 import { PositionOpenViewComponent } from './PositionOpenView'
+import { ActionCell } from '@/components/ActionCell'
 
 export const ActionViewComponent: React.FC<{ actionView: ActionView }> = ({
 	actionView,
@@ -18,11 +19,10 @@ export const ActionViewComponent: React.FC<{ actionView: ActionView }> = ({
 			return <PositionOpenViewComponent view={actionView.actionView.value} />
 		default:
 			return (
-				<div className='w-[100%] flex flex-col'>
-					<p className='h3 mb-[8px] capitalize'>
-						Unsupported Action {actionView.actionView.case}
-					</p>
-				</div>
+				<ActionCell
+					title={`Unsupported Action ${actionView.actionView.case}`}
+					isEncrypted={true}
+				/>
 			)
 	}
 }

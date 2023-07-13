@@ -112,6 +112,12 @@ export default function TransactionDetail() {
 											style={{
 												fontFamily:
 													"'Iosevka', 'Menlo', 'Courier New', Courier, monospace",
+												background: '#282626',
+												minHeight: '44px',
+												borderRadius: '10px',
+												padding: '8px 16px',
+												display: 'flex',
+												alignItems: 'center',
 											}}
 										/>
 									</div>
@@ -127,9 +133,16 @@ export default function TransactionDetail() {
 											collapseStringsAfterLength={48}
 											collapsed={true}
 											/* HACK: the component adds inline styles that don't seem easily overridden by normal CSS rules, replicate .monospace here */
+
 											style={{
 												fontFamily:
 													"'Iosevka', 'Menlo', 'Courier New', Courier, monospace",
+												background: '#282626',
+												minHeight: '44px',
+												borderRadius: '10px',
+												padding: '8px 16px',
+												display: 'flex',
+												alignItems: 'center',
 											}}
 										/>
 									</div>
