@@ -3,5 +3,7 @@ export const routesPath = {
 	SEND: '/send',
 	BALANCE_DETAIL: '/balance-detail',
 	VALIDATORS: '/validators',
-	TRANSACTION: '/tx'
+	TRANSACTION: '/tx',
 }
+
+export const UNKNOWN_ASSET_PREFIX = 'passet1'

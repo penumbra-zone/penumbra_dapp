@@ -3,6 +3,7 @@ import { MemoView } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/
 import { bech32m } from 'bech32'
 import React, { useMemo } from 'react'
 import { AddressComponent } from './penumbra/Address'
+import { ActionCell } from './ActionCell'
 
 type MemoViewComponentProps = { memoView: MemoView }
 
@@ -36,32 +37,18 @@ export const MemoViewComponent: React.FC<MemoViewComponentProps> = ({
 	return (
 		<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
 			{memoText === 'Encrypted' ? (
-				<div className='w-[100%] flex flex-col'>
-					<p className='h3 mb-[8px] capitalize'>Sender Address</p>
-					<div className='flex items-center gap-x-[8px] min-h-[44px] py-[8px] px-[16px] bg-dark_grey rounded-[10px] text-light_grey text_numbers_s'>
-						<Copy text={memoSender} type='last' />
-					</div>
-				</div>
+				<ActionCell title='Sender Address'>
+					<Copy text={memoSender} type='last' />
+				</ActionCell>
 			) : (
-				<div className='w-[100%] flex flex-col'>
-					<p className='h3 mb-[8px] capitalize'>Message</p>
-					<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words min-h-[40px]'>
-						{memoText}
-					</p>
-				</div>
+				<ActionCell title='Message'>{memoText}</ActionCell>
 			)}
-			{memoSender === 'Encrypted' ? (
-				<div className='w-[100%] flex flex-col'>
-					<p className='h3 mb-[8px] capitalize encrypted'>Return Address</p>
-				</div>
-			) : (
-				<div className='w-[100%] flex flex-col'>
-					<p className='h3 mb-[8px] capitalize'>Return Address</p>
-					<div className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words monospace'>
-						<AddressComponent address={memoReturnAddress!} />
-					</div>
-				</div>
-			)}
+			<ActionCell
+				title='Return Address'
+				isEncrypted={memoSender === 'Encrypted'}
+			>
+				<AddressComponent address={memoReturnAddress!} />
+			</ActionCell>
 		</div>
 	)
 }

@@ -1,6 +1,8 @@
+import { ActionCell } from '@/components/ActionCell'
 import { useBalance } from '@/context/BalanceContextProvider'
-import { getActionAssetDetail, getAssetByAssetId } from '@/lib/assets'
+import { getAssetByAssetId, getHumanReadableValue } from '@/lib/assets'
 import { calculateAmount } from '@/lib/calculateAmount'
+import { UNKNOWN_ASSET_PREFIX } from '@/lib/constants'
 import { uint8ToBase64 } from '@/lib/uint8ToBase64'
 import {
 	SwapView,
@@ -22,7 +24,7 @@ export const SwapViewComponent: React.FC<{ view: SwapView }> = ({ view }) => {
 			const {
 				assetHumanAmount: asset1HumanAmount,
 				asssetHumanDenom: assset1HumanDenom,
-			} = getActionAssetDetail(asset1, asset1Amount, asset1Id!)
+			} = getHumanReadableValue(asset1, asset1Amount, asset1Id!)
 
 			const asset2Id = visibleSwap.swapPlaintext?.tradingPair?.asset2
 			const asset2 = getAssetByAssetId(assets, uint8ToBase64(asset2Id!.inner!))
@@ -30,7 +32,7 @@ export const SwapViewComponent: React.FC<{ view: SwapView }> = ({ view }) => {
 			const {
 				assetHumanAmount: asset2HumanAmount,
 				asssetHumanDenom: assset2HumanDenom,
-			} = getActionAssetDetail(asset2, asset2Amount, asset1Id!)
+			} = getHumanReadableValue(asset2, asset2Amount, asset2Id!)
 
 			// TODO: add getActionAssetDetail when visibleSwap.swapPlaintext?.claimFee include assetID
 			const feeAssetId = visibleSwap.swapPlaintext?.claimFee?.assetId
@@ -47,7 +49,10 @@ export const SwapViewComponent: React.FC<{ view: SwapView }> = ({ view }) => {
 				feeExponent = 0
 				//TODO: delete penumbra when visibleSwap.swapPlaintext?.claimFee include assetID
 				feeHumanDenom = feeAssetId
-					? bech32m.encode('passet1', bech32m.toWords(feeAssetId!.inner!))
+					? bech32m.encode(
+							UNKNOWN_ASSET_PREFIX,
+							bech32m.toWords(feeAssetId!.inner!)
+					  )
 					: 'penumbra'
 			} else {
 				const feeDenomMetadata = feeAsset.denomMetadata
@@ -64,22 +69,15 @@ export const SwapViewComponent: React.FC<{ view: SwapView }> = ({ view }) => {
 			)
 
 			return (
-				<div className='w-[100%] flex flex-col'>
-					<p className='h3 mb-[8px] capitalize'>Swap</p>
-					<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-words '>
-						{asset1HumanAmount
-							? `${asset1HumanAmount} ${assset1HumanDenom} for ${assset2HumanDenom} and paid claim fee ${feeHumanAmount} ${feeHumanDenom}`
-							: `${asset2HumanAmount} ${assset2HumanDenom} for ${assset1HumanDenom} and paid claim fee ${feeHumanAmount} ${feeHumanDenom}`}
-					</p>
-				</div>
+				<ActionCell title='Swap'>
+					{asset1HumanAmount
+						? `${asset1HumanAmount} ${assset1HumanDenom} for ${assset2HumanDenom} and paid claim fee ${feeHumanAmount} ${feeHumanDenom}`
+						: `${asset2HumanAmount} ${assset2HumanDenom} for ${assset1HumanDenom} and paid claim fee ${feeHumanAmount} ${feeHumanDenom}`}
+				</ActionCell>
 			)
 		}
 		default: {
-			return (
-				<div className='w-[100%] flex flex-col'>
-					<p className='h3 mb-[8px] capitalize encrypted'>Swap</p>
-				</div>
-			)
+			return <ActionCell title='Swap' isEncrypted={true} />
 		}
 	}
 }
