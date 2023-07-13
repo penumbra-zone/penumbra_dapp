@@ -1,5 +1,5 @@
 import { useBalance } from '@/context/BalanceContextProvider'
-import { getActionAssetDetail, getAssetByAssetId } from '@/lib/assets'
+import { getAssetByAssetId, getHumanReadableValue } from '@/lib/assets'
 import { uint8ToBase64 } from '@/lib/uint8ToBase64'
 import { PositionOpen } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/dex/v1alpha1/dex_pb'
 import React from 'react'
@@ -16,7 +16,7 @@ export const PositionOpenViewComponent: React.FC<{ view: PositionOpen }> = ({
 	const {
 		assetHumanAmount: asset1HumanAmount,
 		asssetHumanDenom: assset1HumanDenom,
-	} = getActionAssetDetail(asset1, asset1Amount, asset1Id!)
+	} = getHumanReadableValue(asset1, asset1Amount, asset1Id!)
 
 	const asset2Id = positionOpen?.phi?.pair?.asset2
 	const asset2 = getAssetByAssetId(assets, uint8ToBase64(asset2Id!.inner!))
@@ -24,7 +24,7 @@ export const PositionOpenViewComponent: React.FC<{ view: PositionOpen }> = ({
 	const {
 		assetHumanAmount: asset2HumanAmount,
 		asssetHumanDenom: assset2HumanDenom,
-	} = getActionAssetDetail(asset2, asset2Amount, asset1Id!)
+	} = getHumanReadableValue(asset2, asset2Amount, asset1Id!)
 
 	const fee = positionOpen?.phi?.component?.fee
 

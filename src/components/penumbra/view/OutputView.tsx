@@ -1,10 +1,10 @@
+import { getHumanReadableValue } from '@/lib/assets'
 import {
 	OutputView,
 	OutputView_Visible,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
-import { AddressViewComponent } from '../Address'
 import { AssetsResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { getActionAssetDetail } from '@/lib/assets'
+import { AddressViewComponent } from '../Address'
 
 export const OutputViewComponent: React.FC<{ view: OutputView }> = ({
 	view,
@@ -23,7 +23,7 @@ export const OutputViewComponent: React.FC<{ view: OutputView }> = ({
 					? undefined
 					: { denomMetadata: valueView?.value?.denom }
 			const assetAmount = valueView?.value?.amount
-			const { assetHumanAmount, asssetHumanDenom } = getActionAssetDetail(
+			const { assetHumanAmount, asssetHumanDenom } = getHumanReadableValue(
 				asset as unknown as AssetsResponse | undefined,
 				assetAmount,
 				assetId!

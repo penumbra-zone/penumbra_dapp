@@ -5,13 +5,21 @@ import {
 	BalanceByAddressRequest,
 	BalanceByAddressResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useState,
+} from 'react'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { useAuth } from './AuthContextProvider'
 import { extensionTransport } from '@/lib/extensionTransport'
 import { uint8ToBase64 } from '@/lib/uint8ToBase64'
+import { calculateAmount } from '@/lib/calculateAmount'
 
 export type AssetBalance = {
 	asset?: AssetId
@@ -56,9 +64,11 @@ export const BalanceContextProvider = (props: Props) => {
 				)?.exponent
 			)
 
-			const amount =
-				(Number(i[1].amount?.lo) + 2 ** 64 * Number(i[1].amount?.hi)) /
-				(exponent ? 10 ** exponent : 1)
+			const amount = calculateAmount(
+				Number(i[1].amount?.lo),
+				Number(i[1].amount?.hi),
+				exponent
+			)
 
 			return {
 				[i[0]]: {

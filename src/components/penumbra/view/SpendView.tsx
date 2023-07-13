@@ -1,10 +1,10 @@
+import { getHumanReadableValue } from '@/lib/assets'
 import {
 	SpendView,
 	SpendView_Visible,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
-import { AddressViewComponent } from '../Address'
-import { getActionAssetDetail } from '@/lib/assets'
 import { AssetsResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { AddressViewComponent } from '../Address'
 
 export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
 	switch (view.spendView.case) {
@@ -21,7 +21,7 @@ export const SpendViewComponent: React.FC<{ view: SpendView }> = ({ view }) => {
 					: { denomMetadata: valueView?.value?.denom }
 
 			const assetAmount = valueView?.value?.amount
-			const { assetHumanAmount, asssetHumanDenom } = getActionAssetDetail(
+			const { assetHumanAmount, asssetHumanDenom } = getHumanReadableValue(
 				asset as unknown as AssetsResponse | undefined,
 				assetAmount,
 				assetId!
