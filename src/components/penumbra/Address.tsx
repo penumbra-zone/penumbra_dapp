@@ -25,7 +25,7 @@ export const AddressComponent: React.FC<{
 
 	return (
 		<div style={{ display: 'inline-block' }}>
-			<span className='monospace'>{display_address}</span>
+			<span className='monospace break-all'>{display_address}</span>
 			<span
 				className='cursor-pointer hover:no-underline hover:opacity-75'
 				onClick={handleCopy}
