@@ -45,11 +45,9 @@ export const getHumanReadableValue = (
 				?.exponent || 0
 	}
 
-	const assetHumanAmount = calculateAmount(
-		Number(amount?.lo),
-		Number(amount?.hi),
-		assetExponent
-	)
+	const assetHumanAmount = amount
+		? calculateAmount(Number(amount?.lo), Number(amount?.hi), assetExponent)
+		: 0
 
 	return {
 		assetHumanAmount,
