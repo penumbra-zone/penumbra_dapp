@@ -6,6 +6,7 @@ import { UNKNOWN_ASSET_PREFIX } from '@/lib/constants'
 import { uint8ToBase64 } from '@/lib/uint8ToBase64'
 import {
 	SwapView,
+	SwapView_Opaque,
 	SwapView_Visible,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/dex/v1alpha1/dex_pb'
 import { bech32m } from 'bech32'
@@ -73,6 +74,33 @@ export const SwapViewComponent: React.FC<{ view: SwapView }> = ({ view }) => {
 					{asset1HumanAmount
 						? `${asset1HumanAmount} ${assset1HumanDenom} for ${assset2HumanDenom} and paid claim fee ${feeHumanAmount} ${feeHumanDenom}`
 						: `${asset2HumanAmount} ${assset2HumanDenom} for ${assset1HumanDenom} and paid claim fee ${feeHumanAmount} ${feeHumanDenom}`}
+				</ActionCell>
+			)
+		}
+		case 'opaque': {
+			const opaqueSwap: SwapView_Opaque = view.swapView.value
+
+			const asset1Id = opaqueSwap.swap?.body?.tradingPair?.asset1
+			const asset1 = getAssetByAssetId(assets, uint8ToBase64(asset1Id!.inner!))
+			const asset1Amount = opaqueSwap.swap?.body?.delta1I
+			const { asssetHumanDenom: assset1HumanDenom } = getHumanReadableValue(
+				asset1,
+				asset1Amount,
+				asset1Id!
+			)
+
+			const asset2Id = opaqueSwap.swap?.body?.tradingPair?.asset2
+			const asset2 = getAssetByAssetId(assets, uint8ToBase64(asset2Id!.inner!))
+			const asset2Amount = opaqueSwap.swap?.body?.delta2I
+			const { asssetHumanDenom: assset2HumanDenom } = getHumanReadableValue(
+				asset2,
+				asset2Amount,
+				asset2Id!
+			)
+
+			return (
+				<ActionCell title='Swap'>
+					{`Opaque swap for trading pair: ${assset1HumanDenom} <=> ${assset2HumanDenom}`}
 				</ActionCell>
 			)
 		}

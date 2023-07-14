@@ -36,13 +36,12 @@ export const MemoViewComponent: React.FC<MemoViewComponentProps> = ({
 
 	return (
 		<div className='flex flex-col p-[16px] gap-y-[16px] w-[800px] bg-brown rounded-[10px]'>
-			{memoText === 'Encrypted' ? (
-				<ActionCell title='Sender Address'>
-					<Copy text={memoSender} type='last' />
-				</ActionCell>
-			) : (
-				<ActionCell title='Message'>{memoText}</ActionCell>
-			)}
+			<ActionCell
+				title={memoText === 'Encrypted' ? 'Sender Address' : 'Message'}
+				isEncrypted={memoText === 'Encrypted'}
+			>
+				{memoText}
+			</ActionCell>
 			<ActionCell
 				title='Return Address'
 				isEncrypted={memoSender === 'Encrypted'}
