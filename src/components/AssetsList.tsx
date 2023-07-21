@@ -1,4 +1,4 @@
-import { AssetBalance } from '@/context/BalanceContextProvider'
+import { AssetBalance } from '@/context'
 import { ChevronLeftIcon } from './Svg'
 
 interface IAssetList {

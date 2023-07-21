@@ -1,4 +1,4 @@
-import { getHumanReadableValue } from '@/lib/assets'
+import { getHumanReadableValue } from '@/lib'
 import {
 	OutputView,
 	OutputView_Visible,

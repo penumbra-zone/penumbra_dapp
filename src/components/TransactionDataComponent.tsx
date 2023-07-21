@@ -1,4 +1,4 @@
-import { calculateAmount } from '@/lib/calculateAmount'
+import { calculateAmount } from '@/lib'
 import { TransactionBodyView } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 import React, { useMemo } from 'react'
 import { ActionCell } from './ActionCell'

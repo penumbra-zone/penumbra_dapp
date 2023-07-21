@@ -1,8 +1,10 @@
-import { AuthContextProvider } from '@/context/AuthContextProvider'
 import './globals.css'
 import { Header } from '@/components/Header'
-import { BalanceContextProvider } from '@/context/BalanceContextProvider'
-import { TransactionContextProvider } from '@/context/TransactionContext'
+import {
+	AuthContextProvider,
+	BalanceContextProvider,
+	TransactionContextProvider,
+} from '@/context'
 import { Toaster } from 'react-hot-toast'
 
 export default function RootLayout({

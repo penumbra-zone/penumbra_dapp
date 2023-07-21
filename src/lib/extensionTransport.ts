@@ -4,8 +4,10 @@ import {
 	AddressByIndexRequest,
 	AssetsRequest,
 	AssetsResponse,
-	BalanceByAddressRequest,
-	BalanceByAddressResponse,
+	BalancesRequest,
+	BalancesResponse,
+	// BalanceByAddressRequest,
+	// BalanceByAddressResponse,
 	ChainParametersRequest,
 	ChainParametersResponse,
 	FMDParametersRequest,
@@ -82,11 +84,11 @@ export const extensionTransport = (s: typeof ViewProtocolService) =>
 					yield new AssetsResponse(res as any)
 				}
 			},
-			async *balanceByAddress(message: BalanceByAddressRequest) {
+			async *balances(message: BalancesRequest) {
 				window.penumbra.on('balance', balance => receiveMessage(balance))
 
 				for await (const res of createMessageStream()) {
-					yield new BalanceByAddressResponse(res as any)
+					yield new BalancesResponse(res as any)
 				}
 			},
 			async *notes(message: NotesRequest) {

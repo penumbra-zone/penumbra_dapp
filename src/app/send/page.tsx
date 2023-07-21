@@ -1,20 +1,24 @@
 'use client'
-import { useAuth } from '@/context/AuthContextProvider'
-import { useBalance } from '@/context/BalanceContextProvider'
-import { AddressValidatorsType, validateAddress } from '@/lib/validateAddress'
+
 import { TransactionPlannerRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { useEffect, useMemo, useState } from 'react'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
-import { extensionTransport } from '@/lib/extensionTransport'
-import { setOnlyNumberInput } from '@/lib/setOnlyNumberInput'
-import { routesPath } from '@/lib/constants'
+
 import { ChevronLeftIcon, SearchSvg } from '@/components/Svg'
 import { Input } from '@/components/Input'
 import { Button } from '@/components/Button'
 import { Select } from '@/components/Select'
 import { useRouter } from 'next/navigation'
 import { bech32m } from 'bech32'
+import { useAuth, useBalance } from '@/context'
+import {
+	AddressValidatorsType,
+	routesPath,
+	setOnlyNumberInput,
+	validateAddress,
+	extensionTransport,
+} from '@/lib'
 
 export default function Send() {
 	const { balance } = useBalance()

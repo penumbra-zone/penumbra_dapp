@@ -5,9 +5,8 @@ import { ChevronLeftIcon } from '@/components/Svg'
 import { TransactionDataComponent } from '@/components/TransactionDataComponent'
 import { TransactionHashComponent } from '@/components/penumbra/TransactionHash'
 import { ActionViewComponent } from '@/components/penumbra/view/ActionView'
-import { useAuth } from '@/context/AuthContextProvider'
-import { routesPath } from '@/lib/constants'
-import { extensionTransport } from '@/lib/extensionTransport'
+import { useAuth } from '@/context'
+import { routesPath, extensionTransport } from '@/lib'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import {
 	TransactionInfoByHashRequest,

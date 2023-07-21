@@ -1,10 +1,11 @@
-import { useBalance } from '@/context/BalanceContextProvider'
+
 import { useState } from 'react'
 import { Button } from './Button'
 import { ArrowUpRightSvg, CachedSvg, DowmloadSvg } from './Svg'
-import { routesPath } from '@/lib/constants'
+import { routesPath } from '@/lib'
 import { ReceiveModal } from './ReceiveModal'
 import { useRouter } from 'next/navigation'
+import { useBalance } from '@/context'
 
 interface IBalanceAction {}
 

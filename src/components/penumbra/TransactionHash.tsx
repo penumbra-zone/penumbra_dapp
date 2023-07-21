@@ -1,7 +1,6 @@
 import React from 'react'
 import { CopySvg } from '../Svg'
-import { copyToClipboard } from '@/lib/copyToClipboard'
-import { truncateHash } from '@/lib/text'
+import { copyToClipboard, truncateHash } from '@/lib'
 
 // A transaction hash, optionally in short form, with a copy button
 export const TransactionHashComponent: React.FC<{

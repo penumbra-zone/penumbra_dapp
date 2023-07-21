@@ -1,4 +1,4 @@
-import { truncateAddress, truncateHash } from '@/lib/text'
+import { truncateAddress, truncateHash } from '@/lib'
 import React, { useMemo } from 'react'
 import { toast } from 'react-hot-toast'
 import { CopySvg } from './Svg'

@@ -1,7 +1,6 @@
 import { ActionCell } from '@/components/ActionCell'
-import { useBalance } from '@/context/BalanceContextProvider'
-import { getAssetByAssetId, getHumanReadableValue } from '@/lib/assets'
-import { uint8ToBase64 } from '@/lib/uint8ToBase64'
+import { useBalance } from '@/context'
+import { getAssetByAssetId, getHumanReadableValue, uint8ToBase64 } from '@/lib'
 import { PositionOpen } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/dex/v1alpha1/dex_pb'
 import React from 'react'
 
