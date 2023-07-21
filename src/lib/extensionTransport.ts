@@ -4,8 +4,8 @@ import {
 	AddressByIndexRequest,
 	AssetsRequest,
 	AssetsResponse,
-	BalanceByAddressRequest,
-	BalanceByAddressResponse,
+	BalancesRequest,
+	BalancesResponse,
 	ChainParametersRequest,
 	ChainParametersResponse,
 	FMDParametersRequest,
@@ -26,7 +26,7 @@ import {
 
 export const extensionTransport = (s: typeof ViewProtocolService) =>
 	createRouterTransport(({ service }) => {
-		let receiveMessage: (value: unknown) => void = function () {}
+		let receiveMessage: (value: unknown) => void = function () { }
 		function waitForNextMessage() {
 			return new Promise(resolve => {
 				receiveMessage = resolve
@@ -82,11 +82,11 @@ export const extensionTransport = (s: typeof ViewProtocolService) =>
 					yield new AssetsResponse(res as any)
 				}
 			},
-			async *balanceByAddress(message: BalanceByAddressRequest) {
+			async *balances(message: BalancesRequest) {
 				window.penumbra.on('balance', balance => receiveMessage(balance))
 
 				for await (const res of createMessageStream()) {
-					yield new BalanceByAddressResponse(res as any)
+					yield new BalancesResponse(res as any)
 				}
 			},
 			async *notes(message: NotesRequest) {
