@@ -1,9 +1,12 @@
 'use client'
-import { ActivityList } from '@/components/ActivityList'
-import { AssetsList } from '@/components/AssetsList'
-import { BalanceAction } from '@/components/BalanceAction'
-import { Button } from '@/components/Button'
-import { Tabs } from '@/components/Tabs'
+
+import {
+	ActivityList,
+	AssetsList,
+	BalanceAction,
+	Button,
+	Tabs,
+} from '@/components'
 import { useAuth, useBalance } from '@/context'
 import { useSearchParams } from 'next/navigation'
 

@@ -1,3 +1,4 @@
+"use client"
 import { truncateAddress, truncateHash } from '@/lib'
 import React, { useMemo } from 'react'
 import { toast } from 'react-hot-toast'

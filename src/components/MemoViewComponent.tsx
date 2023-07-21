@@ -1,4 +1,3 @@
-import { Copy } from '@/components/Copy'
 import { MemoView } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 import { bech32m } from 'bech32'
 import React, { useMemo } from 'react'

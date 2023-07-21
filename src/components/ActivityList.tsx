@@ -1,3 +1,5 @@
+"use client"
+
 import { useTransactions } from '@/context'
 import { ArrowUpRightSvg, ChevronLeftIcon } from './Svg'
 import Link from 'next/link'

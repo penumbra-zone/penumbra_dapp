@@ -1,3 +1,5 @@
+"use client"
+
 import { ActionCell } from '@/components/ActionCell'
 import { useBalance } from '@/context'
 import {

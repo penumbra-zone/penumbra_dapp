@@ -1,3 +1,5 @@
+"use client"
+
 import React from 'react'
 import { CopySvg } from '../Svg'
 import { copyToClipboard, truncateHash } from '@/lib'

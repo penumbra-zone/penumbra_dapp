@@ -1,3 +1,5 @@
+"use client"
+
 import { CircularProgressbar } from 'react-circular-progressbar'
 
 type ProgressBarProps = {
