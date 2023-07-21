@@ -6,8 +6,6 @@ import {
 	AssetsResponse,
 	BalancesRequest,
 	BalancesResponse,
-	// BalanceByAddressRequest,
-	// BalanceByAddressResponse,
 	ChainParametersRequest,
 	ChainParametersResponse,
 	FMDParametersRequest,
@@ -85,7 +83,11 @@ export const extensionTransport = (s: typeof ViewProtocolService) =>
 				}
 			},
 			async *balances(message: BalancesRequest) {
-				window.penumbra.on('balance', balance => receiveMessage(balance))
+				window.penumbra.on(
+					'balance',
+					balance => receiveMessage(balance),
+					message.toJson()
+				)
 
 				for await (const res of createMessageStream()) {
 					yield new BalancesResponse(res as any)

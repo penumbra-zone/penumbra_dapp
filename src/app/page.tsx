@@ -7,12 +7,11 @@ import {
 	Button,
 	Tabs,
 } from '@/components'
-import { useAuth, useBalance } from '@/context'
+import { useAuth } from '@/context'
 import { useSearchParams } from 'next/navigation'
 
 export default function Home() {
 	const auth = useAuth()
-	const { balance } = useBalance()
 	const params = useSearchParams()
 
 	return (
@@ -37,11 +36,7 @@ export default function Home() {
 							initial={params.get('tab')}
 							// eslint-disable-next-line react/no-children-prop
 							children={(type: string) =>
-								type === 'Assets' ? (
-									<AssetsList assets={balance} />
-								) : (
-									<ActivityList />
-								)
+								type === 'Assets' ? <AssetsList /> : <ActivityList />
 							}
 							className='bg-brown'
 						/>
