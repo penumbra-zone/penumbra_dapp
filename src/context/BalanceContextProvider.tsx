@@ -2,8 +2,8 @@
 import {
 	AssetsRequest,
 	AssetsResponse,
-	BalanceByAddressRequest,
-	BalanceByAddressResponse,
+	BalancesRequest,
+	BalancesResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { createPromiseClient } from '@bufbuild/connect'
@@ -40,7 +40,7 @@ type Props = {
 export const BalanceContextProvider = (props: Props) => {
 	const auth = useAuth()
 	const [balance, setBalance] = useState<
-		Record<string, BalanceByAddressResponse>
+		Record<string, BalancesResponse>
 	>({})
 	const [assets, setAssets] = useState<AssetsResponse[]>([])
 
@@ -101,9 +101,9 @@ export const BalanceContextProvider = (props: Props) => {
 				extensionTransport(ViewProtocolService)
 			)
 
-			const request = new BalanceByAddressRequest({})
+			const request = new BalancesRequest({})
 
-			for await (const balance of client.balanceByAddress(request)) {
+			for await (const balance of client.balances(request)) {
 				const asset = uint8ToBase64(balance.asset?.inner!)
 
 				setBalance(state => ({
