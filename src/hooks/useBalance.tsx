@@ -6,12 +6,20 @@ import { extensionTransport } from '@/lib'
 import {
 	AssetsResponse,
 	BalancesRequest,
-	BalancesResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import {
+	AddressIndex,
+	DenomMetadata,
+	Value,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 
 export const useBalance = (asset?: AssetsResponse) => {
 	const auth = useAuth()
-	const [balance, setBalance] = useState<BalancesResponse | null>(null)
+	const [balance, setBalance] = useState<{
+		denomMetadata?: DenomMetadata
+		account?: AddressIndex
+		balance?: Value
+	} | null>(null)
 
 	useEffect(() => {
 		if (!auth!.walletAddress) return setBalance(null)
@@ -27,7 +35,7 @@ export const useBalance = (asset?: AssetsResponse) => {
 			}
 
 			for await (const balance of client.balances(request)) {
-				setBalance(balance)
+				setBalance({ ...balance, ...asset })
 			}
 		}
 		getBalances()
