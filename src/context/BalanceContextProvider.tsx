@@ -15,7 +15,7 @@ import { useAuth } from './AuthContextProvider'
 import { calculateAmount, extensionTransport, uint8ToBase64 } from '@/lib'
 
 export type AssetBalance = {
-	asset?: AssetId
+	assetId?: AssetId
 	display: string
 	base: string
 	exponent: number
@@ -76,6 +76,8 @@ export const BalanceContextProvider = (props: Props) => {
 			.map(i => Object.values(i)[0])
 			.filter(i => Number(i.amount))
 	}, [balance, assets])
+
+	console.log(assetBalance)
 
 	useEffect(() => {
 		if (!auth!.walletAddress) return setAssets([])

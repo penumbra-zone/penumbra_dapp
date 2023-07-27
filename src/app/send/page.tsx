@@ -89,7 +89,7 @@ export default function Send() {
 
 	const getTransactionPlan = async () => {
 		try {
-			const selectedAsset = balance.find(i => i.display === select)?.asset
+			const selectedAsset = balance.find(i => i.display === select)?.assetId
 				?.inner!
 
 			const client = createPromiseClient(
