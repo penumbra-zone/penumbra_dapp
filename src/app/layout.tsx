@@ -1,9 +1,10 @@
-'use client'
-import { AuthContextProvider } from '@/context/AuthContextProvider'
 import './globals.css'
-import { Header } from '@/components/Header'
-import { BalanceContextProvider } from '@/context/BalanceContextProvider'
-import { TransactionContextProvider } from '@/context/TransactionContext'
+import { Header } from '@/components'
+import {
+	AuthContextProvider,
+	BalanceContextProvider,
+	TransactionContextProvider,
+} from '@/context'
 import { Toaster } from 'react-hot-toast'
 import { useEffect } from 'react'
 

@@ -1,3 +1,5 @@
+"use client"
+
 import {
 	Address,
 	AddressView,
@@ -5,7 +7,7 @@ import {
 import { bech32m } from 'bech32'
 import React from 'react'
 import { CopySvg } from '../Svg'
-import { copyToClipboard } from '@/lib/copyToClipboard'
+import { copyToClipboard } from '@/lib'
 
 // A Penumbra address in short form with a copy button
 export const AddressComponent: React.FC<{

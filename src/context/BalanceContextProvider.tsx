@@ -2,27 +2,20 @@
 import {
 	AssetsRequest,
 	AssetsResponse,
-	BalanceByAddressRequest,
-	BalanceByAddressResponse,
+	BalancesRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import {
-	createContext,
-	useContext,
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-	useState,
-} from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
-import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import {
+	AssetId,
+	Value,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { useAuth } from './AuthContextProvider'
-import { extensionTransport } from '@/lib/extensionTransport'
-import { uint8ToBase64 } from '@/lib/uint8ToBase64'
-import { calculateAmount } from '@/lib/calculateAmount'
+import { calculateAmount, extensionTransport, uint8ToBase64 } from '@/lib'
 
 export type AssetBalance = {
-	asset?: AssetId
+	assetId?: AssetId
 	display: string
 	base: string
 	exponent: number
@@ -47,9 +40,7 @@ type Props = {
 
 export const BalanceContextProvider = (props: Props) => {
 	const auth = useAuth()
-	const [balance, setBalance] = useState<
-		Record<string, BalanceByAddressResponse>
-	>({})
+	const [balance, setBalance] = useState<Record<string, Value>>({})
 	const [assets, setAssets] = useState<AssetsResponse[]>([])
 
 	const assetBalance: AssetBalance[] = useMemo(() => {
@@ -86,7 +77,9 @@ export const BalanceContextProvider = (props: Props) => {
 			.filter(i => Number(i.amount))
 	}, [balance, assets])
 
-	useLayoutEffect(() => {
+	console.log(assetBalance)
+
+	useEffect(() => {
 		if (!auth!.walletAddress) return setAssets([])
 		const getAssets = async () => {
 			const client = createPromiseClient(
@@ -111,14 +104,14 @@ export const BalanceContextProvider = (props: Props) => {
 				extensionTransport(ViewProtocolService)
 			)
 
-			const request = new BalanceByAddressRequest({})
+			const request = new BalancesRequest({})
 
-			for await (const balance of client.balanceByAddress(request)) {
-				const asset = uint8ToBase64(balance.asset?.inner!)
+			for await (const balance of client.balances(request)) {
+				const asset = uint8ToBase64(balance.balance?.assetId?.inner!)
 
 				setBalance(state => ({
 					...state,
-					[asset]: balance,
+					[asset]: balance.balance!,
 				}))
 			}
 		}

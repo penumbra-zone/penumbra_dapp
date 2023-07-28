@@ -1,4 +1,6 @@
-import { getHumanReadableValue } from '@/lib/assets'
+"use client"
+
+import { getHumanReadableValue } from '@/lib'
 import {
 	SpendView,
 	SpendView_Visible,

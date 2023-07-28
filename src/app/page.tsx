@@ -1,16 +1,17 @@
 'use client'
-import { ActivityList } from '@/components/ActivityList'
-import { AssetsList } from '@/components/AssetsList'
-import { BalanceAction } from '@/components/BalanceAction'
-import { Button } from '@/components/Button'
-import { Tabs } from '@/components/Tabs'
-import { useAuth } from '@/context/AuthContextProvider'
-import { useBalance } from '@/context/BalanceContextProvider'
+
+import {
+	ActivityList,
+	AssetsList,
+	BalanceAction,
+	Button,
+	Tabs,
+} from '@/components'
+import { useAuth } from '@/context'
 import { useSearchParams } from 'next/navigation'
 
 export default function Home() {
 	const auth = useAuth()
-	const { balance } = useBalance()
 	const params = useSearchParams()
 
 	return (
@@ -35,11 +36,7 @@ export default function Home() {
 							initial={params.get('tab')}
 							// eslint-disable-next-line react/no-children-prop
 							children={(type: string) =>
-								type === 'Assets' ? (
-									<AssetsList assets={balance} />
-								) : (
-									<ActivityList />
-								)
+								type === 'Assets' ? <AssetsList /> : <ActivityList />
 							}
 							className='bg-brown'
 						/>

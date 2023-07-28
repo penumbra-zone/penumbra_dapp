@@ -1,18 +1,16 @@
 'use client'
-import { useAuth } from '@/context/AuthContextProvider'
+
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import vercel from '../../public/logo.png'
 import { Button } from './Button'
-
-import { routesPath } from '@/lib/constants'
-import { extensionTransport } from '@/lib/extensionTransport'
-import { truncateAddress } from '@/lib/text'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import { StatusStreamRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { createPromiseClient } from '@bufbuild/connect'
 import Link from 'next/link'
 import { ProgressBar } from './ProgressBar'
+import { useAuth } from '@/context'
+import { extensionTransport, routesPath, truncateAddress } from '@/lib'
 
 const getPercentage = (partialValue: number, totalValue: number): number => {
 	if (!totalValue) return 0

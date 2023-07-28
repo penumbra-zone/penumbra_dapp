@@ -6,8 +6,8 @@ import {
 import { createContext, useContext, useEffect, useState } from 'react'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { extensionTransport } from '@/lib'
 import { useAuth } from './AuthContextProvider'
-import { extensionTransport } from '@/lib/extensionTransport'
 
 type StoreState = {
 	transactions: TransactionInfoResponse[]

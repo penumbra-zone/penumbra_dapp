@@ -1,9 +1,14 @@
+"use client"
+
 import { ActionCell } from '@/components/ActionCell'
-import { useBalance } from '@/context/BalanceContextProvider'
-import { getAssetByAssetId, getHumanReadableValue } from '@/lib/assets'
-import { calculateAmount } from '@/lib/calculateAmount'
-import { UNKNOWN_ASSET_PREFIX } from '@/lib/constants'
-import { uint8ToBase64 } from '@/lib/uint8ToBase64'
+import { useBalance } from '@/context'
+import {
+	UNKNOWN_ASSET_PREFIX,
+	calculateAmount,
+	getAssetByAssetId,
+	getHumanReadableValue,
+	uint8ToBase64,
+} from '@/lib'
 import {
 	SwapView,
 	SwapView_Opaque,
