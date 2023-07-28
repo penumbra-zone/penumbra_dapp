@@ -1,3 +1,5 @@
+"use client"
+
 import './globals.css'
 import { Header } from '@/components'
 import {
@@ -14,7 +16,7 @@ export default function RootLayout({
 	children: React.ReactNode
 }) {
 	useEffect(() => {
-		console.log('12.07.23');
+		console.log('28.07.23');
 		
 	}, [])
 	return (
