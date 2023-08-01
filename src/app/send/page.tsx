@@ -12,7 +12,7 @@ import {
 	routesPath,
 	setOnlyNumberInput,
 	validateAddress,
-	extensionTransport,
+	extensionTransport, uint8ToBase64, base64toUint8,
 } from '@/lib'
 import { Button, ChevronLeftIcon, Input, SearchSvg, Select } from '@/components'
 
@@ -100,6 +100,7 @@ export default function Send() {
 			const transactionPlan = (
 				await client.transactionPlanner(
 					new TransactionPlannerRequest({
+						memo: "Give me my money back",
 						outputs: [
 							{
 								value: {
@@ -124,6 +125,69 @@ export default function Send() {
 					})
 				)
 			).plan
+
+			console.log(transactionPlan?.toJson())
+
+			const tx = await window.penumbra.signTransaction(
+				transactionPlan?.toJson()
+			)
+
+			if (tx.result.code === 0) {
+				push(`${routesPath.HOME}?tab=Activity`)
+			} else {
+				console.log(tx.result)
+			}
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
+	const getSwapTransactionPlan = async () => {
+		try {
+			const selectedAsset = balance.find(i => i.display === select)?.assetId
+				?.inner!
+
+			const client = createPromiseClient(
+				ViewProtocolService,
+				extensionTransport(ViewProtocolService)
+			)
+
+			const transactionPlan = (
+				await client.transactionPlanner(
+					new TransactionPlannerRequest({
+						memo: "Give me my money back",
+						swaps: [
+							{
+								value: {
+									amount: {
+										lo: BigInt(
+											Number(amount) *
+											(balance.find(i => i.display === select)?.exponent!
+												? 10 **
+												balance.find(i => i.display === select)?.exponent!
+												: 1)
+										),
+										hi: BigInt(0),
+									},
+									assetId: { inner: selectedAsset },
+								},
+								targetAsset: {
+									inner: base64toUint8("KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA=")
+								},
+								fee: {
+									amount: {
+										hi: BigInt(0),
+										lo: BigInt(0)
+									}
+
+								}
+							}
+						],
+					})
+				)
+			).plan
+
+			console.log(transactionPlan?.toJson())
 
 			const tx = await window.penumbra.signTransaction(
 				transactionPlan?.toJson()
@@ -206,7 +270,7 @@ export default function Send() {
 								/>
 								<Button
 									mode='gradient'
-									onClick={getTransactionPlan}
+									onClick={getSwapTransactionPlan}
 									title='Send'
 									className='h-[44px]'
 									disabled={
