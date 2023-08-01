@@ -115,7 +115,7 @@ export default function Swap() {
 		setAmount(
 			String(
 				Number(
-					select ? balance.find(i => i.display === select.asset1)?.amount : 0
+					select.asset1 ? balance.find(i => i.display === select.asset1)?.amount : 0
 				)
 			)
 		)
@@ -258,7 +258,7 @@ export default function Swap() {
 									className='h-[44px]'
 									disabled={
 										!Number(amount) ||
-										!select ||
+										!select.asset1 ||
 										balance.find(i => select.asset1 === i.display)!.amount <
 											Number(amount) ||
 										Object.values(isValidate).includes(false)
