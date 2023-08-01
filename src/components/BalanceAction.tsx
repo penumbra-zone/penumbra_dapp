@@ -43,6 +43,7 @@ export const BalanceAction: React.FC<IBalanceAction> = () => {
 								<div className='flex items-center justify-center'>
 									<DowmloadSvg />
 								</div>
+								
 							}
 							className='rounded-[50%] w-[51px]  ext:pt-[14px] tablet:pt-[14px]  ext:pb-[14px] tablet:pb-[14px]'
 						/>

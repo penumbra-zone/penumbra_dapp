@@ -1,40 +1,50 @@
 
+# # version: '3'
+
+# # services:
+# #   penumbra_frontend:
+# #     image: penumbra:latest    
+# #     ports:
+# #       - 9012:9012
+# #     volumes:
+# #       - ./:/penumbra_frontend
+# #       - /usr/src/app/node_modules
+# #       - /usr/src/app/.next
+# #     restart: always
+
 # version: '3'
 
 # services:
-#   penumbra_frontend:
-#     image: penumbra:latest    
-#     ports:
-#       - 9012:9012
+#    penumbra_frontend:
+#     container_name: penumbra_frontend 
+#     build:
+#       context: ./
+#       dockerfile: Dockerfile
+
 #     volumes:
-#       - ./:/penumbra_frontend
-#       - /usr/src/app/node_modules
-#       - /usr/src/app/.next
+#       - ./src:/app/src
+#       - ./public:/app/public
 #     restart: always
+#     ports:
+#       - 9012:3000
+#     networks:
+#       - my_network
+
+#   # Add more containers below (nginx, postgres, etc.)
+
+# # Define a network, which allows containers to communicate
+# # with each other, by using their container name as a hostname
+# networks:
+#   my_network:
+#     external: true
 
 version: '3'
 
 services:
-   penumbra_frontend:
-    container_name: penumbra_frontend
-    image: leverage:penumbra 
-    build:
-      context: ./
-      dockerfile: Dockerfile
-
-    volumes:
-      - ./src:/app/src
-      - ./public:/app/public
-    restart: always
+  penumbra_frontend:
+    image: penumbra:latest    
     ports:
-      - 9012:3000
-    networks:
-      - my_network
-
-  # Add more containers below (nginx, postgres, etc.)
-
-# Define a network, which allows containers to communicate
-# with each other, by using their container name as a hostname
-networks:
-  my_network:
-    external: true
+      - 9012:9012
+    volumes:
+      - ./:/penumbra_frontend
+    restart: always

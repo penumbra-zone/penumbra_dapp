@@ -1,3 +1,5 @@
+"use client"
+
 import './globals.css'
 import { Header } from '@/components'
 import {
@@ -6,12 +8,17 @@ import {
 	TransactionContextProvider,
 } from '@/context'
 import { Toaster } from 'react-hot-toast'
+import { useEffect } from 'react'
 
 export default function RootLayout({
 	children,
 }: {
 	children: React.ReactNode
 }) {
+	useEffect(() => {
+		console.log('28.07.23');
+		
+	}, [])
 	return (
 		<html lang='en'>
 			<body>

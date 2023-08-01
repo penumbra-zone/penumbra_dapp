@@ -60,7 +60,6 @@ export const AuthContextProvider = ({
 		} else {
 			/* Penumbra is not installed */
 			setWalletAddress('')
-			console.log('Please install Penumbra Wallet')
 		}
 	}
 
@@ -75,7 +74,6 @@ export const AuthContextProvider = ({
 			}
 		} else {
 			/* Penumbra is not installed */
-			console.log('Please install Penumbra Wallet')
 		}
 	}
 

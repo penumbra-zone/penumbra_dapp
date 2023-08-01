@@ -11,7 +11,7 @@ export const TransactionDataComponent: React.FC<
 	TransactionDataComponentProps
 > = ({ bodyView }) => {
 	const { chainId, feeText, expiryText } = useMemo(() => {
-		const chainId = bodyView?.chainId
+		const chainId = bodyView?.transactionParameters?.chainId
 
 		const feeAmountValue = bodyView?.fee?.amount
 
@@ -23,8 +23,8 @@ export const TransactionDataComponent: React.FC<
 		const feeText = `${feeAmount} upenumbra`
 
 		const expiryText =
-			String(bodyView?.expiryHeight) !== '0'
-				? `${bodyView?.expiryHeight}`
+			String(bodyView.transactionParameters?.expiryHeight) !== '0'
+				? `${bodyView.transactionParameters?.expiryHeight}`
 				: 'None'
 
 		return { chainId, feeText, expiryText }
