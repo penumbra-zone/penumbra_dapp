@@ -115,7 +115,9 @@ export default function Swap() {
 		setAmount(
 			String(
 				Number(
-					select.asset1 ? balance.find(i => i.display === select.asset1)?.amount : 0
+					select.asset1
+						? balance.find(i => i.display === select.asset1)?.amount
+						: 0
 				)
 			)
 		)
@@ -200,16 +202,17 @@ export default function Swap() {
 						<p className='h1 mt-[24px]'>Swap</p>
 
 						<div className='bg-brown rounded-[10px] w-[100%] flex flex-col justify-between p-[16px]'>
-							<div className='flex flex-col gap-y-[16px]'>
+							<div className='flex flex-col'>
 								<Select
-									labelClassName='h3'
+									labelClassName='h3 mb-[8px]'
 									label='Assets 1:'
 									options={options1}
 									handleChange={handleChangeSelect('asset1')}
 									initialValue={select.asset1}
+									className='mb-[24px]'
 								/>
 								<Input
-									labelClassName='h3 text-light_grey'
+									labelClassName='h3 text-light_grey mb-[8px]'
 									label='Total :'
 									value={amount}
 									isError={
@@ -230,18 +233,20 @@ export default function Swap() {
 									}
 								/>
 								<Select
-									labelClassName='h3'
+									labelClassName='h3 mb-[8px]'
 									label='Assets 2:'
 									options={options2}
 									handleChange={handleChangeSelect('asset2')}
 									initialValue={select.asset2}
 									disable
+									className='mb-[24px]'
 								/>
 								<Input
-									labelClassName='h3 text-light_grey'
+									labelClassName='h3 text-light_grey mb-[8px]'
 									label='Memo :'
 									value={memo}
 									onChange={handleChangeMemo}
+									className='mb-[24px]'
 								/>
 							</div>
 							<div className='w-[100%] flex items-center gap-x-[8px] mt-[24px]'>

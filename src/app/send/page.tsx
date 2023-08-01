@@ -20,6 +20,7 @@ export default function Send() {
 	const { balance } = useBalance()
 	const auth = useAuth()
 	const { push } = useRouter()
+
 	const [reciever, setReciever] = useState<string>('')
 	const [amount, setAmount] = useState<string>('')
 	const [memo, setMemo] = useState<string>('')
@@ -130,6 +131,8 @@ export default function Send() {
 				)
 			).plan
 
+			console.log(transactionPlan?.actions[0].action.value?.getType().typeName)
+
 			const tx = await window.penumbra.signTransaction(
 				transactionPlan?.toJson()
 			)
@@ -173,13 +176,14 @@ export default function Send() {
 							className='w-[100%]'
 						/>
 						<div className='bg-brown rounded-[10px] w-[100%] flex flex-col justify-between p-[16px]'>
-							<div className='flex flex-col gap-y-[16px]'>
+							<div className='flex flex-col'>
 								<Select
-									labelClassName='h3 '
+									labelClassName='h3 mb-[8px]'
 									label='Assets :'
 									options={options}
 									handleChange={handleChangeSelect}
 									initialValue={select}
+									className='mb-[24px]'
 								/>
 								<Input
 									labelClassName='h3 text-light_grey mb-[8px]'
@@ -203,10 +207,11 @@ export default function Send() {
 									}
 								/>
 								<Input
-									labelClassName='h3 text-light_grey'
+									labelClassName='h3 text-light_grey mb-[8px]'
 									label='Memo :'
 									value={memo}
 									onChange={handleChangeMemo}
+									className='mb-[24px]'
 								/>
 							</div>
 							<div className='w-[100%] flex items-center gap-x-[8px] mt-[24px]'>
