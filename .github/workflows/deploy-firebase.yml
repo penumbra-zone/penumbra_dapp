@@ -14,7 +14,7 @@ on:
   # pull_request:
 jobs:
   build:
-    name: Render and deploy protocol and API docs
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the source code
