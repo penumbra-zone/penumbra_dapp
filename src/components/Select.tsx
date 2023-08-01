@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react'
 import SelectComponent, {
@@ -23,6 +23,7 @@ type SelectPropsType = {
 	className?: string
 	isError?: boolean
 	labelClassName?: string
+	disable?: boolean
 	handleChange?: (value: string) => void
 	onInputChange?: (value: string) => void
 }
@@ -37,6 +38,7 @@ export const Select: React.FC<SelectPropsType> = ({
 	className,
 	isError,
 	labelClassName,
+	disable = false,
 	handleChange,
 	onInputChange,
 	...props
@@ -115,6 +117,7 @@ export const Select: React.FC<SelectPropsType> = ({
 					}`}
 				>
 					<SelectComponent
+						isDisabled={disable}
 						ref={inputRef}
 						classNamePrefix='custom_select'
 						//@ts-ignore

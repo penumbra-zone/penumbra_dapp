@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState } from 'react'
 import { Button } from './Button'
@@ -18,7 +18,7 @@ export const BalanceAction: React.FC<IBalanceAction> = () => {
 
 	const handleReceive = () => toogleModal(true)
 	const onClose = () => toogleModal(false)
-	const gotoSend = () => push(routesPath.SEND)
+	const goto = (route: string) => () => push(route)
 
 	return (
 		<>
@@ -43,7 +43,6 @@ export const BalanceAction: React.FC<IBalanceAction> = () => {
 								<div className='flex items-center justify-center'>
 									<DowmloadSvg />
 								</div>
-								
 							}
 							className='rounded-[50%] w-[51px]  ext:pt-[14px] tablet:pt-[14px]  ext:pb-[14px] tablet:pb-[14px]'
 						/>
@@ -58,7 +57,7 @@ export const BalanceAction: React.FC<IBalanceAction> = () => {
 								</div>
 							}
 							className='rounded-[50%] w-[51px] ext:pt-[14px] tablet:pt-[14px]  ext:pb-[14px] tablet:pb-[14px]'
-							onClick={gotoSend}
+							onClick={goto(routesPath.SEND)}
 						/>
 						{/* </Link> */}
 						<p className='text_button pt-[8px]'>Send</p>
@@ -66,15 +65,15 @@ export const BalanceAction: React.FC<IBalanceAction> = () => {
 					<div className='flex flex-col items-center'>
 						<Button
 							mode='gradient'
-							disabled
 							title={
 								<div className='flex items-center justify-center'>
 									<CachedSvg />
 								</div>
 							}
 							className='rounded-[50%] w-[51px]  ext:pt-[14px] tablet:pt-[14px] ext:pb-[14px] tablet:pb-[14px]'
+							onClick={goto(routesPath.SWAP)}
 						/>
-						<p className='text_button pt-[8px]'>Exchange</p>
+						<p className='text_button pt-[8px]'>Swap</p>
 					</div>
 				</div>
 			</div>
