@@ -5,26 +5,28 @@ import { useEffect, useMemo, useState } from 'react'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import { useRouter } from 'next/navigation'
-import { bech32m } from 'bech32'
 import { useAuth, useBalance } from '@/context'
 import {
 	AddressValidatorsType,
 	routesPath,
 	setOnlyNumberInput,
-	validateAddress,
 	extensionTransport,
 } from '@/lib'
-import { Button, ChevronLeftIcon, Input, SearchSvg, Select } from '@/components'
+import { Button, ChevronLeftIcon, Input, Select } from '@/components'
 
-export default function Send() {
+export default function Swap() {
 	const { balance } = useBalance()
 	const auth = useAuth()
 	const { push } = useRouter()
-
-	const [reciever, setReciever] = useState<string>('')
 	const [amount, setAmount] = useState<string>('')
 	const [memo, setMemo] = useState<string>('')
-	const [select, setSelect] = useState<string>('')
+	const [select, setSelect] = useState<{
+		asset1: string
+		asset2: string
+	}>({
+		asset1: '',
+		asset2: 'penumbra',
+	})
 	const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
 		{} as AddressValidatorsType
 	)
@@ -32,47 +34,71 @@ export default function Send() {
 	useEffect(() => {
 		if (!auth.walletAddress) {
 			setAmount('')
-			setReciever('')
-			setSelect('')
+			setSelect({
+				asset1: '',
+				asset2: 'penumbra',
+			})
 			setIsValidate({} as AddressValidatorsType)
 		}
 	}, [auth.walletAddress])
 
-	const options = useMemo(() => {
+	const options1 = useMemo(() => {
 		if (!balance.length) return []
-		return balance.map(i => {
-			if (!i.display) return { value: '', label: '' }
-			return {
-				value: i.display,
-				label: (
-					<div className='flex flex-col'>
-						<p className='text_numbers break-all'>{i.display}</p>
-						<div className='flex items-center'>
-							<p className='text_body text-light_grey'>Balance:</p>
-							<p className='text_numbers_s text-light_grey ml-[16px]'>
-								{i.amount.toLocaleString('en-US', {
-									minimumFractionDigits: 2,
-									maximumFractionDigits: 20,
-								})}
-							</p>
+		return balance
+			.filter(i => i.display === 'gm' || i.display === 'gn')
+			.map(i => {
+				if (!i.display) return { value: '', label: '' }
+				return {
+					value: i.display,
+					label: (
+						<div className='flex flex-col'>
+							<p className='text_numbers break-all'>{i.display}</p>
+							<div className='flex items-center'>
+								<p className='text_body text-light_grey'>Balance:</p>
+								<p className='text_numbers_s text-light_grey ml-[16px]'>
+									{i.amount.toLocaleString('en-US', {
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 20,
+									})}
+								</p>
+							</div>
 						</div>
-					</div>
-				),
-			}
-		})
+					),
+				}
+			})
 	}, [balance])
 
-	const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setReciever(event.target.value)
-		const validators = validateAddress(event.target.value)
-		setIsValidate(state => ({
-			...state,
-			...validators,
-		}))
-		if (!event.target.value) setIsValidate({} as AddressValidatorsType)
-	}
+	const options2 = useMemo(() => {
+		if (!balance.length) return []
+		return balance
+			.filter(i => i.display === 'penumbra')
+			.map(i => {
+				if (!i.display) return { value: '', label: '' }
+				return {
+					value: i.display,
+					label: (
+						<div className='flex flex-col'>
+							<p className='text_numbers break-all'>{i.display}</p>
+							<div className='flex items-center'>
+								<p className='text_body text-light_grey'>Balance:</p>
+								<p className='text_numbers_s text-light_grey ml-[16px]'>
+									{i.amount.toLocaleString('en-US', {
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 20,
+									})}
+								</p>
+							</div>
+						</div>
+					),
+				}
+			})
+	}, [balance])
 
-	const handleChangeSelect = (value: string) => setSelect(value)
+	const handleChangeSelect = (type: string) => (value: string) =>
+		setSelect(state => ({
+			...state,
+			[type]: value,
+		}))
 
 	const handleChangeAmout = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value, notShow, valueFloat } = setOnlyNumberInput(
@@ -88,14 +114,21 @@ export default function Send() {
 	const handleMax = () =>
 		setAmount(
 			String(
-				Number(select ? balance.find(i => i.display === select)?.amount : 0)
+				Number(
+					select.asset1
+						? balance.find(i => i.display === select.asset1)?.amount
+						: 0
+				)
 			)
 		)
 
-	const getTransactionPlan = async () => {
+	const getSwapTransactionPlan = async () => {
 		try {
-			const selectedAsset = balance.find(i => i.display === select)?.assetId
-				?.inner!
+			const selectedAsset1 = balance.find(i => i.display === select.asset1)
+				?.assetId?.inner!
+
+			const selectedAsset2 = balance.find(i => i.display === select.asset2)
+				?.assetId?.inner!
 
 			const client = createPromiseClient(
 				ViewProtocolService,
@@ -106,32 +139,37 @@ export default function Send() {
 				await client.transactionPlanner(
 					new TransactionPlannerRequest({
 						memo,
-						outputs: [
+						swaps: [
 							{
 								value: {
 									amount: {
 										lo: BigInt(
 											Number(amount) *
-												(balance.find(i => i.display === select)?.exponent!
+												(balance.find(i => i.display === select.asset1)
+													?.exponent!
 													? 10 **
-													  balance.find(i => i.display === select)?.exponent!
+													  balance.find(i => i.display === select.asset1)
+															?.exponent!
 													: 1)
 										),
 										hi: BigInt(0),
 									},
-									assetId: { inner: selectedAsset },
+									assetId: { inner: selectedAsset1 },
 								},
-								address: {
-									inner: new Uint8Array(bech32m.decode(reciever, 160).words),
-									altBech32m: reciever,
+								targetAsset: {
+									inner: selectedAsset2,
+								},
+								fee: {
+									amount: {
+										hi: BigInt(0),
+										lo: BigInt(0),
+									},
 								},
 							},
 						],
 					})
 				)
 			).plan
-
-			console.log(transactionPlan?.actions[0].action.value?.getType().typeName)
 
 			const tx = await window.penumbra.signTransaction(
 				transactionPlan?.toJson()
@@ -143,7 +181,7 @@ export default function Send() {
 				console.log(tx.result)
 			}
 		} catch (error) {
-			console.log(error)
+			console.error(error)
 		}
 	}
 
@@ -161,28 +199,16 @@ export default function Send() {
 							iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
 							className='self-start'
 						/>
-						<p className='h1 mt-[24px]'>Send to address</p>
-						<Input
-							placeholder='Search address...'
-							value={reciever}
-							isError={Object.values(isValidate).includes(false)}
-							onChange={handleChangeSearch}
-							leftSvg={
-								<span className='ml-[24px] mr-[9px]'>
-									<SearchSvg stroke='#E0E0E0' />
-								</span>
-							}
-							helperText='Invalid recipient address'
-							className='w-[100%]'
-						/>
+						<p className='h1 mt-[24px]'>Swap</p>
+
 						<div className='bg-brown rounded-[10px] w-[100%] flex flex-col justify-between p-[16px]'>
 							<div className='flex flex-col'>
 								<Select
 									labelClassName='h3 mb-[8px]'
-									label='Assets :'
-									options={options}
-									handleChange={handleChangeSelect}
-									initialValue={select}
+									label='Assets 1:'
+									options={options1}
+									handleChange={handleChangeSelect('asset1')}
+									initialValue={select.asset1}
 									className='mb-[24px]'
 								/>
 								<Input
@@ -190,8 +216,8 @@ export default function Send() {
 									label='Total :'
 									value={amount}
 									isError={
-										select
-											? balance.find(i => select === i.display)!.amount <
+										select.asset1
+											? balance.find(i => select.asset1 === i.display)!.amount <
 											  Number(amount)
 											: false
 									}
@@ -205,6 +231,15 @@ export default function Send() {
 											Max
 										</div>
 									}
+								/>
+								<Select
+									labelClassName='h3 mb-[8px]'
+									label='Assets 2:'
+									options={options2}
+									handleChange={handleChangeSelect('asset2')}
+									initialValue={select.asset2}
+									disable
+									className='mb-[24px]'
 								/>
 								<Input
 									labelClassName='h3 text-light_grey mb-[8px]'
@@ -223,15 +258,14 @@ export default function Send() {
 								/>
 								<Button
 									mode='gradient'
-									onClick={getTransactionPlan}
+									onClick={getSwapTransactionPlan}
 									title='Send'
 									className='h-[44px]'
 									disabled={
 										!Number(amount) ||
-										!select ||
-										balance.find(i => select === i.display)!.amount <
+										!select.asset1 ||
+										balance.find(i => select.asset1 === i.display)!.amount <
 											Number(amount) ||
-										!reciever ||
 										Object.values(isValidate).includes(false)
 									}
 								/>

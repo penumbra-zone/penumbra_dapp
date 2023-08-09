@@ -63,12 +63,8 @@ export const Input: React.FC<InputProps> = ({
 						{leftSvg}
 						<input
 							ref={inputRef}
-							className={`${
-								customType === 'password'
-									? 'w-[calc(100%-80px)]'
-									: 'w-[calc(100%-40px)]'
-							} h-[42px] rounded-[10px] border-[none] px-[5px] bg-transparent text_body ${leftSvg ? '': 'pl-[12px]'}
-              active:outline-none focus:outline-none placeholder:text-[#524B4B] placeholder:text_body`}
+							className={`w-[100%] h-[42px] rounded-[10px] border-[none] bg-transparent text_body
+              active:outline-none focus:outline-none placeholder:text-[#524B4B] placeholder:text_body px-[20px]`}
 							onBlur={inputBlurHandler}
 							placeholder={placeholder}
 							type='text'
