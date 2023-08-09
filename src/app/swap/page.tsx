@@ -1,6 +1,9 @@
 'use client'
 
-import { TransactionPlannerRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import {
+	AddressByIndexRequest,
+	TransactionPlannerRequest
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { useEffect, useMemo, useState } from 'react'
 import { createPromiseClient } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
@@ -135,10 +138,24 @@ export default function Swap() {
 				extensionTransport(ViewProtocolService)
 			)
 
+			// TODO If the user chose to hide the sender's address, we should get ephemeral address instead of addressByIndex
+			const request = new AddressByIndexRequest({
+				addressIndex: {
+					account: 0,
+				},
+			})
+			const {address} = await client.addressByIndex(request)
+
+
 			const transactionPlan = (
 				await client.transactionPlanner(
 					new TransactionPlannerRequest({
-						memo,
+						memo: {
+							text: memo,
+							sender: {
+								altBech32m: address?.altBech32m
+							}
+						},
 						swaps: [
 							{
 								value: {
