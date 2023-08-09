@@ -8,6 +8,8 @@ import {
 	BalancesResponse,
 	ChainParametersRequest,
 	ChainParametersResponse,
+	EphemeralAddressRequest,
+	EphemeralAddressResponse,
 	FMDParametersRequest,
 	FMDParametersResponse,
 	NotesRequest,
@@ -68,6 +70,11 @@ export const extensionTransport = (s: typeof ViewProtocolService) =>
 
 				return new ChainParametersResponse(response)
 			},
+			ephemeralAddress: async (message: EphemeralAddressRequest) => {
+				const response = await window.penumbra.getEphemeralAddress(message)
+				return new EphemeralAddressResponse(response)
+			},
+
 			async *statusStream(message: StatusStreamRequest) {
 				window.penumbra.on('status', status => receiveMessage(status))
 

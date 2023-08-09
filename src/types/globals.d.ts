@@ -5,6 +5,8 @@ import {
 	AssetsResponse,
 	ChainParametersRequest,
 	ChainParametersResponse,
+	EphemeralAddressRequest,
+	EphemeralAddressResponse,
 	FMDParametersRequest,
 	FMDParametersResponse,
 	NotesRequest,
@@ -56,10 +58,12 @@ export declare namespace Penumbra {
 		getAddressByIndex: (
 			request: AddressByIndexRequest
 		) => Promise<AddressByIndexResponse>
-
 		getTransactionPlanner: (
 			request: TransactionPlannerRequest
 		) => Promise<TransactionPlannerResponse>
+		getEphemeralAddress: (
+			request: EphemeralAddressRequest
+		) => Promise<EphemeralAddressResponse>
 	}
 }
 
