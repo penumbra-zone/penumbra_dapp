@@ -16,7 +16,7 @@ export default function RootLayout({
 	children: React.ReactNode
 }) {
 	useEffect(() => {
-		console.log('28.07.23');
+		console.log('09.08.23');
 		
 	}, [])
 	return (
