@@ -1,48 +1,28 @@
 'use client'
 
-import {
-	AddressByIndexRequest,
-	TransactionPlannerRequest
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { useEffect, useMemo, useState } from 'react'
-import { createPromiseClient } from '@bufbuild/connect'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth, useBalance } from '@/context'
-import {
-	AddressValidatorsType,
-	routesPath,
-	setOnlyNumberInput,
-	extensionTransport,
-} from '@/lib'
+import { routesPath } from '@/lib'
 import { Button, ChevronLeftIcon, Input, Select } from '@/components'
+import { useTransactionPlanner } from '@/hooks'
 
 export default function Swap() {
 	const { balance } = useBalance()
 	const auth = useAuth()
 	const { push } = useRouter()
-	const [amount, setAmount] = useState<string>('')
-	const [memo, setMemo] = useState<string>('')
-	const [select, setSelect] = useState<{
-		asset1: string
-		asset2: string
-	}>({
-		asset1: '',
-		asset2: 'penumbra',
-	})
-	const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
-		{} as AddressValidatorsType
-	)
+	const {
+		values,
+		isValidate,
+		handleChangeSelect,
+		handleChangeInput,
+		sendTransaction,
+		handleMax,
+		clearState,
+	} = useTransactionPlanner('swaps')
 
 	useEffect(() => {
-		if (!auth.walletAddress) {
-			setAmount('')
-			setSelect({
-				asset1: '',
-				asset2: 'penumbra',
-			})
-			setIsValidate({} as AddressValidatorsType)
-		}
+		if (!auth.walletAddress) clearState()
 	}, [auth.walletAddress])
 
 	const options1 = useMemo(() => {
@@ -97,111 +77,6 @@ export default function Swap() {
 			})
 	}, [balance])
 
-	const handleChangeSelect = (type: string) => (value: string) =>
-		setSelect(state => ({
-			...state,
-			[type]: value,
-		}))
-
-	const handleChangeAmout = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const { value, notShow, valueFloat } = setOnlyNumberInput(
-			event.target.value
-		)
-		if (isNaN(valueFloat) || notShow) return
-		setAmount(value)
-	}
-
-	const handleChangeMemo = (event: React.ChangeEvent<HTMLInputElement>) =>
-		setMemo(event.target.value)
-
-	const handleMax = () =>
-		setAmount(
-			String(
-				Number(
-					select.asset1
-						? balance.find(i => i.display === select.asset1)?.amount
-						: 0
-				)
-			)
-		)
-
-	const getSwapTransactionPlan = async () => {
-		try {
-			const selectedAsset1 = balance.find(i => i.display === select.asset1)
-				?.assetId?.inner!
-
-			const selectedAsset2 = balance.find(i => i.display === select.asset2)
-				?.assetId?.inner!
-
-			const client = createPromiseClient(
-				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
-			)
-
-			// TODO If the user chose to hide the sender's address, we should get ephemeral address instead of addressByIndex
-			const request = new AddressByIndexRequest({
-				addressIndex: {
-					account: 0,
-				},
-			})
-			const {address} = await client.addressByIndex(request)
-
-
-			const transactionPlan = (
-				await client.transactionPlanner(
-					new TransactionPlannerRequest({
-						memo: {
-							text: memo,
-							sender: {
-								altBech32m: address?.altBech32m
-							}
-						},
-						swaps: [
-							{
-								value: {
-									amount: {
-										lo: BigInt(
-											Number(amount) *
-												(balance.find(i => i.display === select.asset1)
-													?.exponent!
-													? 10 **
-													  balance.find(i => i.display === select.asset1)
-															?.exponent!
-													: 1)
-										),
-										hi: BigInt(0),
-									},
-									assetId: { inner: selectedAsset1 },
-								},
-								targetAsset: {
-									inner: selectedAsset2,
-								},
-								fee: {
-									amount: {
-										hi: BigInt(0),
-										lo: BigInt(0),
-									},
-								},
-							},
-						],
-					})
-				)
-			).plan
-
-			const tx = await window.penumbra.signTransaction(
-				transactionPlan?.toJson()
-			)
-
-			if (tx.result.code === 0) {
-				push(`${routesPath.HOME}?tab=Activity`)
-			} else {
-				console.log(tx.result)
-			}
-		} catch (error) {
-			console.error(error)
-		}
-	}
-
 	const handleBack = () => push(routesPath.HOME)
 
 	return (
@@ -222,23 +97,23 @@ export default function Swap() {
 							<div className='flex flex-col'>
 								<Select
 									labelClassName='h3 mb-[8px]'
-									label='Assets 1:'
+									label='From :'
 									options={options1}
 									handleChange={handleChangeSelect('asset1')}
-									initialValue={select.asset1}
+									initialValue={values.asset2}
 									className='mb-[24px]'
 								/>
 								<Input
 									labelClassName='h3 text-light_grey mb-[8px]'
 									label='Total :'
-									value={amount}
+									value={values.amount}
 									isError={
-										select.asset1
-											? balance.find(i => select.asset1 === i.display)!.amount <
-											  Number(amount)
+										values.asset1
+											? balance.find(i => values.asset1 === i.display)!.amount <
+											  Number(values.amount)
 											: false
 									}
-									onChange={handleChangeAmout}
+									onChange={handleChangeInput('amount')}
 									helperText={'You do not have enough token'}
 									rightElement={
 										<div
@@ -251,18 +126,11 @@ export default function Swap() {
 								/>
 								<Select
 									labelClassName='h3 mb-[8px]'
-									label='Assets 2:'
+									label='To :'
 									options={options2}
 									handleChange={handleChangeSelect('asset2')}
-									initialValue={select.asset2}
+									initialValue={values.asset2}
 									disable
-									className='mb-[24px]'
-								/>
-								<Input
-									labelClassName='h3 text-light_grey mb-[8px]'
-									label='Memo :'
-									value={memo}
-									onChange={handleChangeMemo}
 									className='mb-[24px]'
 								/>
 							</div>
@@ -275,14 +143,14 @@ export default function Swap() {
 								/>
 								<Button
 									mode='gradient'
-									onClick={getSwapTransactionPlan}
+									onClick={sendTransaction}
 									title='Send'
 									className='h-[44px]'
 									disabled={
-										!Number(amount) ||
-										!select.asset1 ||
-										balance.find(i => select.asset1 === i.display)!.amount <
-											Number(amount) ||
+										!Number(values.amount) ||
+										!values.asset1 ||
+										balance.find(i => values.asset1 === i.display)!.amount <
+											Number(values.amount) ||
 										Object.values(isValidate).includes(false)
 									}
 								/>
