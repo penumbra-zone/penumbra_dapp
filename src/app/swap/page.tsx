@@ -1,11 +1,14 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth, useBalance } from '@/context'
-import { routesPath } from '@/lib'
 import { Button, ChevronLeftIcon, Input, Select } from '@/components'
-import { useTransactionPlanner } from '@/hooks'
+import { useAuth, useBalance } from '@/context'
+import { useTransactionValues } from '@/hooks'
+import { extensionTransport, routesPath } from '@/lib'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { TransactionPlannerRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { createPromiseClient } from '@bufbuild/connect'
+import { useRouter } from 'next/navigation'
+import { useEffect, useMemo } from 'react'
 
 export default function Swap() {
 	const { balance } = useBalance()
@@ -16,10 +19,9 @@ export default function Swap() {
 		isValidate,
 		handleChangeSelect,
 		handleChangeInput,
-		sendTransaction,
 		handleMax,
 		clearState,
-	} = useTransactionPlanner('swaps')
+	} = useTransactionValues()
 
 	useEffect(() => {
 		if (!auth.walletAddress) clearState()
@@ -78,6 +80,66 @@ export default function Swap() {
 	}, [balance])
 
 	const handleBack = () => push(routesPath.HOME)
+
+	const sendTransaction = async () => {
+		try {
+			const asset1 = balance.find(i => i.display === values.asset1)
+
+			const asset2 = balance.find(i => i.display === values.asset2)
+
+			if (!asset1 || !asset2 || !values.amount) return
+
+			const asset1Exponent = asset1.exponent
+
+			const client = createPromiseClient(
+				ViewProtocolService,
+				extensionTransport(ViewProtocolService)
+			)
+
+			const value = {
+				amount: {
+					lo: BigInt(
+						Number(values.amount) * (asset1Exponent ? 10 ** asset1Exponent : 1)
+					),
+					hi: BigInt(0),
+				},
+				assetId: { inner: asset1.assetId?.inner },
+			}
+
+			const fee = {
+				amount: {
+					hi: BigInt(0),
+					lo: BigInt(0),
+				},
+			}
+
+			const transactionPlan = (
+				await client.transactionPlanner(
+					new TransactionPlannerRequest({
+						swaps: [
+							{
+								value,
+								targetAsset: asset2.assetId,
+								fee,
+							},
+						],
+					})
+				)
+			).plan
+
+			const tx = await window.penumbra.signTransaction(
+				transactionPlan?.toJson()
+			)
+
+			if (tx.result.code === 0) {
+				push(`${routesPath.HOME}?tab=Activity`)
+			} else {
+				console.log(tx.result)
+			}
+		} catch (error) {
+			console.log(error)
+		}
+	}
 
 	return (
 		<>

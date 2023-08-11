@@ -1,9 +1,5 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth, useBalance } from '@/context'
-import { routesPath } from '@/lib'
 import {
 	Button,
 	ChevronLeftIcon,
@@ -12,7 +8,20 @@ import {
 	Select,
 	Toogle,
 } from '@/components'
-import { useTransactionPlanner } from '@/hooks'
+import { useAuth, useBalance } from '@/context'
+import { useTransactionValues } from '@/hooks'
+import { extensionTransport, routesPath } from '@/lib'
+import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import {
+	AddressByIndexRequest,
+	EphemeralAddressRequest,
+	TransactionPlannerRequest,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { createPromiseClient } from '@bufbuild/connect'
+import { bech32m } from 'bech32'
+import { useRouter } from 'next/navigation'
+import { useEffect, useMemo } from 'react'
 
 export default function Send() {
 	const { balance } = useBalance()
@@ -24,11 +33,10 @@ export default function Send() {
 		isValidate,
 		handleChangeSelect,
 		handleChangeInput,
-		sendTransaction,
 		handleMax,
 		clearState,
 		handleCheck,
-	} = useTransactionPlanner('outputs')
+	} = useTransactionValues()
 
 	useEffect(() => {
 		if (!auth.walletAddress) clearState()
@@ -59,6 +67,92 @@ export default function Send() {
 	}, [balance])
 
 	const handleBack = () => push(routesPath.HOME)
+
+	const sendTransaction = async () => {
+		try {
+			const asset = balance.find(i => i.display === values.asset1)
+
+			if (!asset || !values.reciever || !values.amount) return
+
+			const assetExponent = asset.exponent
+
+			const client = createPromiseClient(
+				ViewProtocolService,
+				extensionTransport(ViewProtocolService)
+			)
+
+			let address: Address | undefined
+
+			const addressIndex = {
+				account: 0,
+			}
+
+			if (!values.hideAddress) {
+				const request = new AddressByIndexRequest({
+					addressIndex,
+				})
+				const addressByIndex = await client.addressByIndex(request)
+				address = addressByIndex.address
+			} else {
+				const request = new EphemeralAddressRequest({
+					addressIndex,
+				})
+
+				const ephemeralAddress = await client.ephemeralAddress(request)
+				address = ephemeralAddress.address
+			}
+
+			if (!address) return
+
+			const value = {
+				amount: {
+					lo: BigInt(
+						Number(values.amount) * (assetExponent ? 10 ** assetExponent : 1)
+					),
+					hi: BigInt(0),
+				},
+				assetId: { inner: asset.assetId?.inner },
+			}
+
+			const receiverAddress = {
+				altBech32m: values.reciever!,
+				inner: new Uint8Array(bech32m.decode(values.reciever!, 160).words),
+			}
+
+			const memo = {
+				text: values.memo,
+				sender: {
+					altBech32m: address?.altBech32m,
+				},
+			}
+
+			const transactionPlan = (
+				await client.transactionPlanner(
+					new TransactionPlannerRequest({
+						memo,
+						outputs: [
+							{
+								value,
+								address: receiverAddress,
+							},
+						],
+					})
+				)
+			).plan
+
+			const tx = await window.penumbra.signTransaction(
+				transactionPlan?.toJson()
+			)
+
+			if (tx.result.code === 0) {
+				push(`${routesPath.HOME}?tab=Activity`)
+			} else {
+				console.log(tx.result)
+			}
+		} catch (error) {
+			console.log(error)
+		}
+	}
 
 	return (
 		<>
