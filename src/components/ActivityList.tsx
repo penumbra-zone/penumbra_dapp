@@ -1,13 +1,54 @@
-"use client"
+'use client'
 
 import { useTransactions } from '@/context'
 import { ArrowUpRightSvg, ChevronLeftIcon } from './Svg'
 import Link from 'next/link'
 import { TransactionHashComponent } from './penumbra/TransactionHash'
-import { getTransactionType, routesPath, uint8ToBase64 } from '@/lib'
+import {
+	createViewServiceClient,
+	getTransactionType,
+	routesPath,
+	uint8ToBase64,
+} from '@/lib'
+import {
+	TransactionInfoResponse,
+	TransactionPlannerRequest,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { Button } from './Button'
+import { Swap } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/dex/v1alpha1/dex_pb'
 
 export const ActivityList = () => {
 	const { transactions } = useTransactions()
+
+	const swapClaim = (tx: TransactionInfoResponse) => async () => {
+		try {
+			const client = createViewServiceClient()
+
+			const swapValue = tx.txInfo?.transaction?.body?.actions.find(
+				i => i.action.case === 'swap'
+			)?.action.value as Swap
+
+			if (!swapValue) return
+
+			const swapCommitment = swapValue.body?.payload?.commitment
+
+			const transactionPlan = (
+				await client.transactionPlanner(
+					new TransactionPlannerRequest({
+						swapClaims: [
+							{
+								swapCommitment,
+							},
+						],
+					})
+				)
+			).plan
+
+			await window.penumbra.signTransaction(transactionPlan?.toJson())
+		} catch (error) {
+			console.log(error)
+		}
+	}
 
 	return (
 		<div className='w-[100%] flex flex-col items-center'>
@@ -35,14 +76,23 @@ export const ActivityList = () => {
 									/>
 								</div>
 							</div>
-							<Link
-								href={`${routesPath.TRANSACTION}?hash=${uint8ToBase64(
-									i.txInfo?.id?.hash!
-								)}`}
-								className='rotate-180 cursor-pointer'
-							>
-								<ChevronLeftIcon />
-							</Link>
+							<div className='flex'>
+								{getTransactionType(i.txInfo?.view) === 'Swap' && (
+									<Button
+										mode='icon_transparent'
+										title='claim'
+										onClick={swapClaim(i)}
+									/>
+								)}
+								<Link
+									href={`${routesPath.TRANSACTION}?hash=${uint8ToBase64(
+										i.txInfo?.id?.hash!
+									)}`}
+									className='rotate-180 cursor-pointer'
+								>
+									<ChevronLeftIcon />
+								</Link>
+							</div>
 						</div>
 					)
 				})}
