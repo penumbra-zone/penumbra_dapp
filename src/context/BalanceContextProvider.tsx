@@ -5,14 +5,16 @@ import {
 	BalancesRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { createPromiseClient } from '@bufbuild/connect'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import {
 	AssetId,
 	Value,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { useAuth } from './AuthContextProvider'
-import { calculateAmount, extensionTransport, uint8ToBase64 } from '@/lib'
+import {
+	calculateAmount,
+	createViewServiceClient,
+	uint8ToBase64,
+} from '@/lib'
 
 export type AssetBalance = {
 	assetId?: AssetId
@@ -82,10 +84,7 @@ export const BalanceContextProvider = (props: Props) => {
 	useEffect(() => {
 		if (!auth!.walletAddress) return setAssets([])
 		const getAssets = async () => {
-			const client = createPromiseClient(
-				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
-			)
+			const client = createViewServiceClient()
 
 			const assetsRequest = new AssetsRequest({})
 
@@ -99,10 +98,7 @@ export const BalanceContextProvider = (props: Props) => {
 	useEffect(() => {
 		if (!auth!.walletAddress) return setBalance({})
 		const getBalances = async () => {
-			const client = createPromiseClient(
-				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
-			)
+			const client = createViewServiceClient()
 
 			const request = new BalancesRequest({})
 

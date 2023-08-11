@@ -1,10 +1,8 @@
-"use client"
+'use client'
 
 import React, { useEffect, useState } from 'react'
-import { createPromiseClient } from '@bufbuild/connect'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import { AddressByIndexRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { extensionTransport } from '@/lib'
+import { createViewServiceClient } from '@/lib'
 import { ModalProps, ModalWrapper } from './ModalWrapper'
 import { AddressComponent } from './penumbra/Address'
 import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
@@ -14,10 +12,7 @@ export const ReceiveModal: React.FC<ModalProps> = ({ show, onClose }) => {
 
 	useEffect(() => {
 		const getAddressByIndex = async () => {
-			const client = createPromiseClient(
-				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
-			)
+			const client = createViewServiceClient()
 			const request = new AddressByIndexRequest({
 				addressIndex: {
 					account: 0,

@@ -3,10 +3,8 @@
 import { Button, ChevronLeftIcon, Input, Select } from '@/components'
 import { useAuth, useBalance } from '@/context'
 import { useTransactionValues } from '@/hooks'
-import { extensionTransport, routesPath } from '@/lib'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { createViewServiceClient, routesPath } from '@/lib'
 import { TransactionPlannerRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { createPromiseClient } from '@bufbuild/connect'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo } from 'react'
 
@@ -91,10 +89,7 @@ export default function Swap() {
 
 			const asset1Exponent = asset1.exponent
 
-			const client = createPromiseClient(
-				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
-			)
+			const client = createViewServiceClient()
 
 			const value = {
 				amount: {

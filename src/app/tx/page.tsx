@@ -9,13 +9,12 @@ import {
 	TransactionHashComponent,
 } from '@/components'
 import { useAuth } from '@/context'
-import { routesPath, extensionTransport } from '@/lib'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { routesPath, createViewServiceClient } from '@/lib'
 import {
 	TransactionInfoByHashRequest,
 	TransactionInfoByHashResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { createPromiseClient } from '@bufbuild/connect'
+
 import dynamic from 'next/dynamic'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -33,10 +32,7 @@ export default function TransactionDetail() {
 	useEffect(() => {
 		if (!auth!.walletAddress) return
 		const getTransaction = async () => {
-			const client = createPromiseClient(
-				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
-			)
+			const client = createViewServiceClient()
 			const request = new TransactionInfoByHashRequest().fromJson({
 				id: {
 					hash: params.get('hash'),

@@ -10,15 +10,13 @@ import {
 } from '@/components'
 import { useAuth, useBalance } from '@/context'
 import { useTransactionValues } from '@/hooks'
-import { extensionTransport, routesPath } from '@/lib'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { createViewServiceClient, routesPath } from '@/lib'
 import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import {
 	AddressByIndexRequest,
 	EphemeralAddressRequest,
 	TransactionPlannerRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { createPromiseClient } from '@bufbuild/connect'
 import { bech32m } from 'bech32'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo } from 'react'
@@ -76,10 +74,7 @@ export default function Send() {
 
 			const assetExponent = asset.exponent
 
-			const client = createPromiseClient(
-				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
-			)
+			const client = createViewServiceClient()
 
 			let address: Address | undefined
 

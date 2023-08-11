@@ -1,11 +1,9 @@
 import { useAuth } from '@/context'
-import { extensionTransport } from '@/lib'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
+import { createViewServiceClient } from '@/lib'
 import {
 	AssetsRequest,
 	AssetsResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { createPromiseClient } from '@bufbuild/connect'
 import { useEffect, useState } from 'react'
 
 export const useAssets = () => {
@@ -16,10 +14,7 @@ export const useAssets = () => {
 	useEffect(() => {
 		if (!auth!.walletAddress) return setAssets([])
 		const getAssets = async () => {
-			const client = createPromiseClient(
-				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
-			)
+			const client = createViewServiceClient()
 
 			const assetsRequest = new AssetsRequest({})
 
@@ -28,7 +23,7 @@ export const useAssets = () => {
 			}
 		}
 		getAssets()
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [auth.walletAddress])
 
 	return assets
