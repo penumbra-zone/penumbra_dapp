@@ -133,11 +133,9 @@ export default function Send() {
 						],
 					})
 				)
-			).plan
+			).plan!
 
-			const tx = await window.penumbra.signTransaction(
-				transactionPlan?.toJson()
-			)
+			const tx = await window.penumbra.signTransaction(transactionPlan.toJson())
 
 			if (tx.result.code === 0) {
 				push(`${routesPath.HOME}?tab=Activity`)

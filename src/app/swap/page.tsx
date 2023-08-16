@@ -3,12 +3,17 @@
 import { Button, ChevronLeftIcon, Input, Select } from '@/components'
 import { useAuth, useBalance } from '@/context'
 import { useTransactionValues } from '@/hooks'
-import { createViewServiceClient, routesPath } from '@/lib'
+import {
+	createViewServiceClient,
+	getTransactionByHash,
+	routesPath,
+} from '@/lib'
+import { Swap } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/dex/v1alpha1/dex_pb'
 import { TransactionPlannerRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo } from 'react'
 
-export default function Swap() {
+export default function SwapPage() {
 	const { balance } = useBalance()
 	const auth = useAuth()
 	const { push } = useRouter()
@@ -108,7 +113,7 @@ export default function Swap() {
 				},
 			}
 
-			const transactionPlan = (
+			const swapTransactionPlan = (
 				await client.transactionPlanner(
 					new TransactionPlannerRequest({
 						swaps: [
@@ -122,14 +127,44 @@ export default function Swap() {
 				)
 			).plan
 
-			const tx = await window.penumbra.signTransaction(
-				transactionPlan?.toJson()
+			//approve swap
+			const swapResponse = await window.penumbra.signTransaction(
+				swapTransactionPlan?.toJson()
 			)
 
-			if (tx.result.code === 0) {
-				push(`${routesPath.HOME}?tab=Activity`)
+			if (swapResponse.result.code === 0) {
+				setTimeout(async () => {
+					const tx = await getTransactionByHash(swapResponse.result.hash)
+
+					if (!tx) return
+
+					const swapValue = tx.txInfo?.transaction?.body?.actions.find(
+						i => i.action.case === 'swap'
+					)?.action.value as Swap
+
+					const swapCommitment = swapValue.body?.payload?.commitment
+
+					const claimTransactionPlan = (
+						await client.transactionPlanner(
+							new TransactionPlannerRequest({
+								swapClaims: [
+									{
+										swapCommitment,
+									},
+								],
+							})
+						)
+					).plan
+
+					//claim swap
+					const claimResposne = await window.penumbra.signTransaction(
+						claimTransactionPlan?.toJson()
+					)
+
+					console.log({ claimResposne })
+				}, 7000)
 			} else {
-				console.log(tx.result)
+				console.log(swapResponse.result)
 			}
 		} catch (error) {
 			console.log(error)

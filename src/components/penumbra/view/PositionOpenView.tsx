@@ -32,7 +32,7 @@ export const PositionOpenViewComponent: React.FC<{ view: PositionOpen }> = ({
 
 	// TODO: add ID:  plpid1ckppehweenlpnskhnt37s4sr2jw6tegmh9h43r627x39ydusg9es3762qz to values
 	return (
-		<ActionCell title='Swap'>
+		<ActionCell title='Open Liquidity Position '>
 			{`(${asset1HumanAmount} ${assset1HumanDenom}, ${asset2HumanAmount} ${assset2HumanDenom})  Fee: ${fee}`}
 		</ActionCell>
 	)

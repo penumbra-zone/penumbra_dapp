@@ -10,11 +10,7 @@ import {
 	Value,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { useAuth } from './AuthContextProvider'
-import {
-	calculateAmount,
-	createViewServiceClient,
-	uint8ToBase64,
-} from '@/lib'
+import { calculateAmount, createViewServiceClient, uint8ToBase64 } from '@/lib'
 
 export type AssetBalance = {
 	assetId?: AssetId
@@ -78,8 +74,6 @@ export const BalanceContextProvider = (props: Props) => {
 			.map(i => Object.values(i)[0])
 			.filter(i => Number(i.amount))
 	}, [balance, assets])
-
-	console.log(assetBalance)
 
 	useEffect(() => {
 		if (!auth!.walletAddress) return setAssets([])
