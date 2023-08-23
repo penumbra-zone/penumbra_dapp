@@ -9,7 +9,7 @@ import {
 	TransactionHashComponent,
 } from '@/components'
 import { useAuth } from '@/context'
-import { routesPath, getTransactionByHash } from '@/lib'
+import { routesPath, transactionByHash } from '@/lib'
 import { TransactionInfoByHashResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 import dynamic from 'next/dynamic'
@@ -29,7 +29,7 @@ export default function TransactionDetail() {
 	useEffect(() => {
 		if (!auth!.walletAddress) return
 		;(async () => {
-			const tx = await getTransactionByHash(params.get('hash'))
+			const tx = await transactionByHash(params.get('hash'))
 			setTx(tx)
 		})()
 	}, [params, auth])

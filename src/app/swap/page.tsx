@@ -3,11 +3,7 @@
 import { Button, ChevronLeftIcon, Input, Select } from '@/components'
 import { useAuth, useBalance } from '@/context'
 import { useTransactionValues } from '@/hooks'
-import {
-	createViewServiceClient,
-	getTransactionByHash,
-	routesPath,
-} from '@/lib'
+import { createViewServiceClient, routesPath, transactionByHash } from '@/lib'
 import { Swap } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/dex/v1alpha1/dex_pb'
 import { TransactionPlannerRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import { useRouter } from 'next/navigation'
@@ -134,7 +130,7 @@ export default function SwapPage() {
 
 			if (swapResponse.result.code === 0) {
 				setTimeout(async () => {
-					const tx = await getTransactionByHash(swapResponse.result.hash)
+					const tx = await transactionByHash(swapResponse.result.hash)
 
 					if (!tx) return
 
