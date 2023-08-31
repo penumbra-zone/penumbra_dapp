@@ -1,45 +1,29 @@
 'use client'
 
-import { TransactionPlannerRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { useEffect, useMemo, useState } from 'react'
-import { createPromiseClient } from '@bufbuild/connect'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
-import { useRouter } from 'next/navigation'
-import { useAuth, useBalance } from '@/context'
-import {
-	AddressValidatorsType,
-	routesPath,
-	setOnlyNumberInput,
-	extensionTransport,
-} from '@/lib'
 import { Button, ChevronLeftIcon, Input, Select } from '@/components'
+import { useAuth, useBalance } from '@/context'
+import { useTransactionValues } from '@/hooks'
+import { createViewServiceClient, routesPath, transactionByHash } from '@/lib'
+import { Swap } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/dex/v1alpha1/dex_pb'
+import { TransactionPlannerRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { useRouter } from 'next/navigation'
+import { useEffect, useMemo } from 'react'
 
-export default function Swap() {
+export default function SwapPage() {
 	const { balance } = useBalance()
 	const auth = useAuth()
 	const { push } = useRouter()
-	const [amount, setAmount] = useState<string>('')
-	const [memo, setMemo] = useState<string>('')
-	const [select, setSelect] = useState<{
-		asset1: string
-		asset2: string
-	}>({
-		asset1: '',
-		asset2: 'penumbra',
-	})
-	const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
-		{} as AddressValidatorsType
-	)
+	const {
+		values,
+		isValidate,
+		handleChangeSelect,
+		handleChangeInput,
+		handleMax,
+		clearState,
+	} = useTransactionValues()
 
 	useEffect(() => {
-		if (!auth.walletAddress) {
-			setAmount('')
-			setSelect({
-				asset1: '',
-				asset2: 'penumbra',
-			})
-			setIsValidate({} as AddressValidatorsType)
-		}
+		if (!auth.walletAddress) clearState()
 	}, [auth.walletAddress])
 
 	const options1 = useMemo(() => {
@@ -94,98 +78,94 @@ export default function Swap() {
 			})
 	}, [balance])
 
-	const handleChangeSelect = (type: string) => (value: string) =>
-		setSelect(state => ({
-			...state,
-			[type]: value,
-		}))
+	const handleBack = () => push(routesPath.HOME)
 
-	const handleChangeAmout = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const { value, notShow, valueFloat } = setOnlyNumberInput(
-			event.target.value
-		)
-		if (isNaN(valueFloat) || notShow) return
-		setAmount(value)
-	}
-
-	const handleChangeMemo = (event: React.ChangeEvent<HTMLInputElement>) =>
-		setMemo(event.target.value)
-
-	const handleMax = () =>
-		setAmount(
-			String(
-				Number(
-					select.asset1
-						? balance.find(i => i.display === select.asset1)?.amount
-						: 0
-				)
-			)
-		)
-
-	const getSwapTransactionPlan = async () => {
+	const sendTransaction = async () => {
 		try {
-			const selectedAsset1 = balance.find(i => i.display === select.asset1)
-				?.assetId?.inner!
+			const asset1 = balance.find(i => i.display === values.asset1)
 
-			const selectedAsset2 = balance.find(i => i.display === select.asset2)
-				?.assetId?.inner!
+			const asset2 = balance.find(i => i.display === values.asset2)
 
-			const client = createPromiseClient(
-				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
-			)
+			if (!asset1 || !asset2 || !values.amount) return
 
-			const transactionPlan = (
+			const asset1Exponent = asset1.exponent
+
+			const client = createViewServiceClient()
+
+			const value = {
+				amount: {
+					lo: BigInt(
+						Number(values.amount) * (asset1Exponent ? 10 ** asset1Exponent : 1)
+					),
+					hi: BigInt(0),
+				},
+				assetId: { inner: asset1.assetId?.inner },
+			}
+
+			const fee = {
+				amount: {
+					hi: BigInt(0),
+					lo: BigInt(0),
+				},
+			}
+
+			const swapTransactionPlan = (
 				await client.transactionPlanner(
 					new TransactionPlannerRequest({
-						memo,
 						swaps: [
 							{
-								value: {
-									amount: {
-										lo: BigInt(
-											Number(amount) *
-												(balance.find(i => i.display === select.asset1)
-													?.exponent!
-													? 10 **
-													  balance.find(i => i.display === select.asset1)
-															?.exponent!
-													: 1)
-										),
-										hi: BigInt(0),
-									},
-									assetId: { inner: selectedAsset1 },
-								},
-								targetAsset: {
-									inner: selectedAsset2,
-								},
-								fee: {
-									amount: {
-										hi: BigInt(0),
-										lo: BigInt(0),
-									},
-								},
+								value,
+								targetAsset: asset2.assetId,
+								fee,
 							},
 						],
 					})
 				)
 			).plan
 
-			const tx = await window.penumbra.signTransaction(
-				transactionPlan?.toJson()
+			//approve swap
+			const swapResponse = await window.penumbra.signTransaction(
+				swapTransactionPlan?.toJson()
 			)
 
-			if (tx.result.code === 0) {
-				push(`${routesPath.HOME}?tab=Activity`)
+			if (swapResponse.result.code === 0) {
+				setTimeout(async () => {
+					const tx = await transactionByHash(swapResponse.result.hash)
+
+					if (!tx) return
+
+					const swapValue = tx.txInfo?.transaction?.body?.actions.find(
+						i => i.action.case === 'swap'
+					)?.action.value as Swap
+
+					const swapCommitment = swapValue.body?.payload?.commitment
+
+					const claimTransactionPlan = (
+						await client.transactionPlanner(
+							new TransactionPlannerRequest({
+								swapClaims: [
+									{
+										swapCommitment,
+									},
+								],
+							})
+						)
+					).plan
+
+					//claim swap
+					const claimResposne = await window.penumbra.signTransaction(
+						claimTransactionPlan?.toJson()
+					)
+
+					console.log({ claimResposne })
+				}, 7000)
 			} else {
-				console.log(tx.result)
+				console.log(swapResponse.result)
 			}
 		} catch (error) {
-			console.error(error)
+			console.log(error)
 		}
 	}
-
-	const handleBack = () => push(routesPath.HOME)
 
 	return (
 		<>
@@ -205,23 +185,23 @@ export default function Swap() {
 							<div className='flex flex-col'>
 								<Select
 									labelClassName='h3 mb-[8px]'
-									label='Assets 1:'
+									label='From :'
 									options={options1}
 									handleChange={handleChangeSelect('asset1')}
-									initialValue={select.asset1}
+									initialValue={values.asset2}
 									className='mb-[24px]'
 								/>
 								<Input
 									labelClassName='h3 text-light_grey mb-[8px]'
 									label='Total :'
-									value={amount}
+									value={values.amount}
 									isError={
-										select.asset1
-											? balance.find(i => select.asset1 === i.display)!.amount <
-											  Number(amount)
+										values.asset1
+											? balance.find(i => values.asset1 === i.display)!.amount <
+											  Number(values.amount)
 											: false
 									}
-									onChange={handleChangeAmout}
+									onChange={handleChangeInput('amount')}
 									helperText={'You do not have enough token'}
 									rightElement={
 										<div
@@ -234,18 +214,11 @@ export default function Swap() {
 								/>
 								<Select
 									labelClassName='h3 mb-[8px]'
-									label='Assets 2:'
+									label='To :'
 									options={options2}
 									handleChange={handleChangeSelect('asset2')}
-									initialValue={select.asset2}
+									initialValue={values.asset2}
 									disable
-									className='mb-[24px]'
-								/>
-								<Input
-									labelClassName='h3 text-light_grey mb-[8px]'
-									label='Memo :'
-									value={memo}
-									onChange={handleChangeMemo}
 									className='mb-[24px]'
 								/>
 							</div>
@@ -258,14 +231,14 @@ export default function Swap() {
 								/>
 								<Button
 									mode='gradient'
-									onClick={getSwapTransactionPlan}
+									onClick={sendTransaction}
 									title='Send'
 									className='h-[44px]'
 									disabled={
-										!Number(amount) ||
-										!select.asset1 ||
-										balance.find(i => select.asset1 === i.display)!.amount <
-											Number(amount) ||
+										!Number(values.amount) ||
+										!values.asset1 ||
+										balance.find(i => values.asset1 === i.display)!.amount <
+											Number(values.amount) ||
 										Object.values(isValidate).includes(false)
 									}
 								/>

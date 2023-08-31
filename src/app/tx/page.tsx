@@ -9,13 +9,9 @@ import {
 	TransactionHashComponent,
 } from '@/components'
 import { useAuth } from '@/context'
-import { routesPath, extensionTransport } from '@/lib'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
-import {
-	TransactionInfoByHashRequest,
-	TransactionInfoByHashResponse,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { createPromiseClient } from '@bufbuild/connect'
+import { routesPath, transactionByHash } from '@/lib'
+import { TransactionInfoByHashResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+
 import dynamic from 'next/dynamic'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -32,29 +28,13 @@ export default function TransactionDetail() {
 
 	useEffect(() => {
 		if (!auth!.walletAddress) return
-		const getTransaction = async () => {
-			const client = createPromiseClient(
-				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
-			)
-			const request = new TransactionInfoByHashRequest().fromJson({
-				id: {
-					hash: params.get('hash'),
-				},
-			})
-
-			const tx = await client.transactionInfoByHash(request)
-
-			if (!Object.values(tx.txInfo!).length) return
+		;(async () => {
+			const tx = await transactionByHash(params.get('hash'))
 			setTx(tx)
-		}
-		getTransaction()
+		})()
 	}, [params, auth])
 
 	const handleBack = () => push(`${routesPath.HOME}?tab=Activity`)
-
-	// const rawTx = JSON.parse(tx?.txInfo?.transaction?.toJsonString() || '{}')
-	// const rawView = JSON.parse(tx?.txInfo?.view?.toJsonString() || '{}')
 
 	const rawTx = tx?.txInfo?.transaction?.toJson() as object
 	const rawView = tx?.txInfo?.view?.toJson() as object
@@ -134,8 +114,6 @@ export default function TransactionDetail() {
 											displayDataTypes={false}
 											collapseStringsAfterLength={48}
 											collapsed={true}
-											/* HACK: the component adds inline styles that don't seem easily overridden by normal CSS rules, replicate .monospace here */
-
 											style={{
 												fontFamily:
 													"'Iosevka', 'Menlo', 'Courier New', Courier, monospace",

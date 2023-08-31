@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useTransactions } from '@/context'
 import { ArrowUpRightSvg, ChevronLeftIcon } from './Svg'
@@ -35,14 +35,16 @@ export const ActivityList = () => {
 									/>
 								</div>
 							</div>
-							<Link
-								href={`${routesPath.TRANSACTION}?hash=${uint8ToBase64(
-									i.txInfo?.id?.hash!
-								)}`}
-								className='rotate-180 cursor-pointer'
-							>
-								<ChevronLeftIcon />
-							</Link>
+							<div className='flex'>
+								<Link
+									href={`${routesPath.TRANSACTION}?hash=${uint8ToBase64(
+										i.txInfo?.id?.hash!
+									)}`}
+									className='rotate-180 cursor-pointer'
+								>
+									<ChevronLeftIcon />
+								</Link>
+							</div>
 						</div>
 					)
 				})}

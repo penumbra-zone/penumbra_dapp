@@ -1,3 +1,4 @@
+import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 import {
 	AddressByIndexRequest,
 	AddressByIndexResponse,
@@ -5,6 +6,8 @@ import {
 	AssetsResponse,
 	ChainParametersRequest,
 	ChainParametersResponse,
+	EphemeralAddressRequest,
+	EphemeralAddressResponse,
 	FMDParametersRequest,
 	FMDParametersResponse,
 	NotesRequest,
@@ -56,10 +59,12 @@ export declare namespace Penumbra {
 		getAddressByIndex: (
 			request: AddressByIndexRequest
 		) => Promise<AddressByIndexResponse>
-
 		getTransactionPlanner: (
 			request: TransactionPlannerRequest
 		) => Promise<TransactionPlannerResponse>
+		getEphemeralAddress: (
+			request: EphemeralAddressRequest
+		) => Promise<EphemeralAddressResponse>
 	}
 }
 

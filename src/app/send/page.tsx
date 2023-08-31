@@ -1,41 +1,43 @@
 'use client'
 
-import { TransactionPlannerRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-import { useEffect, useMemo, useState } from 'react'
-import { createPromiseClient } from '@bufbuild/connect'
-import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
-import { useRouter } from 'next/navigation'
-import { bech32m } from 'bech32'
-import { useAuth, useBalance } from '@/context'
 import {
-	AddressValidatorsType,
-	routesPath,
-	setOnlyNumberInput,
-	validateAddress,
-	extensionTransport,
-} from '@/lib'
-import { Button, ChevronLeftIcon, Input, SearchSvg, Select } from '@/components'
+	Button,
+	ChevronLeftIcon,
+	Input,
+	SearchSvg,
+	Select,
+	Toogle,
+} from '@/components'
+import { useAuth, useBalance } from '@/context'
+import { useTransactionValues } from '@/hooks'
+import { createViewServiceClient, routesPath } from '@/lib'
+import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import {
+	AddressByIndexRequest,
+	EphemeralAddressRequest,
+	TransactionPlannerRequest,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { bech32m } from 'bech32'
+import { useRouter } from 'next/navigation'
+import { useEffect, useMemo } from 'react'
 
 export default function Send() {
 	const { balance } = useBalance()
 	const auth = useAuth()
 	const { push } = useRouter()
 
-	const [reciever, setReciever] = useState<string>('')
-	const [amount, setAmount] = useState<string>('')
-	const [memo, setMemo] = useState<string>('')
-	const [select, setSelect] = useState<string>('')
-	const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
-		{} as AddressValidatorsType
-	)
+	const {
+		values,
+		isValidate,
+		handleChangeSelect,
+		handleChangeInput,
+		handleMax,
+		clearState,
+		handleCheck,
+	} = useTransactionValues()
 
 	useEffect(() => {
-		if (!auth.walletAddress) {
-			setAmount('')
-			setReciever('')
-			setSelect('')
-			setIsValidate({} as AddressValidatorsType)
-		}
+		if (!auth.walletAddress) clearState()
 	}, [auth.walletAddress])
 
 	const options = useMemo(() => {
@@ -62,45 +64,62 @@ export default function Send() {
 		})
 	}, [balance])
 
-	const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setReciever(event.target.value)
-		const validators = validateAddress(event.target.value)
-		setIsValidate(state => ({
-			...state,
-			...validators,
-		}))
-		if (!event.target.value) setIsValidate({} as AddressValidatorsType)
-	}
+	const handleBack = () => push(routesPath.HOME)
 
-	const handleChangeSelect = (value: string) => setSelect(value)
-
-	const handleChangeAmout = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const { value, notShow, valueFloat } = setOnlyNumberInput(
-			event.target.value
-		)
-		if (isNaN(valueFloat) || notShow) return
-		setAmount(value)
-	}
-
-	const handleChangeMemo = (event: React.ChangeEvent<HTMLInputElement>) =>
-		setMemo(event.target.value)
-
-	const handleMax = () =>
-		setAmount(
-			String(
-				Number(select ? balance.find(i => i.display === select)?.amount : 0)
-			)
-		)
-
-	const getTransactionPlan = async () => {
+	const sendTransaction = async () => {
 		try {
-			const selectedAsset = balance.find(i => i.display === select)?.assetId
-				?.inner!
+			const asset = balance.find(i => i.display === values.asset1)
 
-			const client = createPromiseClient(
-				ViewProtocolService,
-				extensionTransport(ViewProtocolService)
-			)
+			if (!asset || !values.reciever || !values.amount) return
+
+			const assetExponent = asset.exponent
+
+			const client = createViewServiceClient()
+
+			let address: Address | undefined
+
+			const addressIndex = {
+				account: 0,
+			}
+
+			if (!values.hideAddress) {
+				const request = new AddressByIndexRequest({
+					addressIndex,
+				})
+				const addressByIndex = await client.addressByIndex(request)
+				address = addressByIndex.address
+			} else {
+				const request = new EphemeralAddressRequest({
+					addressIndex,
+				})
+
+				const ephemeralAddress = await client.ephemeralAddress(request)
+				address = ephemeralAddress.address
+			}
+
+			if (!address) return
+
+			const value = {
+				amount: {
+					lo: BigInt(
+						Number(values.amount) * (assetExponent ? 10 ** assetExponent : 1)
+					),
+					hi: BigInt(0),
+				},
+				assetId: { inner: asset.assetId?.inner },
+			}
+
+			const receiverAddress = {
+				altBech32m: values.reciever!,
+				inner: new Uint8Array(bech32m.decode(values.reciever!, 160).words),
+			}
+
+			const memo = {
+				text: values.memo,
+				sender: {
+					altBech32m: address?.altBech32m,
+				},
+			}
 
 			const transactionPlan = (
 				await client.transactionPlanner(
@@ -108,34 +127,15 @@ export default function Send() {
 						memo,
 						outputs: [
 							{
-								value: {
-									amount: {
-										lo: BigInt(
-											Number(amount) *
-												(balance.find(i => i.display === select)?.exponent!
-													? 10 **
-													  balance.find(i => i.display === select)?.exponent!
-													: 1)
-										),
-										hi: BigInt(0),
-									},
-									assetId: { inner: selectedAsset },
-								},
-								address: {
-									inner: new Uint8Array(bech32m.decode(reciever, 160).words),
-									altBech32m: reciever,
-								},
+								value,
+								address: receiverAddress,
 							},
 						],
 					})
 				)
-			).plan
+			).plan!
 
-			console.log(transactionPlan?.actions[0].action.value?.getType().typeName)
-
-			const tx = await window.penumbra.signTransaction(
-				transactionPlan?.toJson()
-			)
+			const tx = await window.penumbra.signTransaction(transactionPlan.toJson())
 
 			if (tx.result.code === 0) {
 				push(`${routesPath.HOME}?tab=Activity`)
@@ -146,8 +146,6 @@ export default function Send() {
 			console.log(error)
 		}
 	}
-
-	const handleBack = () => push(routesPath.HOME)
 
 	return (
 		<>
@@ -164,9 +162,9 @@ export default function Send() {
 						<p className='h1 mt-[24px]'>Send to address</p>
 						<Input
 							placeholder='Search address...'
-							value={reciever}
+							value={values.reciever}
 							isError={Object.values(isValidate).includes(false)}
-							onChange={handleChangeSearch}
+							onChange={handleChangeInput('reciever')}
 							leftSvg={
 								<span className='ml-[24px] mr-[9px]'>
 									<SearchSvg stroke='#E0E0E0' />
@@ -181,21 +179,21 @@ export default function Send() {
 									labelClassName='h3 mb-[8px]'
 									label='Assets :'
 									options={options}
-									handleChange={handleChangeSelect}
-									initialValue={select}
+									handleChange={handleChangeSelect('asset1')}
+									initialValue={values.asset1}
 									className='mb-[24px]'
 								/>
 								<Input
 									labelClassName='h3 text-light_grey mb-[8px]'
 									label='Total :'
-									value={amount}
+									value={values.amount}
 									isError={
-										select
-											? balance.find(i => select === i.display)!.amount <
-											  Number(amount)
+										values.asset1
+											? balance.find(i => values.asset1 === i.display)!.amount <
+											  Number(values.amount)
 											: false
 									}
-									onChange={handleChangeAmout}
+									onChange={handleChangeInput('amount')}
 									helperText={'You do not have enough token'}
 									rightElement={
 										<div
@@ -209,9 +207,14 @@ export default function Send() {
 								<Input
 									labelClassName='h3 text-light_grey mb-[8px]'
 									label='Memo :'
-									value={memo}
-									onChange={handleChangeMemo}
+									value={values.memo}
+									onChange={handleChangeInput('memo')}
 									className='mb-[24px]'
+								/>
+								<Toogle
+									checked={Boolean(values.hideAddress)}
+									label='Hide Sender from Recipient'
+									onChange={handleCheck}
 								/>
 							</div>
 							<div className='w-[100%] flex items-center gap-x-[8px] mt-[24px]'>
@@ -223,15 +226,15 @@ export default function Send() {
 								/>
 								<Button
 									mode='gradient'
-									onClick={getTransactionPlan}
+									onClick={sendTransaction}
 									title='Send'
 									className='h-[44px]'
 									disabled={
-										!Number(amount) ||
-										!select ||
-										balance.find(i => select === i.display)!.amount <
-											Number(amount) ||
-										!reciever ||
+										!Number(values.amount) ||
+										!values.asset1 ||
+										balance.find(i => values.asset1 === i.display)!.amount <
+											Number(values.amount) ||
+										!values.reciever ||
 										Object.values(isValidate).includes(false)
 									}
 								/>

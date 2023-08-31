@@ -1,4 +1,3 @@
-import { createRouterTransport } from '@bufbuild/connect'
 import { ViewProtocolService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/view/v1alpha1/view_connect'
 import {
 	AddressByIndexRequest,
@@ -8,6 +7,8 @@ import {
 	BalancesResponse,
 	ChainParametersRequest,
 	ChainParametersResponse,
+	EphemeralAddressRequest,
+	EphemeralAddressResponse,
 	FMDParametersRequest,
 	FMDParametersResponse,
 	NotesRequest,
@@ -23,6 +24,7 @@ import {
 	TransactionPlannerRequest,
 	TransactionPlannerResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { createPromiseClient, createRouterTransport } from '@bufbuild/connect'
 
 export const extensionTransport = (s: typeof ViewProtocolService) =>
 	createRouterTransport(({ service }) => {
@@ -68,6 +70,11 @@ export const extensionTransport = (s: typeof ViewProtocolService) =>
 
 				return new ChainParametersResponse(response)
 			},
+			ephemeralAddress: async (message: EphemeralAddressRequest) => {
+				const response = await window.penumbra.getEphemeralAddress(message)
+				return new EphemeralAddressResponse(response)
+			},
+
 			async *statusStream(message: StatusStreamRequest) {
 				window.penumbra.on('status', status => receiveMessage(status))
 
@@ -113,3 +120,9 @@ export const extensionTransport = (s: typeof ViewProtocolService) =>
 			},
 		})
 	})
+
+export const createViewServiceClient = () =>
+	createPromiseClient(
+		ViewProtocolService,
+		extensionTransport(ViewProtocolService)
+	)
